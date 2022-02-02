@@ -8,7 +8,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
-#include <tuple>
 
 using namespace sf;
 using namespace std;
