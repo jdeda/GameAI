@@ -2,3 +2,6 @@
 
 # Ignore object files.
 *.o
+
+# Ignore VS-Code Workspace.
+*.code-workspace
