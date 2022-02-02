@@ -1,8 +1,8 @@
 /**
- * Program animates sprites moving and across a window.
- * @file hw1_pt1.cpp
+ * Program displays a window animating different steering behaviors.
+ * @file main.cpp
  * @author Jese Deda
- * @date 1/22/22
+ * @date 2/2/22
  */
 
 #include <SFML/Graphics.hpp>
@@ -12,249 +12,381 @@
 using namespace sf;
 using namespace std;
 
-/* ContentWindow X length. */
-const int CONTENT_WINDOW_X = 640;
+/* SceneView X length. */
+const int SCENE_WINDOW_X = 640;
 
-/* ContentWindow Y length. */
-const int CONTENT_WINDOW_Y = 480;
+/* SceneView Y length. */
+const int SCENE_WINDOW_Y = 480;
 
-/* ContentWindow frame rate. */
-const int CONTENT_WINDOW_FR = 100;
+/* SceneView frame rate. */
+const int SCENE_WINDOW_FR = 100;
 
 /* Expected speed for sprite moving in X dimensions. */
 const float SPEED_X = 5.f;
 
 /* Expected speed for sprite moving in Y dimensions. */
-const float SPEED_Y = (float(CONTENT_WINDOW_Y) / float(CONTENT_WINDOW_X)) * float(SPEED_X);
+const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
 
 /* Number of sprites. */
-const int NUM_SPRITES = 4;
+const int NUM_CHARACTERS = 4;
 
 /* Debug output (prints the sprites coordinates). */
-void debug(const Sprite &sprite) {
+void debug(const Sprite &sprite)
+{
 	cout << sprite.getPosition().x;
 	cout << " ";
 	cout << sprite.getPosition().y << endl;
 }
+
 /* Debug output (for sanity check). */
-void sanity() {
+void sanity()
+{
 	cout << "sanity" << endl;
 }
 
-/** ContentWindow top left corner point. */
-const Vector2f topLeft = Vector2f(0, 0);
+/** Represents status of character for assisting in when to render a character. */
+enum CharacterStatus
+{
+	waiting,
+	running,
+	justFinished,
+	finished
+};
 
-/** ContentWindow top right corner point. */
-const Vector2f topRight = Vector2f(CONTENT_WINDOW_X, 0);
+/** Character is a sprite with additional attributes and behaviors. */
+class Character
+{
 
-/** ContentWindow bottom left corner point. */
-const Vector2f botRight = Vector2f(CONTENT_WINDOW_X, CONTENT_WINDOW_Y);
+public:
+	/** Constructs a Character. */
+	Character() {}
 
-/** ContentWindow bottom left corner point. */
-const Vector2f botLeft = Vector2f(0, CONTENT_WINDOW_Y);
+	/** Character's texture. */
+	Texture texture;
+
+	/** Character's sprite. */
+	Sprite sprite;
+
+	/** Character's scale (how large or small character is). */
+	float scale;
+
+	/** Character's status (used for rendering purposes). */
+	CharacterStatus status;
+
+	/** Returns the character's x position. */
+	int x() const
+	{
+		return sprite.getPosition().x;
+	}
+
+	/** Returns the character's y position. */
+	int y() const
+	{
+		return sprite.getPosition().y;
+	}
+};
+
+/** Represents view where scene will take place. */
+class SceneView
+{
+private:
+	/** Width of SceneView. */
+	int width;
+
+	/** Height of SceneView. */
+	int height;
+
+	/** Frames per second of SceneView. */
+	int frames;
+
+	/** SceneView top left corner point. */
+	Vector2f topLeft = Vector2f(0, 0);
+
+	/** SceneView top right corner point. */
+	Vector2f topRight = Vector2f(width, 0);
+
+	/** SceneView bottom left corner point. */
+	Vector2f botRight = Vector2f(width, height);
+
+	/** SceneView bottom left corner point. */
+	Vector2f botLeft = Vector2f(0, height);
+
+public:
+	/** Scene of SceneView. For now, it will be kept public. */
+	RenderWindow scene;
+
+	/** Constructs the SceneView. */
+	SceneView(int w, int h, int fps)
+	{
+		// Set dimensions and fps.
+		width = w;
+		height = h;
+		frames = fps;
+
+		// Create empty scene.
+		scene.create(VideoMode(width, height), "CSC484");
+		scene.setFramerateLimit(frames);
+
+		// Set corners.
+		topLeft = Vector2f(0, 0);
+		topRight = Vector2f(width, 0);
+		botRight = Vector2f(width, height);
+		botLeft = Vector2f(0, height);
+	}
+
+	/** Getters. */
+	int getWidth() { return width; }
+	int getHeight() { return height; }
+	int getFrames() { return frames; }
+	Vector2f getTopRight() { return topRight; }
+	Vector2f getBotRight() { return botRight; }
+	Vector2f getBotLeft() { return botLeft; }
+	Vector2f getTopLeft() { return topLeft; }
+
+	/**
+ 	* Returns true if character is at a point otherwise false.
+  	* @param point the point to compare sprite position to (immutable reference)
+  	* @param character the character to check (immutable reference)
+  	* @return true if sprite is at a point otherwise false.
+  	*/
+	bool at(const Vector2f &point, const Character &character)
+	{
+		return character.x() == point.x && character.y() == point.y;
+	}
+
+	bool atCorner(const Character &character)
+	{
+		return at(topLeft, character) || at(topRight, character) || at(botRight, character) || at(botLeft, character);
+	}
+
+	/**
+    * Returns true if character is in the SceneView top region otherwise false.
+    * @param character the character to check (immutable reference)
+    * @return true if character is in the top region otherwise false.
+    */
+	bool inTopRegion(const Character &character)
+	{
+		int x = character.x();
+		int y = character.y();
+		return x >= 0 && x <= width && y == 0;
+	}
+	/**
+    * Returns true if character is in the SceneView right region otherwise false.
+    * @param character the character to check (immutable reference)
+    * @return true if character is in the right region otherwise false.
+    */
+	bool inRightRegion(const Character &character)
+	{
+		int x = character.x();
+		int y = character.y();
+		return y >= 0 && y <= height && x == width;
+	}
+
+	/**
+  	* Returns true if character is in the SceneView bottom region otherwise false.
+  	* @param character the character to check (immutable reference)
+  	* @return true if character is in the bottom region otherwise false.
+  	*/
+	bool inBotRegion(const Character &character)
+	{
+		int x = character.x();
+		int y = character.y();
+		return x >= 0 && x <= width && y == height;
+	}
+
+	/**
+  	* Returns true if character is in the SceneView left region otherwise false.
+  	* @param character the character to check (immutable reference)
+  	* @return true if character is in the left region otherwise false.
+  	*/
+	bool inLeftRegion(const Character &character)
+	{
+		int x = character.x();
+		int y = character.y();
+		return y >= 0 && y <= height && x == 0;
+	}
+};
 
 /**
-  * Returns true if sprite is at a point otherwise false.
-  * @param point the point to compare sprite position to (immutable reference)
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is at a point otherwise false.
-  */
-bool at(const Vector2f &point, const Sprite &sprite) {
-	return sprite.getPosition().x == point.x && sprite.getPosition().y == point.y;
-}
-
-/**
-  * Returns true if sprite is at a ContentWindow corner point otherwise false.
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is at a corner point otherwise false.
-  */
-bool atCorner(const Sprite &sprite) {
-	return at(topLeft, sprite) || at(topRight, sprite) || at(botRight, sprite) || at(botLeft, sprite);
-}
-
-/**
-  * Returns true if sprite is in the ContentWindow top region otherwise false.
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is in the top region otherwise false.
-  */
-bool inTopRegion(const Sprite &sprite) {
-	int x = sprite.getPosition().x;
-	int y = sprite.getPosition().y;
-	return x >= 0 && x <= CONTENT_WINDOW_X && y == 0;
-}
-/**
-  * Returns true if sprite is in the ContentWindow right region otherwise false.
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is in the right region otherwise false.
-  */
-bool inRightRegion(const Sprite &sprite) {
-	int x = sprite.getPosition().x;
-	int y = sprite.getPosition().y;
-	return y >= 0 && y <= CONTENT_WINDOW_Y && x == CONTENT_WINDOW_X;
-}
-
-/**
-  * Returns true if sprite is in the ContentWindow bottom region otherwise false.
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is in the bottom region otherwise false.
-  */
-bool inBotRegion(const Sprite &sprite) {
-	int x = sprite.getPosition().x;
-	int y = sprite.getPosition().y;
-	return x >= 0 && x <= CONTENT_WINDOW_X && y == CONTENT_WINDOW_Y;
-}
-
-/**
-  * Returns true if sprite is in the ContentWindow left region otherwise false.
-  * @param sprite the sprite to check (immutable reference)
-  * @return true if sprite is in the left region otherwise false.
-  */
-bool inLeftRegion(const Sprite &sprite) {
-	int x = sprite.getPosition().x;
-	int y = sprite.getPosition().y;
-	return y >= 0 && y <= CONTENT_WINDOW_Y && x == 0;
-}
-
-/**
-  * Moves the referenced sprite via mutation according to its ContentWindow region and trajectory.
+  * Moves the referenced sprite via mutation according to its SceneView region and trajectory.
   * @param sprite the sprite to move (mutable)
+  * @param sceneView view to check regions of (immutable)
   */
-void move(Sprite &sprite) {
-	if (inTopRegion(sprite) && !at(topRight, sprite) && sprite.getRotation() == 0) { 
-		sprite.move(SPEED_X, 0);
+void move(Character &character, SceneView &sceneView)
+{
+	// Move right.
+	if (sceneView.inTopRegion(character) && !sceneView.at(sceneView.getTopRight(), character) && character.sprite.getRotation() == 0)
+	{
+		character.sprite.move(SPEED_X, 0);
 	}
-	if (inRightRegion(sprite) && !at(botRight, sprite) && sprite.getRotation() == 90) { 
-		sprite.move(0, SPEED_Y);
+
+	// Move down.
+	if (sceneView.inRightRegion(character) && !sceneView.at(sceneView.getBotRight(), character) && character.sprite.getRotation() == 90)
+	{
+		character.sprite.move(0, SPEED_Y);
 	}
-	if (inBotRegion(sprite) && !at(botLeft, sprite) && sprite.getRotation() == 180) { 
-		sprite.move(-SPEED_X, 0);
+
+	// Move left.
+	if (sceneView.inBotRegion(character) && !sceneView.at(sceneView.getBotLeft(), character) && character.sprite.getRotation() == 180)
+	{
+		character.sprite.move(-SPEED_X, 0);
 	}
-	if (inLeftRegion(sprite) && !at(topLeft, sprite) && sprite.getRotation() == 270) {
-		sprite.move(0, -SPEED_Y);
+
+	// Move up.
+	if (sceneView.inLeftRegion(character) && !sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
+	{
+		character.sprite.move(0, -SPEED_Y);
 	}
 }
 
 /**
   * Rotates the referenced sprite via mutation respective to corner point it has reached.
-  * @param sprite the sprite to move
+  * @param sprite the sprite to move (mutable)
+  * @param sceneView view to check regions of (immutable)
   */
-void rotate(Sprite &sprite) {
-	if (at(topLeft, sprite)) {
-		sprite.setRotation(0);
+void rotate(Character &character, SceneView &sceneView)
+{
+
+	// Don't rotate (just started).
+	if (sceneView.at(sceneView.getTopLeft(), character))
+	{
+		character.sprite.setRotation(0);
 	}
-	if (at(topRight, sprite)) {
-		sprite.setRotation(90);
+
+	// Face down (time to move down).
+	if (sceneView.at(sceneView.getTopRight(), character))
+	{
+		character.sprite.setRotation(90);
 	}
-	if (at(botRight, sprite)) {
-		sprite.setRotation(180);
+
+	// Face left (time to move left).
+	if (sceneView.at(sceneView.getBotRight(), character))
+	{
+		character.sprite.setRotation(180);
 	}
-	if (at(botLeft, sprite)) {
-		sprite.setRotation(270);
+
+	// Face up (time to move up).
+	if (sceneView.at(sceneView.getBotLeft(), character))
+	{
+		character.sprite.setRotation(270);
 	}
 }
-
-/** Represents status of sprite for assisting in when to render a sprite. */
-enum SpriteStatus { waiting, running, justFinished, finished };
-
 
 /**
   * Runs the program.
   * @return 0 if exit success otherwise failure.
   */
-int main() {
+int main()
+{
 
-    // Make sprites with boid texture.
+	// Make characters;
 	Texture texture;
 	texture.loadFromFile("Assets/boid.png");
-	vector<Sprite> sprites(NUM_SPRITES, Sprite(texture));
-	for(auto &sprite: sprites) { sprite.setScale(0.05, 0.05); }
+	float scale = 0.05;
+	vector<Character> characters(NUM_CHARACTERS, Character());
+	for (auto &character : characters)
+	{
+		character.scale = scale;
+		character.texture = texture;
+		character.sprite = *(new Sprite(texture));
+		character.sprite.setScale(scale, scale);
+	}
+	characters[0].status = CharacterStatus::running; // Only first character runs at first.
 
-	// Account for sprites finishing.
-	vector<SpriteStatus> spriteStatuses( NUM_SPRITES, SpriteStatus::waiting );
-	spriteStatuses[0] = SpriteStatus::running;
-
-	// Setup ContentView.
-	RenderWindow ContentWindow(VideoMode(CONTENT_WINDOW_X, CONTENT_WINDOW_Y), "CSC484 HW1");
-	ContentWindow.setFramerateLimit(CONTENT_WINDOW_FR);
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
 	// Render in window.
-	while (ContentWindow.isOpen())
+	while (sceneView.scene.isOpen())
 	{
 		// Handle window event.
 		Event event;
-		while(ContentWindow.pollEvent(event))
+		while (sceneView.scene.pollEvent(event))
 		{
-			switch(event.type)
+			switch (event.type)
 			{
-				case Event::Closed:
-					ContentWindow.close();
-					break;
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
 			}
 		}
-			
+
 		// Rotate and move sprites accordingly.
 		int i = 0;
 		int j = 0;
-		for(auto &sprite: sprites) { 
-
-			// Only transform running sprites.
-			if(spriteStatuses[i] == SpriteStatus::running) {
+		for (auto &character : characters)
+		{
+			// Only transform running characters.
+			if (character.status == CharacterStatus::running)
+			{
 
 				// First sprite hit a corner, except for when it is starting.
-				if (atCorner(sprite) && !at(topLeft, sprite)) {
-					if (j + 1 <= NUM_SPRITES) {
-						spriteStatuses[j + 1] = SpriteStatus::running;
+				if (sceneView.atCorner(character) && !sceneView.at(sceneView.getTopLeft(), character))
+				{
+					if (j + 1 <= NUM_CHARACTERS)
+					{
+						characters[j + 1].status = CharacterStatus::running;
 					}
 				}
 
 				// Sprite has completed a loop.
-				if (at(topLeft, sprite) && sprite.getRotation() == 270) {
-					spriteStatuses[i] = SpriteStatus::justFinished;
-					sprite.setRotation(0);
-
+				if (sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
+				{
+					character.status = CharacterStatus::justFinished;
+					character.sprite.setRotation(0);
 				}
-				
+
 				// Sprite has not completed a loop.
-				else {
-			    	rotate(sprite);
-					move(sprite);
+				else
+				{
+					rotate(character, sceneView);
+					move(character, sceneView);
 				}
 			}
+
+			// Increment counters.
 			i++;
 			j++;
 		}
 
 		// If all sprites are finished, reset visualization pattern.
 		int numFinished = 0;
-		for(auto status: spriteStatuses) {
-			if (status == SpriteStatus::finished) { numFinished += 1; } 
+		for (auto &character : characters)
+		{
+			if (character.status == CharacterStatus::finished)
+			{
+				numFinished += 1;
+			}
 		}
-		if (numFinished == NUM_SPRITES) { 
-			for(auto status: spriteStatuses) { status = SpriteStatus:: waiting; }
-			spriteStatuses[0] = SpriteStatus::running;
+		if (numFinished == NUM_CHARACTERS)
+		{
+			for (auto &character : characters)
+			{
+				character.status = CharacterStatus::waiting;
+			}
+			characters[0].status = CharacterStatus::running;
 		}
 
-
-		// Re-render ContentWindow.
-		ContentWindow.clear(Color(255, 255, 255));
-		int k = 0;
-		for(auto &sprite: sprites) { 
-
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		for (auto &character : characters)
+		{
 			// Finish the justFinished sprite.
-			if(spriteStatuses[k] == SpriteStatus::justFinished) {
-				spriteStatuses[k] = SpriteStatus::finished;
-				ContentWindow.draw(sprite); 
+			if (character.status == CharacterStatus::justFinished)
+			{
+				character.status = CharacterStatus::finished;
+				sceneView.scene.draw(character.sprite);
 			}
 
 			// Only render running sprites.
-			if(spriteStatuses[k] == SpriteStatus::running) {
-				ContentWindow.draw(sprite); 
+			if (character.status == CharacterStatus::running)
+			{
+				sceneView.scene.draw(character.sprite);
 			}
-			k++;
 		}
-		ContentWindow.display();
+		sceneView.scene.display();
 	}
 
 	// Exit progam.
-    return 0;
+	return EXIT_SUCCESS;
 }
