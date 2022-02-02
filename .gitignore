@@ -1,0 +1,4 @@
+# Git Ignore File
+
+# Ignore object files.
+*.o
