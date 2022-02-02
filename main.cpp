@@ -1,8 +1,8 @@
 /**
- * Program animates sprites moving and across a window.
- * @file hw1_pt1.cpp
+ * Program displays a window animating different steering behaviors.
+ * @file main.cpp
  * @author Jese Deda
- * @date 1/22/22
+ * @date 2/2/22
  */
 
 #include <SFML/Graphics.hpp>
