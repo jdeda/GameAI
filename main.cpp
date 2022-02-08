@@ -41,20 +41,6 @@ void fail(string message) {
 	exit(1);
 }
 
-/* Debug output (prints the sprites coordinates). */
-void debug(const Sprite &sprite)
-{
-	cout << sprite.getPosition().x;
-	cout << " ";
-	cout << sprite.getPosition().y << endl;
-}
-
-/* Debug output (for sanity check). */
-void sanity()
-{
-	cout << "sanity" << endl;
-}
-
 /** Represents status of character for assisting in when to render a character. */
 enum CharacterStatus
 {
@@ -408,6 +394,18 @@ Algorithm getAlg() {
 	else {
 		return Algorithm(caseNum);
 	}
+}
+
+/* Debug output (prints the sprites coordinates). */
+void debug(const Character &character)
+{
+	cout << character.x() << " " << character.y() << endl;
+}
+
+/* Debug output (for sanity check). */
+void sanity()
+{
+	cout << "sanity" << endl;
 }
 
 /** Runs the program.*/
