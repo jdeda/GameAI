@@ -2,12 +2,12 @@
  * Program displays a window animating different steering behaviors.
  * @file main.cpp
  * @author Jese Deda
- * @date 2/2/22
  */
 
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include "steering.cpp"
 
 using namespace sf;
 using namespace std;
@@ -147,7 +147,7 @@ public:
  	* Returns true if character is at a point otherwise false.
   	* @param point the point to compare sprite position to (immutable reference)
   	* @param character the character to check (immutable reference)
-  	* @return true if sprite is at a point otherwise false.
+  	* @return true if character is at a point otherwise false.
   	*/
 	bool at(const Vector2f &point, const Character &character)
 	{
@@ -208,8 +208,8 @@ public:
 };
 
 /**
-  * Moves the referenced sprite via mutation according to its SceneView region and trajectory.
-  * @param sprite the sprite to move (mutable)
+  * Moves the referenced character via mutation according to its SceneView region and trajectory.
+  * @param character the character to move (mutable)
   * @param sceneView view to check regions of (immutable)
   */
 void move(Character &character, SceneView &sceneView)
@@ -240,8 +240,8 @@ void move(Character &character, SceneView &sceneView)
 }
 
 /**
-  * Rotates the referenced sprite via mutation respective to corner point it has reached.
-  * @param sprite the sprite to move (mutable)
+  * Rotates the referenced character via mutation respective to corner point it has reached.
+  * @param character the character to move (mutable)
   * @param sceneView view to check regions of (immutable)
   */
 void rotate(Character &character, SceneView &sceneView)
@@ -296,10 +296,11 @@ int main()
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
-	// Render in window.
+	// Render scene and measure time.
+	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
-		// Handle window event.
+		// Handle scene poll event.
 		Event event;
 		while (sceneView.scene.pollEvent(event))
 		{
@@ -311,7 +312,7 @@ int main()
 			}
 		}
 
-		// Rotate and move sprites accordingly.
+		// Rotate and move characters accordingly.
 		int i = 0;
 		int j = 0;
 		for (auto &character : characters)
@@ -320,7 +321,7 @@ int main()
 			if (character.status == CharacterStatus::running)
 			{
 
-				// First sprite hit a corner, except for when it is starting.
+				// First character hit a corner, except for when it is starting.
 				if (sceneView.atCorner(character) && !sceneView.at(sceneView.getTopLeft(), character))
 				{
 					if (j + 1 <= NUM_CHARACTERS)
@@ -329,14 +330,14 @@ int main()
 					}
 				}
 
-				// Sprite has completed a loop.
+				// Character has completed a loop.
 				if (sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
 				{
 					character.status = CharacterStatus::justFinished;
 					character.sprite.setRotation(0);
 				}
 
-				// Sprite has not completed a loop.
+				// Character has not completed a loop.
 				else
 				{
 					rotate(character, sceneView);
@@ -349,7 +350,7 @@ int main()
 			j++;
 		}
 
-		// If all sprites are finished, reset visualization pattern.
+		// If all characters are finished, reset visualization pattern.
 		int numFinished = 0;
 		for (auto &character : characters)
 		{
@@ -371,14 +372,14 @@ int main()
 		sceneView.scene.clear(Color(255, 255, 255));
 		for (auto &character : characters)
 		{
-			// Finish the justFinished sprite.
+			// Finish the justFinished character.
 			if (character.status == CharacterStatus::justFinished)
 			{
 				character.status = CharacterStatus::finished;
 				sceneView.scene.draw(character.sprite);
 			}
 
-			// Only render running sprites.
+			// Only render running characters.
 			if (character.status == CharacterStatus::running)
 			{
 				sceneView.scene.draw(character.sprite);
