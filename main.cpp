@@ -70,6 +70,9 @@ public:
 	/** Character's status (used for rendering purposes). */
 	CharacterStatus status;
 
+	/** Character's kinematic data. */
+	Kinematic kinematic;
+
 	/** Returns the character's x position. */
 	int x() const
 	{
@@ -388,12 +391,8 @@ Algorithm getAlg() {
 
 	// Map to enum.
 	caseNum--;
-	if (caseNum < 0 || caseNum > AlgorithmStrings.size()) {
-		return Algorithm::INVALID;
-	}
-	else {
-		return Algorithm(caseNum);
-	}
+	if (caseNum < 0 || caseNum > AlgorithmStrings.size()) { return Algorithm::INVALID; }
+	else { return Algorithm(caseNum); }
 }
 
 /* Debug output (prints the sprites coordinates). */
