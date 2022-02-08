@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include "steering.cpp"
 
 using namespace sf;
 using namespace std;
