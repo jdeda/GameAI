@@ -401,10 +401,13 @@ Algorithm getAlg() {
 	if (cin.bad()) { fail("invalid algorithm choice"); }
 
 	// Map to enum.
-	if (caseNum == 1) { return Algorithm::ArriveAlign; }
-	else if (caseNum == 2) { return Algorithm::Wander; }
-	else if (caseNum == 3) { return Algorithm::Flock; }
-	else { return Algorithm::INVALID; }
+	caseNum--;
+	if (caseNum < 0 || caseNum > AlgorithmStrings.size()) {
+		return Algorithm::INVALID;
+	}
+	else {
+		return Algorithm(caseNum);
+	}
 }
 
 /** Runs the program.*/
@@ -415,12 +418,16 @@ int main(int argc, char *argv[])
 	switch (alg) {
 		case Algorithm::ArriveAlign:
 			ArriveAnimation();
+			break;
 		case Algorithm::Wander:
 			WanderAnimation();
+			break;
 		case Algorithm::Flock:
 			FlockAnimation();
+			break;
 		case Algorithm::INVALID:
 			fail("invalid algorithm choice");
+			break;
 	}
 
 	// Exit progam.
