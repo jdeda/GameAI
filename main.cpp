@@ -5,12 +5,17 @@
  */
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <vector>
+#include <string>
+#include <iostream>
 #include "steering.cpp"
+#include <stdlib.h>
 
 using namespace sf;
 using namespace std;
+
+/** Number of arguments for program. */
+const int ARGC = 2;
 
 /* SceneView X length. */
 const int SCENE_WINDOW_X = 640;
@@ -22,13 +27,19 @@ const int SCENE_WINDOW_Y = 480;
 const int SCENE_WINDOW_FR = 100;
 
 /* Expected speed for sprite moving in X dimensions. */
-const float SPEED_X = 5.f;
+const float SPEED_X = 10.f;
 
 /* Expected speed for sprite moving in Y dimensions. */
 const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
 
 /* Number of sprites. */
 const int NUM_CHARACTERS = 4;
+
+/** Exits program and displays message to console*/
+void fail(string message) {
+	cout << "error: " << message << endl;
+	exit(1);
+}
 
 /* Debug output (prints the sprites coordinates). */
 void debug(const Sprite &sprite)
@@ -272,26 +283,8 @@ void rotate(Character &character, SceneView &sceneView)
 	}
 }
 
-/**
-  * Runs the program.
-  * @return 0 if exit success otherwise failure.
-  */
-int main()
-{
-
-	// Make characters;
-	Texture texture;
-	texture.loadFromFile("Assets/boid.png");
-	float scale = 0.05;
-	vector<Character> characters(NUM_CHARACTERS, Character());
-	for (auto &character : characters)
-	{
-		character.scale = scale;
-		character.texture = texture;
-		character.sprite = *(new Sprite(texture));
-		character.sprite.setScale(scale, scale);
-	}
-	characters[0].status = CharacterStatus::running; // Only first character runs at first.
+/** Animates the arrive steering behavior. */
+void ArriveAnimation() {
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -312,80 +305,122 @@ int main()
 			}
 		}
 
-		// Rotate and move characters accordingly.
-		int i = 0;
-		int j = 0;
-		for (auto &character : characters)
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.display();
+	}
+}
+/** Animates the wander steering behavior. */
+void WanderAnimation() {
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
 		{
-			// Only transform running characters.
-			if (character.status == CharacterStatus::running)
+			switch (event.type)
 			{
-
-				// First character hit a corner, except for when it is starting.
-				if (sceneView.atCorner(character) && !sceneView.at(sceneView.getTopLeft(), character))
-				{
-					if (j + 1 <= NUM_CHARACTERS)
-					{
-						characters[j + 1].status = CharacterStatus::running;
-					}
-				}
-
-				// Character has completed a loop.
-				if (sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
-				{
-					character.status = CharacterStatus::justFinished;
-					character.sprite.setRotation(0);
-				}
-
-				// Character has not completed a loop.
-				else
-				{
-					rotate(character, sceneView);
-					move(character, sceneView);
-				}
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
 			}
-
-			// Increment counters.
-			i++;
-			j++;
-		}
-
-		// If all characters are finished, reset visualization pattern.
-		int numFinished = 0;
-		for (auto &character : characters)
-		{
-			if (character.status == CharacterStatus::finished)
-			{
-				numFinished += 1;
-			}
-		}
-		if (numFinished == NUM_CHARACTERS)
-		{
-			for (auto &character : characters)
-			{
-				character.status = CharacterStatus::waiting;
-			}
-			characters[0].status = CharacterStatus::running;
 		}
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
-		for (auto &character : characters)
-		{
-			// Finish the justFinished character.
-			if (character.status == CharacterStatus::justFinished)
-			{
-				character.status = CharacterStatus::finished;
-				sceneView.scene.draw(character.sprite);
-			}
+		sceneView.scene.display();
+	}
+}
 
-			// Only render running characters.
-			if (character.status == CharacterStatus::running)
+/** Animates the flocking steering behavior. */
+void FlockAnimation() {
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
+		{
+			switch (event.type)
 			{
-				sceneView.scene.draw(character.sprite);
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
 			}
 		}
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.display();
+	}
+}
+
+/** Represents possible steering behavior algorithms for switching over and running animations. */
+enum Algorithm {
+	ArriveAlign,
+	Wander,
+	Flock,
+	INVALID
+};
+
+/** Algorithms represented as strings. */
+vector<string> AlgorithmStrings = {
+	"ArriveAlign",
+	"Wander",
+	"Flock",
+	"INVALID"
+};
+
+/** Returns an Algorithm if input is valid, otherwise fail program. */
+Algorithm getAlg() {
+
+	// Display user menu.
+	cout << "**************************************" << endl;
+	cout << "*****Welcome to SteeringBehaviors*****" << endl;
+	cout << "**************************************" << endl;
+	cout << "Choose an algorithm to visualize" << endl;
+	for(int i = 0; i < AlgorithmStrings.size() - 1; i++) {
+		cout << i + 1 << ". " << AlgorithmStrings[i] << endl;
+	}
+
+	// Get algorithm number.
+	int caseNum = 0;
+	cout << "Enter an algorithm number: ";
+	cin >> caseNum; 
+	if (cin.bad()) { fail("invalid algorithm choice"); }
+
+	// Map to enum.
+	if (caseNum == 1) { return Algorithm::ArriveAlign; }
+	else if (caseNum == 2) { return Algorithm::Wander; }
+	else if (caseNum == 3) { return Algorithm::Flock; }
+	else { return Algorithm::INVALID; }
+}
+
+/** Runs the program.*/
+int main(int argc, char *argv[])
+{
+	// Get algorithm and run corresponding algorithm.
+	Algorithm alg = getAlg();
+	switch (alg) {
+		case Algorithm::ArriveAlign:
+			ArriveAnimation();
+		case Algorithm::Wander:
+			WanderAnimation();
+		case Algorithm::Flock:
+			FlockAnimation();
+		case Algorithm::INVALID:
+			fail("invalid algorithm choice");
 	}
 
 	// Exit progam.
