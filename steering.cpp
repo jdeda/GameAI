@@ -15,7 +15,6 @@ using namespace sf;
  * - order of update clarification
  * - implement variable matching algorithms
  */
- 
 
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
@@ -61,6 +60,7 @@ public:
         rotation += steering.angular * time;
     }
 };
+ 
 
 /** Represents steering behaviors. */
 class SteeringBehavior {
