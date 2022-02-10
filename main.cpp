@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "steering.cpp"
+#include "steering.h"
 #include <stdlib.h>
 
 using namespace sf;
@@ -303,7 +303,7 @@ void ArriveAnimation() {
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
-	texture.loadFromFile("Assets/boid.png");
+	texture.loadFromFile("assets/boid.png");
 	Character character;
 	character.scale = scale;
 	character.texture = texture;
