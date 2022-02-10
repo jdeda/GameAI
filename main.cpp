@@ -41,6 +41,7 @@ void fail(string message) {
 	exit(1);
 }
 
+
 /** Represents status of character for assisting in when to render a character. */
 enum CharacterStatus
 {
@@ -53,6 +54,11 @@ enum CharacterStatus
 /** Character is a sprite with additional attributes and behaviors. */
 class Character
 {
+
+private:
+
+	/** Character's kinematic data. */
+	Kinematic kinematic;
 
 public:
 	/** Constructs a Character. */
@@ -70,9 +76,6 @@ public:
 	/** Character's status (used for rendering purposes). */
 	CharacterStatus status;
 
-	/** Character's kinematic data. */
-	Kinematic kinematic;
-
 	/** Returns the character's x position. */
 	int x() const
 	{
@@ -83,6 +86,23 @@ public:
 	int y() const
 	{
 		return sprite.getPosition().y;
+	}
+
+	/** Returns the charcter's kinematic. */
+	Kinematic getKinematic() {
+		return kinematic;
+	}
+
+   /**
+	* Updates character's sprite and kinematic.
+     * @param steering the steering output to apply (immutable)
+     * @param time the change in time since last update (copy)
+	*/
+	void update(const SteeringOutput& steering, float time) {
+		kinematic.update(steering, time);
+		// Notice, the sprite should only accessible here, for now,
+		// we will leave it public for simplicity.
+
 	}
 };
 
@@ -272,8 +292,28 @@ void rotate(Character &character, SceneView &sceneView)
 	}
 }
 
+
 /** Animates the arrive steering behavior. */
 void ArriveAnimation() {
+
+
+	// Setup Arrive algorithm.
+	Velocity velocityMatcher(0.01);
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("Assets/boid.png");
+	Character character;
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+
+	// Setup mouse for character.
+	Mouse mouse;
+	Kinematic mouseKinematic;
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -282,6 +322,10 @@ void ArriveAnimation() {
 	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
+
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
 		// Handle scene poll event.
 		Event event;
 		while (sceneView.scene.pollEvent(event))
@@ -294,11 +338,30 @@ void ArriveAnimation() {
 			}
 		}
 
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		sceneView.scene.display();
+	// Set character's position to that of the mouse.
+	Vector2i mousePosition = mouse.getPosition(sceneView.scene);
+	cout << mousePosition.x << " " << mousePosition.y << endl;
+	character.sprite.setPosition(mousePosition.x, mousePosition.y);
+	
+	// Make character move at same speed as mouse.
+	// // Update mouse kinematic.
+	// mouseKinematic.position = mouse.getPosition(); // v2f
+	// mouseKinematic.orientation = 0; // not needed?
+	// mouseKinematic.velocity = 0; // v2f
+	// mouseKinematic.rotation = 0; // not needed?
+	// // Velocity match character to mouse.
+	// float deltaTime = getDeltaTime(elapsedTimeFromPreviousLoopIteration, clock.getElapsedTime());
+	// cout << deltaTime << endl;
+	// SteeringOutput steering = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+	// character.update(steering, deltaTime);
+	
+	// Re-render scene.
+	sceneView.scene.clear(Color(255, 255, 255));
+	sceneView.scene.draw(character.sprite);
+	sceneView.scene.display();
 	}
 }
+
 /** Animates the wander steering behavior. */
 void WanderAnimation() {
 

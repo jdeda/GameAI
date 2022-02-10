@@ -115,15 +115,27 @@ class Orientation: SteeringBehavior {
 /** Represents velocity-matching steering behavior. */
 class Velocity: SteeringBehavior {
 
+private:
+
     /** Free parameter: estimation of time to reach target velocity. */
-    float timeToTargeVelocityt;
+    float timeToTargeVelocity;
+
+public:
+
+    Velocity(float f) {
+        timeToTargeVelocity = f;
+    }
 
     /** Returns variable-matching steering output relative to orientation. */
     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
         SteeringOutput output = SteeringOutput();
         output.linear = target.velocity - character.velocity;
-        output.linear /= timeToTargeVelocityt;
+        output.linear /= timeToTargeVelocity;
         return output;
+    }
+
+    float getTimeToTargeVelocity() {
+        return timeToTargeVelocity;
     }
 };
 
