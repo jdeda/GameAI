@@ -131,6 +131,7 @@ public:
         SteeringOutput output = SteeringOutput();
         output.linear = target.velocity - character.velocity;
         output.linear /= timeToTargeVelocity;
+        output.angular = 0;
         return output;
     }
 

@@ -292,6 +292,11 @@ void rotate(Character &character, SceneView &sceneView)
 	}
 }
 
+/** Returns the distance between the two vectors. */
+float distance(Vector2i p1, Vector2i p2) {
+	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
+}
+
 
 /** Animates the arrive steering behavior. */
 void ArriveAnimation() {
@@ -323,8 +328,10 @@ void ArriveAnimation() {
 	while (sceneView.scene.isOpen())
 	{
 
+		// How does this dt work? Calling clock.restart().asSecondss()
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
 		float dt = clock.restart().asSeconds();
+		Vector2i mousePosition1 = mouse.getPosition(sceneView.scene);
 
 		// Handle scene poll event.
 		Event event;
@@ -338,10 +345,30 @@ void ArriveAnimation() {
 			}
 		}
 
-	// Set character's position to that of the mouse.
-	Vector2i mousePosition = mouse.getPosition(sceneView.scene);
-	cout << mousePosition.x << " " << mousePosition.y << endl;
-	character.sprite.setPosition(mousePosition.x, mousePosition.y);
+	// // Set character's position to that of the mouse.
+	// Vector2i mousePosition = mouse.getPosition(sceneView.scene);
+	// cout << mousePosition.x << " " << mousePosition.y << endl;
+	// character.sprite.setPosition(mousePosition.x, mousePosition.y);
+
+	// Velocity match character to mouse.
+	// need kinematic of both to compute acceeleration
+	// need time for the update.. so...
+	// problem is...what is the mouse kinematic?
+	// sfml only gives us position, anything with time we have to
+	// figure out ourselves.
+	// so...
+	Vector2i mousePosition2 = mouse.getPosition(sceneView.scene);
+	float mouseDistanceDelta = distance(mousePosition2, mousePosition1);
+	
+
+
+	// mouseKinematic.position = mouse.getPosition(); // v2f
+	// mouseKinematic.orientation = 0; // not needed?
+	// mouseKinematic.velocity = 0; // v2f..
+	// mouseKinematic.rotation = 0; // not needed?
+
+
+
 	
 	// Make character move at same speed as mouse.
 	// // Update mouse kinematic.
