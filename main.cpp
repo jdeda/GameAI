@@ -8,8 +8,8 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "steering.h"
 #include <stdlib.h>
+#include "steering.cpp"
 
 using namespace sf;
 using namespace std;
