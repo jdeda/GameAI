@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include "steering.cpp"
+#include <tuple>
 
 using namespace sf;
 using namespace std;
@@ -343,43 +344,51 @@ class PositionTable
 {
 
 private:
-	vector<Character> table;
+	vector<tuple<int, Vector2f>> table;
 
 public:
 	PositionTable(const vector<Character>& characters)
 	{
-		table = vector<Character>(characters); // TODO: Does this copy the objects...?
-	}
-
-	Vector2f getOldPosition(const Character &character) const
-	{
-		for(const Character &c: table) {
-			if(c.getID() == character.getID()) {
-				return c.getPosition();
-			}
+		for(const Character &c: characters) {
+			table.push_back(tuple<int, Vector2f>(c.getID(), c.getPosition()));
 		}
 	}
 
-	float getDelta(const Character &character) const
-	{
-		for(const Character &c: table) {
-			if(c.getID() == character.getID()) {
-				return distance(c, character);
-			}
-		}
-	}
+	// Vector2f getOldPosition(const Character &character) const
+	// {
+	// 	for(const Character &c: table) {
+	// 		if(c.getID() == character.getID()) {
+	// 			return c.getPosition();
+	// 		}
+	// 	}
+	// }
+
+	// float getDelta(const Character &character) const
+	// {
+	// 	for(const Character &c: table) {
+	// 		if(c.getID() == character.getID()) {
+	// 			return distance(c, character);
+	// 		}
+	// 	}
+	// }
 
 	void update(const vector<Character>& characters)
 	{
-		table = vector<Character>(characters);
+		for(const Character &c: characters) {
+			table.push_back(tuple<int, Vector2f>(c.getID(), c.getPosition()));
+		}
 	}
 
 	void debug() const
 	{
-		for(const Character& character: this->table)
-		{
-			cout << character.x() << " " << character.y() << endl;
+		for(const tuple<int, Vector2f> &entry: table) {
+			int id = get<0>(entry);
+			Vector2f p = get<1>(entry);
+			int x = p.x;
+			int y = p.y;
+			cout << x << " " << y << endl;;
 		}
+
 	}
 
 };
@@ -419,12 +428,9 @@ void ArriveAnimation() {
 	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
-		positionTable.debug();
-
-		// How does this dt work? Calling clock.restart().asSecondss()
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
 		float dt = clock.restart().asSeconds();
-		Vector2i mousePosition1 = mouse.getPosition(sceneView.scene);
+		positionTable.debug();
 
 		// Handle scene poll event.
 		Event event;
@@ -438,51 +444,18 @@ void ArriveAnimation() {
 			}
 		}
 
-	// // Set character's position to that of the mouse.
-	// Vector2i mousePosition = mouse.getPosition(sceneView.scene);
-	// cout << mousePosition.x << " " << mousePosition.y << endl;
-	// character.sprite.setPosition(mousePosition.x, mousePosition.y);
+		// Set character's position to that of the mouse.
+		Vector2i mousePosition = mouse.getPosition(sceneView.scene);
+		character.sprite.setPosition(mousePosition.x, mousePosition.y);
 
-	// Velocity match character to mouse.
-	// need kinematic of both to compute acceeleration
-	// need time for the update.. so...
-	// problem is...what is the mouse kinematic?
-	// sfml only gives us position, anything with time we have to
-	// figure out ourselves.
-	// so...
-	Vector2i mousePosition2 = mouse.getPosition(sceneView.scene);
-	float mouseDistanceDelta = distance(mousePosition2, mousePosition1);
-	
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
+		sceneView.scene.display();
 
-
-	// mouseKinematic.position = mouse.getPosition(); // v2f
-	// mouseKinematic.orientation = 0; // not needed?
-	// mouseKinematic.velocity = 0; // v2f..
-	// mouseKinematic.rotation = 0; // not needed?
-
-
-
-	
-	// Make character move at same speed as mouse.
-	// // Update mouse kinematic.
-	// mouseKinematic.position = mouse.getPosition(); // v2f
-	// mouseKinematic.orientation = 0; // not needed?
-	// mouseKinematic.velocity = 0; // v2f
-	// mouseKinematic.rotation = 0; // not needed?
-	// // Velocity match character to mouse.
-	// float deltaTime = getDeltaTime(elapsedTimeFromPreviousLoopIteration, clock.getElapsedTime());
-	// cout << deltaTime << endl;
-	// SteeringOutput steering = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-	// character.update(steering, deltaTime);
-	
-	// Re-render scene.
-	sceneView.scene.clear(Color(255, 255, 255));
-	sceneView.scene.draw(character.sprite);
-	sceneView.scene.display();
-
-	// Update position table.
-	positionTable.update(characters);
-	mousePositionOld = mouse.getPosition();
+		// Update position table.
+		positionTable.update(characters);
+		mousePositionOld = mouse.getPosition();
 	}
 }
 
