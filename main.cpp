@@ -35,12 +35,32 @@ const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SP
 /* Number of sprites. */
 const int NUM_CHARACTERS = 4;
 
+/** Represents a unique ID. */
+class ID {
+	private:
+		static int count;
+		int id;
+	public:
+
+	 	/** Sets the id of the instance and increments the static count (pattern to preserve uniqueness). */
+		ID()
+		{
+			id = count + 1;
+			count += 1;
+		}
+
+		int getID() const
+		{
+			return id;
+		}
+};
+int ID::count = 0;
+
 /** Exits program and displays message to console*/
 void fail(string message) {
 	cout << "error: " << message << endl;
 	exit(1);
 }
-
 
 /** Represents status of character for assisting in when to render a character. */
 enum CharacterStatus
@@ -60,9 +80,14 @@ private:
 	/** Character's kinematic data. */
 	Kinematic kinematic;
 
+	/** Character's unique ID. */
+	ID id;
+
 public:
-	/** Constructs a Character. */
-	Character() {}
+	/** Constructs a Character with a unique ID. */
+	Character() {
+		id = ID();
+	}
 
 	/** Character's texture. */
 	Texture texture;
@@ -86,6 +111,17 @@ public:
 	int y() const
 	{
 		return sprite.getPosition().y;
+	}
+
+	Vector2f getPosition() const
+	{
+		return sprite.getPosition();
+	}
+
+	/** Returns the character's id. */
+	int getID() const
+	{
+		return id.getID();
 	}
 
 	/** Returns the charcter's kinematic. */
@@ -297,10 +333,60 @@ float distance(Vector2i p1, Vector2i p2) {
 	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
 }
 
+/** Returns the distance between the two vectors. */
+float distance(Character c1, Character c2) {
+	return sqrt(pow(c1.y() - c1.y(), 2) + pow(c2.x() - c1.x(), 2));
+}
+
+
+class PositionTable
+{
+
+private:
+	vector<Character> table;
+
+public:
+	PositionTable(const vector<Character>& characters)
+	{
+		table = vector<Character>(characters); // TODO: Does this copy the objects...?
+	}
+
+	Vector2f getOldPosition(const Character &character) const
+	{
+		for(const Character &c: table) {
+			if(c.getID() == character.getID()) {
+				return c.getPosition();
+			}
+		}
+	}
+
+	float getDelta(const Character &character) const
+	{
+		for(const Character &c: table) {
+			if(c.getID() == character.getID()) {
+				return distance(c, character);
+			}
+		}
+	}
+
+	void update(const vector<Character>& characters)
+	{
+		table = vector<Character>(characters);
+	}
+
+	void debug() const
+	{
+		for(const Character& character: this->table)
+		{
+			cout << character.x() << " " << character.y() << endl;
+		}
+	}
+
+};
+
 
 /** Animates the arrive steering behavior. */
 void ArriveAnimation() {
-
 
 	// Setup Arrive algorithm.
 	Velocity velocityMatcher(0.01);
@@ -316,17 +402,24 @@ void ArriveAnimation() {
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
 
-	// Setup mouse for character.
+	// Setup mouse.
 	Mouse mouse;
 	Kinematic mouseKinematic;
+	Vector2i mousePositionOld = mouse.getPosition();
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup PositionTable.
+	vector<Character> characters;
+	characters.push_back(character);
+	PositionTable positionTable(characters);
 
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
+		positionTable.debug();
 
 		// How does this dt work? Calling clock.restart().asSecondss()
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
@@ -386,6 +479,10 @@ void ArriveAnimation() {
 	sceneView.scene.clear(Color(255, 255, 255));
 	sceneView.scene.draw(character.sprite);
 	sceneView.scene.display();
+
+	// Update position table.
+	positionTable.update(characters);
+	mousePositionOld = mouse.getPosition();
 	}
 }
 
