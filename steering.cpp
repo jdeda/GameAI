@@ -61,13 +61,12 @@ public:
     }
 };
  
-inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew) {
+inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew, float orientationOld, float orientationNew) {
 	Kinematic newKinematic;
-	return newKinematic;
-}
-
-inline Kinematic computeKinematic(float dt, const Vector2i& positionOld, const Vector2i& positionNew) {
-	Kinematic newKinematic;
+    newKinematic.position = positionNew;
+    newKinematic.linearVelocity = (positionNew - positionOld) / dt;
+    newKinematic.orientation = orientationNew;
+    newKinematic.angularVelocity = (orientationNew - orientationOld) / dt;
 	return newKinematic;
 }
 

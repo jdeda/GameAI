@@ -119,6 +119,11 @@ public:
 		return sprite.getPosition();
 	}
 
+	float getOrientation() const
+	{
+		return sprite.getRotation();
+	}
+
 	/** Returns the character's id. */
 	int getID() const
 	{
@@ -270,11 +275,6 @@ public:
 };
 
 /** Returns the distance between the two vectors. */
-float distance(Vector2i p1, Vector2i p2) {
-	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
-}
-
-/** Returns the distance between the two vectors. */
 float distance(Vector2f p1, Vector2f p2) {
 	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
 }
@@ -283,6 +283,24 @@ float distance(Vector2f p1, Vector2f p2) {
 float distance(Character c1, Character c2) {
 	return sqrt(pow(c1.y() - c1.y(), 2) + pow(c2.x() - c1.x(), 2));
 }
+
+class OrientationTable
+{
+
+private:
+	unordered_map<int, float> table;
+
+public:
+	OrientationTable(const unordered_map<int, float>& orientations)
+	{
+		table = orientations;
+	}
+
+	float getOldOrientation(const Character &character) const
+	{
+		return table.at(character.getID());
+	}
+};
 
 class PositionTable
 {
@@ -299,12 +317,6 @@ public:
 	Vector2f getOldPosition(const Character &character) const
 	{
 		return table.at(character.getID());
-	}
-
-	float getDelta(const Character &character) const
-	{
-		Vector2f p1 = table.at(character.getID());
-		return distance(p1, character.getPosition());
 	}
 
 	void debug(const Character &character) const
@@ -337,9 +349,20 @@ public:
 		return PositionTable(positions);
 	}
 
-	inline void updateKinematics(float dt, const PositionTable& positions) {
+	inline OrientationTable generateOrientationTable() {
+		unordered_map<int, float> orientations;
 		for(auto & character: characters) {
-			character->setKinematic(computeKinematic(dt, positions.getOldPosition(*character), character->getPosition()));
+			orientations.insert({character->getID(), character->getOrientation()});
+		}
+		return OrientationTable(orientations);
+	}
+
+	inline void updateKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations) {
+		for(auto & character: characters) {
+			character->setKinematic(computeKinematic(
+				dt, positions.getOldPosition(*character), character->getPosition(),
+				orientations.getOldOrientation(*character), character->getOrientation()
+			));
 		}
 	}
 };
@@ -376,16 +399,17 @@ void ArriveAnimation() {
 	// Setup mouse.
 	Mouse mouse;
 	Kinematic mouseKinematic;
-	Vector2i mousePositionOld = mouse.getPosition();
+	Vector2f mousePositionOld(mouse.getPosition());
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
-	// Setup CharacterTable.
+	// Setup CharacterTable and PositionTable.
 	vector<Character*> characters;
 	characters.push_back(&character);
 	CharacterTable characterTable(characters);
 	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
 
 	// Render scene and measure time.
 	Clock clock;
@@ -393,7 +417,7 @@ void ArriveAnimation() {
 	{
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
 		float dt = clock.restart().asSeconds();
-		positionTable.debug(character);
+		// positionTable.debug(character);
 
 		// Handle scene poll event.
 		Event event;
@@ -408,18 +432,23 @@ void ArriveAnimation() {
 		}
 
 		// Generate kinematics for every character.
-		Vector2i mousePosition = mouse.getPosition(sceneView.scene);
-		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePosition);
-		characterTable.updateKinematics(dt, positionTable);
+		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
+		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0);
+		characterTable.updateKinematics(dt, positionTable, orientationTable);
+
+		// Velocity match character to the mouse.
+		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		character.update(match, dt);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
 
-		// Update positions of previous loop.
+		// Update positions and orientations of previous loop.
 		positionTable = characterTable.generatePositionTable();
-		mousePositionOld = mouse.getPosition();
+		orientationTable = characterTable.generateOrientationTable();
+		mousePositionOld = Vector2f(mouse.getPosition());
 	}
 }
 
