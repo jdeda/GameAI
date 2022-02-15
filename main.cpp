@@ -10,31 +10,10 @@
 #include <iostream>
 #include <stdlib.h>
 #include "steering.cpp"
-#include <tuple>
+#include "hyperparameters.h"
 
 using namespace sf;
 using namespace std;
-
-/** Number of arguments for program. */
-const int ARGC = 2;
-
-/* SceneView X length. */
-const int SCENE_WINDOW_X = 640;
-
-/* SceneView Y length. */
-const int SCENE_WINDOW_Y = 480;
-
-/* SceneView frame rate. */
-const int SCENE_WINDOW_FR = 100;
-
-/* Expected speed for sprite moving in X dimensions. */
-const float SPEED_X = 10.f;
-
-/* Expected speed for sprite moving in Y dimensions. */
-const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
-
-/* Number of sprites. */
-const int NUM_CHARACTERS = 4;
 
 /** Represents a unique ID. */
 class ID {
@@ -436,11 +415,13 @@ void ArriveAnimation() {
 		// Generate kinematics for every character.
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0);
+		mouseKinematic.update(SteeringOutput(), dt);
+		cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
 		characterTable.updateKinematics(dt, positionTable, orientationTable);
 
 		// Velocity match character to the mouse.
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		cout << match.linearAcceleration << endl;
+		// cout << match.linearAcceleration << endl;
 		character.update(match, dt);
 
 		// Re-render scene.

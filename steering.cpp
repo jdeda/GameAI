@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <bits/stdc++.h>
+#include "hyperparameters.h"
 using namespace sf;
 
 /**
@@ -58,6 +59,20 @@ public:
         orientation += angularVelocity * time;
         linearVelocity += steering.linearAcceleration * time;
         angularVelocity += steering.angularAcceleration * time;
+
+        // Clip position.
+        if(position.x >= SCENE_WINDOW_X) {
+            position.x = SCENE_WINDOW_X;
+        }
+        if(position.x < 0) {
+            position.x = 0;
+        }
+        if(position.y >= SCENE_WINDOW_Y) {
+            position.y = SCENE_WINDOW_Y;
+        }
+        if(position.y < 0) {
+            position.y = 0;
+        }
     }
 };
  
