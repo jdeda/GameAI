@@ -147,9 +147,11 @@ public:
 	*/
 	void update(const SteeringOutput& steering, float time) {
 		kinematic.update(steering, time);
+		sprite.setPosition(kinematic.position.x, kinematic.position.y);
+		sprite.setRotation(kinematic.orientation);
+
 		// Notice, the sprite should only accessible here, for now,
 		// we will leave it public for simplicity.
-
 	}
 };
 
@@ -438,6 +440,7 @@ void ArriveAnimation() {
 
 		// Velocity match character to the mouse.
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		cout << match.linearAcceleration << endl;
 		character.update(match, dt);
 
 		// Re-render scene.
