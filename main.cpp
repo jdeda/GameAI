@@ -335,64 +335,82 @@ float distance(Vector2i p1, Vector2i p2) {
 }
 
 /** Returns the distance between the two vectors. */
+float distance(Vector2f p1, Vector2f p2) {
+	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
+}
+
+/** Returns the distance between the two vectors. */
 float distance(Character c1, Character c2) {
 	return sqrt(pow(c1.y() - c1.y(), 2) + pow(c2.x() - c1.x(), 2));
 }
-
 
 class PositionTable
 {
 
 private:
-	vector<tuple<int, Vector2f>> table;
+	unordered_map<int, Vector2f> table;
 
 public:
 	PositionTable(const vector<Character>& characters)
 	{
-		for(const Character &c: characters) {
-			table.push_back(tuple<int, Vector2f>(c.getID(), c.getPosition()));
+		for(auto & character: characters) {
+			table.insert({character.getID(), character.getPosition()});
 		}
 	}
 
-	// Vector2f getOldPosition(const Character &character) const
-	// {
-	// 	for(const Character &c: table) {
-	// 		if(c.getID() == character.getID()) {
-	// 			return c.getPosition();
-	// 		}
-	// 	}
-	// }
-
-	// float getDelta(const Character &character) const
-	// {
-	// 	for(const Character &c: table) {
-	// 		if(c.getID() == character.getID()) {
-	// 			return distance(c, character);
-	// 		}
-	// 	}
-	// }
-
-	void update(const vector<Character>& characters)
+	Vector2f getOldPosition(const Character &character) const
 	{
-		for(const Character &c: characters) {
-			table.push_back(tuple<int, Vector2f>(c.getID(), c.getPosition()));
-		}
+		return table.at(character.getID());
 	}
 
-	void debug() const
+	float getDelta(const Character &character) const
 	{
-		for(const tuple<int, Vector2f> &entry: table) {
-			int id = get<0>(entry);
-			Vector2f p = get<1>(entry);
-			int x = p.x;
-			int y = p.y;
-			cout << x << " " << y << endl;;
-		}
-
+		Vector2f p1 = table.at(character.getID());
+		return distance(p1, character.getPosition());
 	}
 
+	void debug(const Character &character) const
+	{
+		Vector2f p = table.at(character.getID());
+		cout << character.getID() << " " << p.x << " " << p.y << endl;
+	}
 };
 
+class CharacterTable
+{
+private:
+	unordered_map<int, Character*> table;
+	vector<Character*> characters;
+
+public:
+	CharacterTable(const vector<Character*>& characters)
+	{
+		for(auto & character: characters) {
+			this->table.insert({character->getID(), character});
+			this->characters.push_back(character);
+		}
+	}
+
+	PositionTable generatePositionTable() {
+		vector<Character> charactersNP;
+		for(auto & character: characters) {
+			charactersNP.push_back(*character);
+		}
+		return PositionTable(charactersNP);
+	}
+};
+
+/* Debug output (prints the sprites coordinates). */
+void debug(const Character &character)
+{
+	cout << character.x() << " " << character.y() << endl;
+}
+
+/* Debug output (for sanity check). */
+void sanity()
+{
+	cout << "sanity" << endl;
+}
 
 /** Animates the arrive steering behavior. */
 void ArriveAnimation() {
@@ -419,10 +437,11 @@ void ArriveAnimation() {
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
-	// Setup PositionTable.
-	vector<Character> characters;
-	characters.push_back(character);
-	PositionTable positionTable(characters);
+	// Setup CharacterTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
 
 	// Render scene and measure time.
 	Clock clock;
@@ -430,7 +449,7 @@ void ArriveAnimation() {
 	{
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
 		float dt = clock.restart().asSeconds();
-		positionTable.debug();
+		positionTable.debug(character);
 
 		// Handle scene poll event.
 		Event event;
@@ -453,8 +472,8 @@ void ArriveAnimation() {
 		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
 
-		// Update position table.
-		positionTable.update(characters);
+		// Update positions of previous loop.
+		positionTable = characterTable.generatePositionTable();
 		mousePositionOld = mouse.getPosition();
 	}
 }
@@ -553,18 +572,6 @@ Algorithm getAlg() {
 	caseNum--;
 	if (caseNum < 0 || caseNum > AlgorithmStrings.size()) { return Algorithm::INVALID; }
 	else { return Algorithm(caseNum); }
-}
-
-/* Debug output (prints the sprites coordinates). */
-void debug(const Character &character)
-{
-	cout << character.x() << " " << character.y() << endl;
-}
-
-/* Debug output (for sanity check). */
-void sanity()
-{
-	cout << "sanity" << endl;
 }
 
 /** Runs the program.*/
