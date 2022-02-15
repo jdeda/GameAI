@@ -22,10 +22,10 @@ class SteeringOutput {
 public:
 
     /** Linear acceleration (d/t^2). */
-    Vector2f linear;
+    Vector2f linearAcceleration;
 
     /** Angular acceleration (theta/t^2). */
-    float angular;
+    float angularAcceleration;
 };
 
 /** Represents kinematic data for steering behaviors. Units are not defined. */
@@ -40,10 +40,10 @@ public:
     float orientation;
 
     /** Current linear velocity (d/t). */
-    Vector2f velocity;
+    Vector2f linearVelocity;
 
     /** Current angular velocity (theta/t). */
-    float rotation;
+    float angularVelocity;
 
     /**
      * Updates all kinematic data given steering input and change in time
@@ -54,13 +54,22 @@ public:
      * @param time the change in time since last update (immutable)
      */
     void update(const SteeringOutput& steering, const float time) {
-        position += velocity * time; // do these operations actually work properly? maybe...
-        orientation += rotation * time;
-        velocity += steering.linear * time;
-        rotation += steering.angular * time;
+        position += linearVelocity * time; // do these operations actually work properly? maybe...
+        orientation += angularVelocity * time;
+        linearVelocity += steering.linearAcceleration * time;
+        angularVelocity += steering.angularAcceleration * time;
     }
 };
  
+inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew) {
+	Kinematic newKinematic;
+	return newKinematic;
+}
+
+inline Kinematic computeKinematic(float dt, const Vector2i& positionOld, const Vector2i& positionNew) {
+	Kinematic newKinematic;
+	return newKinematic;
+}
 
 /** Represents steering behaviors. */
 class SteeringBehavior {
@@ -129,9 +138,9 @@ public:
     /** Returns variable-matching steering output relative to orientation. */
     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
         SteeringOutput output = SteeringOutput();
-        output.linear = target.velocity - character.velocity;
-        output.linear /= timeToTargeVelocity;
-        output.angular = 0;
+        output.linearAcceleration = target.linearVelocity - character.linearVelocity;
+        output.linearAcceleration /= timeToTargeVelocity;
+        output.angularAcceleration = 0;
         return output;
     }
 

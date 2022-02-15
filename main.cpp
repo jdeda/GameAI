@@ -125,9 +125,14 @@ public:
 		return id.getID();
 	}
 
-	/** Returns the charcter's kinematic. */
+	/** Returns the character's kinematic. */
 	Kinematic getKinematic() {
 		return kinematic;
+	}
+
+	/** Sets the character's kinematic.*/
+	void setKinematic(Kinematic kinematic) {
+		this->kinematic = kinematic;
 	}
 
    /**
@@ -331,6 +336,12 @@ public:
 		}
 		return PositionTable(positions);
 	}
+
+	inline void updateKinematics(float dt, const PositionTable& positions) {
+		for(auto & character: characters) {
+			character->setKinematic(computeKinematic(dt, positions.getOldPosition(*character), character->getPosition()));
+		}
+	}
 };
 
 /* Debug output (prints the sprites coordinates). */
@@ -396,9 +407,10 @@ void ArriveAnimation() {
 			}
 		}
 
-		// Set character's position to that of the mouse.
+		// Generate kinematics for every character.
 		Vector2i mousePosition = mouse.getPosition(sceneView.scene);
-		character.sprite.setPosition(mousePosition.x, mousePosition.y);
+		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePosition);
+		characterTable.updateKinematics(dt, positionTable);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
