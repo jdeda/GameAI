@@ -264,71 +264,6 @@ public:
 	}
 };
 
-/**
-  * Moves the referenced character via mutation according to its SceneView region and trajectory.
-  * @param character the character to move (mutable)
-  * @param sceneView view to check regions of (immutable)
-  */
-void move(Character &character, SceneView &sceneView)
-{
-	// Move right.
-	if (sceneView.inTopRegion(character) && !sceneView.at(sceneView.getTopRight(), character) && character.sprite.getRotation() == 0)
-	{
-		character.sprite.move(SPEED_X, 0);
-	}
-
-	// Move down.
-	if (sceneView.inRightRegion(character) && !sceneView.at(sceneView.getBotRight(), character) && character.sprite.getRotation() == 90)
-	{
-		character.sprite.move(0, SPEED_Y);
-	}
-
-	// Move left.
-	if (sceneView.inBotRegion(character) && !sceneView.at(sceneView.getBotLeft(), character) && character.sprite.getRotation() == 180)
-	{
-		character.sprite.move(-SPEED_X, 0);
-	}
-
-	// Move up.
-	if (sceneView.inLeftRegion(character) && !sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
-	{
-		character.sprite.move(0, -SPEED_Y);
-	}
-}
-
-/**
-  * Rotates the referenced character via mutation respective to corner point it has reached.
-  * @param character the character to move (mutable)
-  * @param sceneView view to check regions of (immutable)
-  */
-void rotate(Character &character, SceneView &sceneView)
-{
-
-	// Don't rotate (just started).
-	if (sceneView.at(sceneView.getTopLeft(), character))
-	{
-		character.sprite.setRotation(0);
-	}
-
-	// Face down (time to move down).
-	if (sceneView.at(sceneView.getTopRight(), character))
-	{
-		character.sprite.setRotation(90);
-	}
-
-	// Face left (time to move left).
-	if (sceneView.at(sceneView.getBotRight(), character))
-	{
-		character.sprite.setRotation(180);
-	}
-
-	// Face up (time to move up).
-	if (sceneView.at(sceneView.getBotLeft(), character))
-	{
-		character.sprite.setRotation(270);
-	}
-}
-
 /** Returns the distance between the two vectors. */
 float distance(Vector2i p1, Vector2i p2) {
 	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
@@ -351,11 +286,9 @@ private:
 	unordered_map<int, Vector2f> table;
 
 public:
-	PositionTable(const vector<Character>& characters)
+	PositionTable(const unordered_map<int, Vector2f>& positions)
 	{
-		for(auto & character: characters) {
-			table.insert({character.getID(), character.getPosition()});
-		}
+		table = positions;
 	}
 
 	Vector2f getOldPosition(const Character &character) const
@@ -391,12 +324,12 @@ public:
 		}
 	}
 
-	PositionTable generatePositionTable() {
-		vector<Character> charactersNP;
+	inline PositionTable generatePositionTable() {
+		unordered_map<int, Vector2f> positions;
 		for(auto & character: characters) {
-			charactersNP.push_back(*character);
+			positions.insert({character->getID(), character->getPosition()});
 		}
-		return PositionTable(charactersNP);
+		return PositionTable(positions);
 	}
 };
 
