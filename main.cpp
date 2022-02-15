@@ -122,13 +122,15 @@ public:
    /**
 	* Updates character's sprite and kinematic.
      * @param steering the steering output to apply (immutable)
-     * @param time the change in time since last update (copy)
+     * @param time the change in time since last update (immutable)
+	 * @param clip if true clip otherwise don't (immutable)
 	*/
-	void update(const SteeringOutput& steering, float time) {
-		kinematic.update(steering, time);
+	void update(const SteeringOutput& steering, const float time, const bool clip) {
+		kinematic.update(steering, time, clip);
 		sprite.setPosition(kinematic.position.x, kinematic.position.y);
 		sprite.setRotation(kinematic.orientation);
 
+		// TODO: 
 		// Notice, the sprite should only accessible here, for now,
 		// we will leave it public for simplicity.
 	}
@@ -338,7 +340,7 @@ public:
 		return OrientationTable(orientations);
 	}
 
-	inline void updateKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations) {
+	inline void setKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations) {
 		for(auto & character: characters) {
 			character->setKinematic(computeKinematic(
 				dt, positions.getOldPosition(*character), character->getPosition(),
@@ -391,6 +393,7 @@ void ArriveAnimation() {
 	CharacterTable characterTable(characters);
 	PositionTable positionTable = characterTable.generatePositionTable();
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = true;
 
 	// Render scene and measure time.
 	Clock clock;
@@ -415,14 +418,14 @@ void ArriveAnimation() {
 		// Generate kinematics for every character.
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0);
-		mouseKinematic.update(SteeringOutput(), dt);
+		mouseKinematic.update(SteeringOutput(), dt, clip);
 		cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
-		characterTable.updateKinematics(dt, positionTable, orientationTable);
+		characterTable.setKinematics(dt, positionTable, orientationTable);
 
 		// Velocity match character to the mouse.
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 		// cout << match.linearAcceleration << endl;
-		character.update(match, dt);
+		character.update(match, dt, clip);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));

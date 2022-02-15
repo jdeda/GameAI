@@ -9,14 +9,6 @@
 #include "hyperparameters.h"
 using namespace sf;
 
-/**
- * TODOS
- * - support vector math <either functions or create a class> <maybe it works?>
- * - support clipping
- * - order of update clarification
- * - implement variable matching algorithms
- */
-
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
 
@@ -33,6 +25,7 @@ public:
 class Kinematic {
 
 public:
+    // TODO: these variables should be private with getters, and can only be set via an update.
 
     /** Current point in space (x, y). */
     Vector2f position;
@@ -46,21 +39,9 @@ public:
     /** Current angular velocity (theta/t). */
     float angularVelocity;
 
-    /**
-     * Updates all kinematic data given steering input and change in time
-     * using the Netwon-Euler 1 integration update algorithm. Order of update matters:
-     * apply steering output last to ensure character gets update from last time around 
-     * update (no retroactive update) and optionally clip.
-     * @param steering the steering output to apply (immutable)
-     * @param time the change in time since last update (immutable)
-     */
-    void update(const SteeringOutput& steering, const float time) {
-        position += linearVelocity * time; // do these operations actually work properly? maybe...
-        orientation += angularVelocity * time;
-        linearVelocity += steering.linearAcceleration * time;
-        angularVelocity += steering.angularAcceleration * time;
-
-        // Clip position.
+    // TODO: Store clipping parameters somewhere as static constant variables.
+    inline void clip()
+    {
         if(position.x >= SCENE_WINDOW_X) {
             position.x = SCENE_WINDOW_X;
         }
@@ -74,6 +55,23 @@ public:
             position.y = 0;
         }
     }
+
+    /**
+     * Updates all kinematic data given steering input and change in time
+     * using the Netwon-Euler 1 integration update algorithm. Order of update matters:
+     * apply steering output last to ensure character gets update from last time around 
+     * update (no retroactive update) and optionally clip.
+     * @param steering the steering output to apply (immutable)
+     * @param time the change in time since last update (immutable)
+     * @param clip if true clip, else no do not clip (immutable)
+     */
+    inline void update(const SteeringOutput& steering, const float time, const bool clip) {
+        position += linearVelocity * time; // do these operations actually work properly? maybe...
+        orientation += angularVelocity * time;
+        linearVelocity += steering.linearAcceleration * time;
+        angularVelocity += steering.angularAcceleration * time;
+        if (clip) { this->clip(); }
+    } 
 };
  
 inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew, float orientationOld, float orientationNew) {
@@ -96,23 +94,6 @@ class SteeringBehavior {
          * @return steering output
          */
         virtual SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) = 0;
-};
-
-/** Clips a given steering output according to free parameters. */
-struct Clip {
-
-     /** Free parameter: maximal possible acceleration. */
-    float maxAcceleration;
-
-    /**
-     * Returns a clipped version of the given steering output.
-     * @param output (immutable)
-     * @return clipped steering output
-     */
-    SteeringOutput clip(const SteeringOutput& output) {
-        SteeringOutput clipped = SteeringOutput();
-        return clipped;
-    }
 };
 
 /** Represents position-matching steering behavior. */
