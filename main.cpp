@@ -14,6 +14,7 @@
 
 using namespace sf;
 using namespace std;
+
 /* Debug output (prints the vector coordinates). */
 void debug(Vector2f v)
 {
@@ -60,69 +61,69 @@ enum CharacterStatus
 class Character
 {
 
-private:
+	private:
 
-	/** Character's kinematic data. */
-	Kinematic kinematic;
+		/** Character's kinematic data. */
+		Kinematic kinematic;
 
-	/** Character's unique ID. */
-	ID id;
+		/** Character's unique ID. */
+		ID id;
 
-public:
-	/** Constructs a Character with a unique ID. */
-	Character() {
-		id = ID();
-	}
+	public:
+		/** Constructs a Character with a unique ID. */
+		Character() {
+			id = ID();
+		}
 
-	/** Character's texture. */
-	Texture texture;
+		/** Character's texture. */
+		Texture texture;
 
-	/** Character's sprite. */
-	Sprite sprite;
+		/** Character's sprite. */
+		Sprite sprite;
 
-	/** Character's scale (how large or small character is). */
-	float scale;
+		/** Character's scale (how large or small character is). */
+		float scale;
 
-	/** Character's status (used for rendering purposes). */
-	CharacterStatus status;
+		/** Character's status (used for rendering purposes). */
+		CharacterStatus status;
 
-	/** Returns the character's x position. */
-	int x() const
-	{
-		return sprite.getPosition().x;
-	}
+		/** Returns the character's x position. */
+		int x() const
+		{
+			return sprite.getPosition().x;
+		}
 
-	/** Returns the character's y position. */
-	int y() const
-	{
-		return sprite.getPosition().y;
-	}
+		/** Returns the character's y position. */
+		int y() const
+		{
+			return sprite.getPosition().y;
+		}
 
-	Vector2f getPosition() const
-	{
-		return sprite.getPosition();
-	}
+		Vector2f getPosition() const
+		{
+			return sprite.getPosition();
+		}
 
-	float getOrientation() const
-	{
-		return sprite.getRotation();
-	}
+		float getOrientation() const
+		{
+			return sprite.getRotation();
+		}
 
-	/** Returns the character's id. */
-	int getID() const
-	{
-		return id.getID();
-	}
+		/** Returns the character's id. */
+		int getID() const
+		{
+			return id.getID();
+		}
 
-	/** Returns the character's kinematic. */
-	Kinematic getKinematic() {
-		return kinematic;
-	}
+		/** Returns the character's kinematic. */
+		Kinematic getKinematic() {
+			return kinematic;
+		}
 
-	/** Sets the character's kinematic.*/
-	void setKinematic(Kinematic kinematic) {
-		this->kinematic = kinematic;
-	}
+		/** Sets the character's kinematic.*/
+		void setKinematic(Kinematic kinematic) {
+			this->kinematic = kinematic;
+		}
 
    /**
 	* Updates character's sprite and kinematic.
@@ -141,122 +142,122 @@ public:
 /** Represents view where scene will take place. */
 class SceneView
 {
-private:
-	/** Width of SceneView. */
-	int width;
+	private:
+		/** Width of SceneView. */
+		int width;
 
-	/** Height of SceneView. */
-	int height;
+		/** Height of SceneView. */
+		int height;
 
-	/** Frames per second of SceneView. */
-	int frames;
+		/** Frames per second of SceneView. */
+		int frames;
 
-	/** SceneView top left corner point. */
-	Vector2f topLeft = Vector2f(0, 0);
+		/** SceneView top left corner point. */
+		Vector2f topLeft = Vector2f(0, 0);
 
-	/** SceneView top right corner point. */
-	Vector2f topRight = Vector2f(width, 0);
+		/** SceneView top right corner point. */
+		Vector2f topRight = Vector2f(width, 0);
 
-	/** SceneView bottom left corner point. */
-	Vector2f botRight = Vector2f(width, height);
+		/** SceneView bottom left corner point. */
+		Vector2f botRight = Vector2f(width, height);
 
-	/** SceneView bottom left corner point. */
-	Vector2f botLeft = Vector2f(0, height);
+		/** SceneView bottom left corner point. */
+		Vector2f botLeft = Vector2f(0, height);
 
-public:
-	/** Scene of SceneView. For now, it will be kept public. */
-	RenderWindow scene;
+	public:
+		/** Scene of SceneView. For now, it will be kept public. */
+		RenderWindow scene;
 
-	/** Constructs the SceneView. */
-	SceneView(int w, int h, int fps)
-	{
-		// Set dimensions and fps.
-		width = w;
-		height = h;
-		frames = fps;
+		/** Constructs the SceneView. */
+		SceneView(int w, int h, int fps)
+		{
+			// Set dimensions and fps.
+			width = w;
+			height = h;
+			frames = fps;
 
-		// Create empty scene.
-		scene.create(VideoMode(width, height), "CSC484");
-		scene.setFramerateLimit(frames);
+			// Create empty scene.
+			scene.create(VideoMode(width, height), "CSC484");
+			scene.setFramerateLimit(frames);
 
-		// Set corners.
-		topLeft = Vector2f(0, 0);
-		topRight = Vector2f(width, 0);
-		botRight = Vector2f(width, height);
-		botLeft = Vector2f(0, height);
-	}
+			// Set corners.
+			topLeft = Vector2f(0, 0);
+			topRight = Vector2f(width, 0);
+			botRight = Vector2f(width, height);
+			botLeft = Vector2f(0, height);
+		}
 
-	/** Getters. */
-	int getWidth() { return width; }
-	int getHeight() { return height; }
-	int getFrames() { return frames; }
-	Vector2f getTopRight() { return topRight; }
-	Vector2f getBotRight() { return botRight; }
-	Vector2f getBotLeft() { return botLeft; }
-	Vector2f getTopLeft() { return topLeft; }
+		/** Getters. */
+		int getWidth() { return width; }
+		int getHeight() { return height; }
+		int getFrames() { return frames; }
+		Vector2f getTopRight() { return topRight; }
+		Vector2f getBotRight() { return botRight; }
+		Vector2f getBotLeft() { return botLeft; }
+		Vector2f getTopLeft() { return topLeft; }
 
-	/**
- 	* Returns true if character is at a point otherwise false.
-  	* @param point the point to compare sprite position to (immutable reference)
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is at a point otherwise false.
-  	*/
-	bool at(const Vector2f &point, const Character &character)
-	{
-		return character.x() == point.x && character.y() == point.y;
-	}
+		/**
+		* Returns true if character is at a point otherwise false.
+		* @param point the point to compare sprite position to (immutable reference)
+		* @param character the character to check (immutable reference)
+		* @return true if character is at a point otherwise false.
+		*/
+		bool at(const Vector2f &point, const Character &character)
+		{
+			return character.x() == point.x && character.y() == point.y;
+		}
 
-	bool atCorner(const Character &character)
-	{
-		return at(topLeft, character) || at(topRight, character) || at(botRight, character) || at(botLeft, character);
-	}
+		bool atCorner(const Character &character)
+		{
+			return at(topLeft, character) || at(topRight, character) || at(botRight, character) || at(botLeft, character);
+		}
 
-	/**
-    * Returns true if character is in the SceneView top region otherwise false.
-    * @param character the character to check (immutable reference)
-    * @return true if character is in the top region otherwise false.
-    */
-	bool inTopRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return x >= 0 && x <= width && y == 0;
-	}
-	/**
-    * Returns true if character is in the SceneView right region otherwise false.
-    * @param character the character to check (immutable reference)
-    * @return true if character is in the right region otherwise false.
-    */
-	bool inRightRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return y >= 0 && y <= height && x == width;
-	}
+		/**
+		* Returns true if character is in the SceneView top region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the top region otherwise false.
+		*/
+		bool inTopRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return x >= 0 && x <= width && y == 0;
+		}
+		/**
+		* Returns true if character is in the SceneView right region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the right region otherwise false.
+		*/
+		bool inRightRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return y >= 0 && y <= height && x == width;
+		}
 
-	/**
-  	* Returns true if character is in the SceneView bottom region otherwise false.
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is in the bottom region otherwise false.
-  	*/
-	bool inBotRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return x >= 0 && x <= width && y == height;
-	}
+		/**
+		* Returns true if character is in the SceneView bottom region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the bottom region otherwise false.
+		*/
+		bool inBotRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return x >= 0 && x <= width && y == height;
+		}
 
-	/**
-  	* Returns true if character is in the SceneView left region otherwise false.
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is in the left region otherwise false.
-  	*/
-	bool inLeftRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return y >= 0 && y <= height && x == 0;
-	}
+		/**
+		* Returns true if character is in the SceneView left region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the left region otherwise false.
+		*/
+		bool inLeftRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return y >= 0 && y <= height && x == 0;
+		}
 };
 
 /** Returns the distance between the two vectors. */
@@ -271,82 +272,80 @@ float distance(Character c1, Character c2) {
 
 class OrientationTable
 {
+	private:
+		unordered_map<int, float> table;
 
-private:
-	unordered_map<int, float> table;
+	public:
+		OrientationTable(const unordered_map<int, float>& orientations)
+		{
+			table = orientations;
+		}
 
-public:
-	OrientationTable(const unordered_map<int, float>& orientations)
-	{
-		table = orientations;
-	}
+		float getOldOrientation(const Character &character) const
+		{
+			return table.at(character.getID());
+		}
 
-	float getOldOrientation(const Character &character) const
-	{
-		return table.at(character.getID());
-	}
-
-	void debug(const Character &character) const
-	{
-		float o = table.at(character.getID());
-		cout << character.getID() << " " << o << endl;
-	}
+		void debug(const Character &character) const
+		{
+			float o = table.at(character.getID());
+			cout << character.getID() << " " << o << endl;
+		}
 };
 
 class PositionTable
 {
+	private:
+		unordered_map<int, Vector2f> table;
 
-private:
-	unordered_map<int, Vector2f> table;
+	public:
+		PositionTable(const unordered_map<int, Vector2f>& positions)
+		{
+			table = positions;
+		}
 
-public:
-	PositionTable(const unordered_map<int, Vector2f>& positions)
-	{
-		table = positions;
-	}
+		Vector2f getOldPosition(const Character &character) const
+		{
+			return table.at(character.getID());
+		}
 
-	Vector2f getOldPosition(const Character &character) const
-	{
-		return table.at(character.getID());
-	}
-
-	void debug(const Character &character) const
-	{
-		Vector2f p = table.at(character.getID());
-		cout << character.getID() << " " << p.x << " " << p.y << endl;
-	}
+		void debug(const Character &character) const
+		{
+			Vector2f p = table.at(character.getID());
+			cout << character.getID() << " " << p.x << " " << p.y << endl;
+		}
 };
 
 class CharacterTable
 {
-private:
-	unordered_map<int, Character*> table;
-	vector<Character*> characters;
+	private:
+		unordered_map<int, Character*> table;
+		vector<Character*> characters;
 
-public:
-	CharacterTable(const vector<Character*>& characters)
-	{
-		for(auto & character: characters) {
-			this->table.insert({character->getID(), character});
-			this->characters.push_back(character);
+	public:
+		CharacterTable(const vector<Character*>& characters)
+		{
+			for(auto & character: characters) {
+				this->table.insert({character->getID(), character});
+				this->characters.push_back(character);
+			}
 		}
-	}
 
-	inline PositionTable generatePositionTable() {
-		unordered_map<int, Vector2f> positions;
-		for(auto & character: characters) {
-			positions.insert({character->getID(), character->getPosition()});
+		inline PositionTable generatePositionTable() {
+			unordered_map<int, Vector2f> positions;
+			for(auto & character: characters) {
+				positions.insert({character->getID(), character->getPosition()});
+			}
+			return PositionTable(positions);
 		}
-		return PositionTable(positions);
-	}
 
-	inline OrientationTable generateOrientationTable() {
-		unordered_map<int, float> orientations;
-		for(auto & character: characters) {
-			orientations.insert({character->getID(), character->getOrientation()});
+		inline OrientationTable generateOrientationTable() {
+			unordered_map<int, float> orientations;
+			for(auto & character: characters) {
+				orientations.insert({character->getID(), character->getOrientation()});
+			}
+			return OrientationTable(orientations);
 		}
-		return OrientationTable(orientations);
-	}
 };
 
 /* Debug output (prints the sprites coordinates). */
@@ -531,6 +530,7 @@ void ArriveAlignAnimation()  {
 		orientationTable = characterTable.generateOrientationTable();
 	}
 }
+
 /** Animates the wander steering behavior. */
 void WanderAnimation() {
 

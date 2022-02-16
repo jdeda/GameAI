@@ -26,16 +26,16 @@ const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SP
 const float MAX_SPEED = 2.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_POS = 2000.f;
+const float MAX_VELOCITY_POS = 750.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_NEG = -2000.f;
+const float MAX_VELOCITY_NEG = -750.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_POS = 1000.f;
+const float MAX_ACCELERATION_POS = 500.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_NEG = -1000.f;
+const float MAX_ACCELERATION_NEG = -500.f;
 
 /** Estimated time to reach target speed. */
 const float TIME_TO_REACH_TARGET_SPEED = 1.f;
@@ -47,9 +47,9 @@ const float TIME_TO_REACH_TARGET_ROTATION = 1.f;
 const float TIME_TO_REACH_TARGET_VELOCITY = 1.f;
 
 /** Defined radius for which sprite has arrived at a target. */
-const float RADIUS_OF_ARRIVAL = 5.f;
+const float RADIUS_OF_ARRIVAL = 50.f;
 
 /** Defined radius for which sprite must declerate towards target. */
-const float RADIUS_OF_DECELERATION = 10.f;
+const float RADIUS_OF_DECELERATION = 250.f;
 
 #endif
