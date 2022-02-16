@@ -364,6 +364,11 @@ void debug(const Character &character)
 {
 	cout << character.x() << " " << character.y() << endl;
 }
+/* Debug output (prints the vector coordinates). */
+void debug(Vector2f v)
+{
+	cout << v.x << " " << v.y << endl;
+}
 
 /* Debug output (for sanity check). */
 void sanity()
@@ -432,7 +437,6 @@ void VelocityMatchAnimation() {
 		 * rely soly on the mouse's movements. The character is velocity matching the mouse, so all it needs to do is apply the accelerations computed from the matcher function.
 		 * It does not move itself, it moves from the matcher function: it is simply following the provided calculations to velocity match the mouse.
 		 */
-		// cout << character.getKinematic().orientation << endl;
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
 		mouseKinematic.update(SteeringOutput(), dt, clip);
@@ -453,33 +457,77 @@ void VelocityMatchAnimation() {
 
 /** Amimates the arrive and align steering behavior. */
 /** Animates the wander steering behavior. */
-void ArriveAlignAnimation() {
+void ArriveAlignAnimation()  {
+
+	// Setup velocity matcher.
+	Velocity velocityMatcher(TIME_TO_TARGET_VELOCITY);
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character;
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+
+	// Setup click position data.
+	Vector2f mouseClickPosition;
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup CharacterTable and PositionTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = true;
 
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
 		// Handle scene poll event.
 		Event event;
 		while (sceneView.scene.pollEvent(event))
 		{
 			switch (event.type)
 			{
+
+			// Mouse clicked.
+			case Event::MouseButtonPressed:
+				mouseClickPosition = Vector2f(Mouse::getPosition());
+				debug(mouseClickPosition);
+				break;
+
+			// Close scene.
 			case Event::Closed:
 				sceneView.scene.close();
 				break;
 			}
 		}
 
+		// Have mouse arrive-align wherever the latest mouse click was.
+		SteeringOutput arrivealign; // = ArriveAlign(character, mouseClickPosition);
+		character.update(arrivealign, dt, clip);
+
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
+
+		// Update positions and orientations of previous loop.
+		positionTable = characterTable.generatePositionTable();
+		orientationTable = characterTable.generateOrientationTable();
 	}
 }
-
 /** Animates the wander steering behavior. */
 void WanderAnimation() {
 
