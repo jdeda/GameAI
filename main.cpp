@@ -415,7 +415,6 @@ void ArriveAnimation() {
 	{
 		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
 		float dt = clock.restart().asSeconds();
-		// positionTable.debug(character);
 
 		// Handle scene poll event.
 		Event event;
@@ -431,29 +430,13 @@ void ArriveAnimation() {
 
 		// Generate kinematics for every character.
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
-		// mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
-		// mouseKinematic.update(SteeringOutput(), dt, clip);
-		// characterTable.setKinematics(dt, positionTable, orientationTable);
-		// cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
-		// cout << mouseKinematic.linearVelocity.x << " " << mouseKinematic.linearVelocity.y << endl;
-		cout << mousePositionNew.x << " " << mousePositionNew.y << endl;
-		cout << mousePositionOld.x << " " << mousePositionOld.y << endl << endl;
+		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
+		mouseKinematic.update(SteeringOutput(), dt, clip); // Why?
+		// characterTable.setKinematics(dt, positionTable, orientationTable); // Why is this broken?
 
 		// Velocity match character to the mouse.
-		// SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		// character.update(match, dt, clip);
-		// Vector2f characterPos = character.getKinematic().position;
-		// cout << characterPos.x << " " << characterPos.y << endl;
-		// cout << endl;
-		
-		// Move accordingly.
-		SteeringOutput match;
-		// match.linearAcceleration = Vector2f(1.f, 1.f);
-		// match.angularAcceleration = 0.f;
-		// character.update(match, dt, clip);
-		// Vector2f characterPos = character.getKinematic().position;
-		// cout << characterPos.x << " " << characterPos.y << endl;
-		// cout << endl;
+		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		character.update(match, dt, clip);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
@@ -464,6 +447,10 @@ void ArriveAnimation() {
 		positionTable = characterTable.generatePositionTable();
 		orientationTable = characterTable.generateOrientationTable();
 		mousePositionOld = Vector2f(mouse.getPosition(sceneView.scene));
+
+		// TODO:
+		// Must always update kinematic in loop even if no steering behaviors applied. Computing kinematics only gets you position and velocities,
+		// but you need to update even if nothing applied. This is very odd.
 	}
 }
 

@@ -64,10 +64,7 @@ public:
         if(angularVelocity >= MAX_ACCELERATION_POS) { angularVelocity = MAX_ACCELERATION_POS; }
         if(angularVelocity <= MAX_VELOCITY_NEG) { angularVelocity = MAX_VELOCITY_NEG; }
 
-        // Clip if you move out of bounds.
-        // if(position.x + linearVelocity.x >= SCENE_WINDOW_X) {
-
-        // }
+        // TODO: Clip if you move out of bounds????
     }
 
     /**
@@ -90,9 +87,6 @@ public:
  
 inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew, float orientationOld, float orientationNew) {
 	Kinematic newKinematic;
-    // cout << positionNew.x << " " << positionNew.y << endl;
-    // cout << positionOld.x << " " << positionOld.y << endl << endl;
-    // The y's for some reason don't match if you never move?????!?!?!
     newKinematic.position = positionNew;
     newKinematic.linearVelocity = (positionNew - positionOld) / dt;
     newKinematic.orientation = orientationNew;
