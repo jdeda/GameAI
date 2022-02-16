@@ -13,27 +13,43 @@ const int SCENE_WINDOW_Y = 480;
 /* SceneView frame rate. */
 const int SCENE_WINDOW_FR = 100;
 
+/* Number of sprites. */
+const int NUM_CHARACTERS = 4;
+
 /* Expected speed for sprite moving in X dimensions. */
-const float SPEED_X = 10.f;
+const float SPEED_X = 50.f;
 
 /* Expected speed for sprite moving in Y dimensions. */
 const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
 
-/* Number of sprites. */
-const int NUM_CHARACTERS = 4;
-
-const float TIME_TO_TARGET_VELOCITY = 1.0;
+/** Maximim possible speed for a sprite. */
+const float MAX_SPEED = 2.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_POS = 50.f;
+const float MAX_VELOCITY_POS = 2000.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_NEG = -50.f;
+const float MAX_VELOCITY_NEG = -2000.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_POS = 50.f;
+const float MAX_ACCELERATION_POS = 1000.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_NEG = -50.f;
+const float MAX_ACCELERATION_NEG = -1000.f;
+
+/** Estimated time to reach target speed. */
+const float TIME_TO_REACH_TARGET_SPEED = 1.f;
+
+/** Estimated time to reach target rotation. */
+const float TIME_TO_REACH_TARGET_ROTATION = 1.f;
+
+/** Estimated time to reach target velocity. */
+const float TIME_TO_REACH_TARGET_VELOCITY = 1.f;
+
+/** Defined radius for which sprite has arrived at a target. */
+const float RADIUS_OF_ARRIVAL = 5.f;
+
+/** Defined radius for which sprite must declerate towards target. */
+const float RADIUS_OF_DECELERATION = 10.f;
 
 #endif

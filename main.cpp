@@ -14,6 +14,11 @@
 
 using namespace sf;
 using namespace std;
+/* Debug output (prints the vector coordinates). */
+void debug(Vector2f v)
+{
+	cout << v.x << " " << v.y << endl;
+}
 
 /** Represents a unique ID. */
 class ID {
@@ -127,24 +132,9 @@ public:
 	*/
 	void update(const SteeringOutput& steering, const float dt, const bool clip) {
 		kinematic.update(steering, dt, clip);
-		sprite.move(kinematic.linearVelocity); // THIS WAS THE WHOLE PROBLEM. UPDATE WITH VELOCITY DUMBASS.
+		sprite.setPosition(kinematic.position);
 		sprite.setRotation(kinematic.orientation);
-
-		// If moving moves you out of bounds, don't move.
-		// const sf::Vector2f spriteSize(
-        //     sprite.getTexture()->getSize().x * sprite.getScale().x,
-        //     sprite.getTexture()->getSize().y * sprite.getScale().y
-        // );
-
-		// cout << sprite.getPosition().x << " " << sprite.getPosition().y << endl;
-		// kinematic.update(steering, dt, clip);
-		// sprite.setPosition(kinematic.position); // THIS WAS THE WHOLE PROBLEM. UPDATE WITH VELOCITY DUMBASS.
-		// sprite.setRotation(kinematic.orientation);
-		// cout << sprite.getPosition().x << " " << sprite.getPosition().y << endl;
-		// cout << endl;
-		// TODO: 
-		// Notice, the sprite should only accessible here, for now,
-		// we will leave it public for simplicity.
+		// debug(kinematic.linearVelocity);
 	}
 };
 
@@ -364,11 +354,6 @@ void debug(const Character &character)
 {
 	cout << character.x() << " " << character.y() << endl;
 }
-/* Debug output (prints the vector coordinates). */
-void debug(Vector2f v)
-{
-	cout << v.x << " " << v.y << endl;
-}
 
 /* Debug output (for sanity check). */
 void sanity()
@@ -380,7 +365,7 @@ void sanity()
 void VelocityMatchAnimation() {
 
 	// Setup velocity matcher.
-	Velocity velocityMatcher(TIME_TO_TARGET_VELOCITY);
+	Velocity velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
 
 	// Setup character.
 	float scale = 0.05;
@@ -443,6 +428,10 @@ void VelocityMatchAnimation() {
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 		character.update(match, dt, clip);
 
+		// debug(character);
+		// debug(character.getKinematic().position);
+		// BIG PROLEM. THESE DO NOT MATCH AT ALL.
+
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
@@ -456,11 +445,12 @@ void VelocityMatchAnimation() {
 }
 
 /** Amimates the arrive and align steering behavior. */
-/** Animates the wander steering behavior. */
 void ArriveAlignAnimation()  {
 
-	// Setup velocity matcher.
-	Velocity velocityMatcher(TIME_TO_TARGET_VELOCITY);
+	// Setup arrive-align matchers.
+	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION);
+	SteeringComposer steeringComposer;
 
 	// Setup character.
 	float scale = 0.05;
@@ -474,7 +464,7 @@ void ArriveAlignAnimation()  {
 	character.status = CharacterStatus::running;
 
 	// Setup click position data.
-	Vector2f mouseClickPosition;
+	Vector2f mouseClickPosition(0.f, 0.f);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -515,8 +505,21 @@ void ArriveAlignAnimation()  {
 		}
 
 		// Have mouse arrive-align wherever the latest mouse click was.
-		SteeringOutput arrivealign; // = ArriveAlign(character, mouseClickPosition);
-		character.update(arrivealign, dt, clip);
+		Kinematic mouseKinematic;
+		mouseKinematic.position = mouseClickPosition;
+		mouseKinematic.orientation = 0;
+		// SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		// SteeringOutput align = orientationMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		// SteeringOutput composed = steeringComposer.compose(arrive, align);
+		// character.update(arrivealign, dt, clip);
+		if(mouseClickPosition != Vector2f(0.f, 0.f)) {
+			SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+			character.update(arrive, dt, clip);
+			// debug(mouseClickPosition);
+			// debug(character.sprite.getPosition());
+			// debug(character.getKinematic().position);
+			// cout << endl;
+		}
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
