@@ -281,7 +281,7 @@ float distance(Character c1, Character c2) {
 
 class OrientationTable
 {
-
+	
 private:
 	unordered_map<int, float> table;
 
@@ -294,6 +294,12 @@ public:
 	float getOldOrientation(const Character &character) const
 	{
 		return table.at(character.getID());
+	}
+
+	void debug(const Character &character) const
+	{
+		float o = table.at(character.getID());
+		cout << character.getID() << " " << o << endl;
 	}
 };
 
@@ -350,17 +356,6 @@ public:
 			orientations.insert({character->getID(), character->getOrientation()});
 		}
 		return OrientationTable(orientations);
-	}
-
-	inline void setKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations, const bool clip) {
-		for(auto & character: characters) {
-			Kinematic kinematic = character->getKinematic();
-			character->setKinematic(computeKinematic(
-				dt, positions.getOldPosition(*character), character->getPosition(),
-				orientations.getOldOrientation(*character), character->getOrientation()
-			));
-			character->update(SteeringOutput(), dt, clip);
-		}
 	}
 };
 
@@ -463,8 +458,32 @@ void VelocityMatchAnimation() {
 }
 
 /** Amimates the arrive and align steering behavior. */
+/** Animates the wander steering behavior. */
 void ArriveAlignAnimation() {
 
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
+			}
+		}
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.display();
+	}
 }
 
 /** Animates the wander steering behavior. */
