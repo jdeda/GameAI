@@ -352,13 +352,14 @@ public:
 		return OrientationTable(orientations);
 	}
 
-	inline void setKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations) {
+	inline void setKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations, const bool clip) {
 		for(auto & character: characters) {
 			Kinematic kinematic = character->getKinematic();
 			character->setKinematic(computeKinematic(
 				dt, positions.getOldPosition(*character), character->getPosition(),
 				orientations.getOldOrientation(*character), character->getOrientation()
 			));
+			character->update(SteeringOutput(), dt, clip);
 		}
 	}
 };
@@ -375,10 +376,10 @@ void sanity()
 	cout << "sanity" << endl;
 }
 
-/** Animates the arrive steering behavior. */
-void ArriveAnimation() {
+/** Animates the velocity match steering behavior. */
+void VelocityMatchAnimation() {
 
-	// Setup Arrive algorithm.
+	// Setup velocity matcher.
 	Velocity velocityMatcher(TIME_TO_TARGET_VELOCITY);
 
 	// Setup character.
@@ -428,15 +429,22 @@ void ArriveAnimation() {
 			}
 		}
 
-		// Generate kinematics for every character.
+		/**
+		 * Update mouse kinematic and velocity match charcter to mouse.
+		 *
+		 * Notes on this behavior:
+		 * Mouse will generate a new kinematic and update itself with an empty steering behavior. The mouse moves automatically and thus its kinematic needs to be computed
+		 * (AKA set its velocities) and updated (AKA needs to apply its own movement). The character's however do not need to do any of this. Why? The character's movements
+		 * rely soly on the mouse's movements. The character is velocity matching the mouse, so all it needs to do is apply the accelerations computed from the matcher function.
+		 * It does not move itself, it moves from the matcher function: it is simply following the provided calculations to velocity match the mouse.
+		 */
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
 		mouseKinematic.update(SteeringOutput(), dt, clip); // Why?
-		// characterTable.setKinematics(dt, positionTable, orientationTable); // Why is this broken?
-
-		// Velocity match character to the mouse.
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 		character.update(match, dt, clip);
+
+		cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
@@ -452,6 +460,11 @@ void ArriveAnimation() {
 		// Must always update kinematic in loop even if no steering behaviors applied. Computing kinematics only gets you position and velocities,
 		// but you need to update even if nothing applied. This is very odd.
 	}
+}
+
+/** Amimates the arrive and align steering behavior. */
+void ArriveAlignAnimation() {
+
 }
 
 /** Animates the wander steering behavior. */
@@ -512,6 +525,7 @@ void FlockAnimation() {
 
 /** Represents possible steering behavior algorithms for switching over and running animations. */
 enum Algorithm {
+	VelocityMatch,
 	ArriveAlign,
 	Wander,
 	Flock,
@@ -520,6 +534,7 @@ enum Algorithm {
 
 /** Algorithms represented as strings. */
 vector<string> AlgorithmStrings = {
+	"VelocityMatch",
 	"ArriveAlign",
 	"Wander",
 	"Flock",
@@ -556,8 +571,11 @@ int main(int argc, char *argv[])
 	// Get algorithm and run corresponding algorithm.
 	Algorithm alg = getAlg();
 	switch (alg) {
+		case Algorithm::VelocityMatch:
+			VelocityMatchAnimation();
+			break;
 		case Algorithm::ArriveAlign:
-			ArriveAnimation();
+			ArriveAlignAnimation();
 			break;
 		case Algorithm::Wander:
 			WanderAnimation();
