@@ -281,7 +281,7 @@ float distance(Character c1, Character c2) {
 
 class OrientationTable
 {
-	
+
 private:
 	unordered_map<int, float> table;
 
@@ -387,7 +387,6 @@ void VelocityMatchAnimation() {
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
-	character.sprite.setPosition(0.f, 0.f);
 
 	// Setup mouse.
 	Mouse mouse;
@@ -433,13 +432,12 @@ void VelocityMatchAnimation() {
 		 * rely soly on the mouse's movements. The character is velocity matching the mouse, so all it needs to do is apply the accelerations computed from the matcher function.
 		 * It does not move itself, it moves from the matcher function: it is simply following the provided calculations to velocity match the mouse.
 		 */
+		// cout << character.getKinematic().orientation << endl;
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
-		mouseKinematic.update(SteeringOutput(), dt, clip); // Why?
+		mouseKinematic.update(SteeringOutput(), dt, clip);
 		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 		character.update(match, dt, clip);
-
-		cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
@@ -450,10 +448,6 @@ void VelocityMatchAnimation() {
 		positionTable = characterTable.generatePositionTable();
 		orientationTable = characterTable.generateOrientationTable();
 		mousePositionOld = Vector2f(mouse.getPosition(sceneView.scene));
-
-		// TODO:
-		// Must always update kinematic in loop even if no steering behaviors applied. Computing kinematics only gets you position and velocities,
-		// but you need to update even if nothing applied. This is very odd.
 	}
 }
 

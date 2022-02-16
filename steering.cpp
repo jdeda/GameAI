@@ -149,10 +149,6 @@ public:
         output.angularAcceleration = 0;
         return output;
     }
-
-    float getTimeToTargeVelocity() {
-        return timeToTargeVelocity;
-    }
 };
 
 /** Represents rotation-matching steering behavior. */
