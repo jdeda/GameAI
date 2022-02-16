@@ -90,6 +90,9 @@ public:
  
 inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew, float orientationOld, float orientationNew) {
 	Kinematic newKinematic;
+    // cout << positionNew.x << " " << positionNew.y << endl;
+    // cout << positionOld.x << " " << positionOld.y << endl << endl;
+    // The y's for some reason don't match if you never move?????!?!?!
     newKinematic.position = positionNew;
     newKinematic.linearVelocity = (positionNew - positionOld) / dt;
     newKinematic.orientation = orientationNew;

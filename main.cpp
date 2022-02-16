@@ -431,9 +431,13 @@ void ArriveAnimation() {
 
 		// Generate kinematics for every character.
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
-		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
-		mouseKinematic.update(SteeringOutput(), dt, clip);
+		// mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
+		// mouseKinematic.update(SteeringOutput(), dt, clip);
 		// characterTable.setKinematics(dt, positionTable, orientationTable);
+		// cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
+		// cout << mouseKinematic.linearVelocity.x << " " << mouseKinematic.linearVelocity.y << endl;
+		cout << mousePositionNew.x << " " << mousePositionNew.y << endl;
+		cout << mousePositionOld.x << " " << mousePositionOld.y << endl << endl;
 
 		// Velocity match character to the mouse.
 		// SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
@@ -444,12 +448,12 @@ void ArriveAnimation() {
 		
 		// Move accordingly.
 		SteeringOutput match;
-		match.linearAcceleration = Vector2f(1.f, 1.f);
-		match.angularAcceleration = 0.f;
-		character.update(match, dt, clip);
-		Vector2f characterPos = character.getKinematic().position;
-		cout << characterPos.x << " " << characterPos.y << endl;
-		cout << endl;
+		// match.linearAcceleration = Vector2f(1.f, 1.f);
+		// match.angularAcceleration = 0.f;
+		// character.update(match, dt, clip);
+		// Vector2f characterPos = character.getKinematic().position;
+		// cout << characterPos.x << " " << characterPos.y << endl;
+		// cout << endl;
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
@@ -459,7 +463,7 @@ void ArriveAnimation() {
 		// Update positions and orientations of previous loop.
 		positionTable = characterTable.generatePositionTable();
 		orientationTable = characterTable.generateOrientationTable();
-		mousePositionOld = Vector2f(mouse.getPosition());
+		mousePositionOld = Vector2f(mouse.getPosition(sceneView.scene));
 	}
 }
 
