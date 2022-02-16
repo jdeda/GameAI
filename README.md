@@ -30,8 +30,9 @@ Algorithm choices:
 ## Program Features: Algorithms
 This program has a host of steering behavior variable-matching algorithms that can be visualized. See psuedo-code below to know more about these algorithms.
 
-### Algorithm: VELOCITY
-This algorithm simply matches the character's velocity to the target's velocity. 
+### Algorithm: VelocityMatch
+Velocity matching algorithm. This algorithm simply matches the character's velocity to the target's velocity. 
+Visually, the character will follow target on parallel path, "copying its movements" but staying a fixed distance away.
 ```python
 def VAR_MATCH_VELOCITY(character, target, timeToTargetVelocity):
     linear = target.velocity - character.velocity
@@ -39,38 +40,40 @@ def VAR_MATCH_VELOCITY(character, target, timeToTargetVelocity):
     return linear
 ```
 
-### Algorithm: ARRIVE
-This algorithm smoothly moves character's position to target's position.
+### Algorithm: Arrive
+Position matching algorithm. This algorithm smoothly moves the character's position to the target's position.
+Visually, the character will "arrive" at the target location, smoothly, slowing down upon approach, without oscillation or reversing or overshooting, and finally stopping.
 ```python
 def ARRIVE(character, target, timeToTargetSpeed,
-           maxSpeed, radiusSatisfaction, radiusDeceleration):
+           maxSpeed, radiusOfArrival, radiusOfDeceleration):
 
     # Extract direction and distance from character to target.
     direction = target.position - character.position
     distance = direction.length()
    
-    # Set goal speed.
-    if distance < radiusSatisfaction
+    #  Set goal speed.
+    if distance < radiusOfArrival
         goalSpeed = 0
-    else if distance > radiusDeceleration
+    else if distance > radiusOfDeceleration
         goalSpeed = maxSpeed
     else
         goalSpeed = maxSpeed * (distance / radiusDeceleration)
  
-    # Set goal velocity.
+    # Set goal velocity in direction of character to target with goal speed.
     goalVelocity = direction
     goalVelocity.normalize()
     goalVelocity *= goalSpeed
  
-    # Make into acceleration and return
+    # Make into acceleration such that we can apply and get to goal velocity.
     linear = goalVelocity - character.velocity
     linear /= timeToTargetSpeed
-    return linear, angular # angular probably needed even if not used
+    angular = 0
+    return linear, angular
     
 ```
 
-### Algorithm: ALIGN
-This algorithm matches character's orientation to target's orientation with no regards to position or velocity of either one.
+### Algorithm: Align
+Orientation matching algorithm. This algorithm matches character's orientation to target's orientation with no regards to position or velocity of either one. Visually, the character will smoothly orient its direction towards the target over a time, eventually locking.
 ```python
 def mapToRange(rotation):
     r = rotation mod 360
@@ -81,8 +84,8 @@ def mapToRange(rotation):
     else
         return 180 + r
         
-def ALIGN(character, target, timeToTargetRotation,
-          maxRotation, radiusSatisfaction, radiusDeceleration): 
+def ALIGN(character, target, timeToReachTargetRotation,
+          maxRotation, radiusOfArrival, radiusOfDeceleration): 
 
     # Extract direction and distance from character to target.
     rotation = target.orientation - character.orientation
@@ -90,21 +93,21 @@ def ALIGN(character, target, timeToTargetRotation,
     rotationSize = |rotation|
     
     # Set rotation.
-    if rotationSize < radiusSatisfaction
+    if rotationSize < radiusOfArrival
         goalRotation = 0
-    else if rotationSize > radiusDeceleration
+    else if rotationSize > radiusOfDeceleration
         goalRotation = maxRotation
     else
-        goalRotation = maxRotation * (rotationSize / rotationDecel
-        
+        goalRotation = maxRotation * (rotationSize / radiusOfDeceleration)
     
-    # Convert to angular acceleration and return.
+    # Make into acceleration such that we can apply and get to goal velocity.
     angular = goalRotation - characte.rotation
     angular /= timeToTargetRotation
-    return angular
+    linear = 0
+    return linear, angular
 ```
 
-### Algorithm: WANDER
+### Algorithm: Wander
 This algorithm simply moves character randomly about.
 ```python
 def WANDER(character, target, timeToTarget):
@@ -118,9 +121,13 @@ def WANDER(character, target, timeToTarget):
     
 ```
 
-### Algorithm: FLOCK
+### Algorithm: Flock
 This algorithm moves group of characters together in unison.
 ```python
 def FLOCK(character, target, timeToTarget):
     // TBD...
 ```
+
+
+### Resources
+Artifical Intelligence for Games, Third Edition - Ian Millington, ISBN:1138483974
