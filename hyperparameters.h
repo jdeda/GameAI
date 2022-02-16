@@ -23,19 +23,19 @@ const float SPEED_X = 50.f;
 const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
 
 /** Maximim possible speed for a sprite. */
-const float MAX_SPEED = 2.f;
+const float MAX_SPEED = 500.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_POS = 750.f;
+const float MAX_VELOCITY_POS = 1500.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_VELOCITY_NEG = -750.f;
+const float MAX_VELOCITY_NEG = -1500.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_POS = 500.f;
+const float MAX_ACCELERATION_POS = 1000.f;
 
 /** Maximim possible velocity for a sprite. */
-const float MAX_ACCELERATION_NEG = -500.f;
+const float MAX_ACCELERATION_NEG = -1000.f;
 
 /** Estimated time to reach target speed. */
 const float TIME_TO_REACH_TARGET_SPEED = 1.f;

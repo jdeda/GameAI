@@ -391,7 +391,7 @@ void VelocityMatchAnimation() {
 	CharacterTable characterTable(characters);
 	PositionTable positionTable = characterTable.generatePositionTable();
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
-	bool clip = true;
+	bool clip = false;
 
 	// Render scene and measure time.
 	Clock clock;
@@ -492,7 +492,7 @@ void ArriveAlignAnimation()  {
 
 			// Mouse clicked.
 			case Event::MouseButtonPressed:
-				mouseClickPosition = Vector2f(Mouse::getPosition());
+				mouseClickPosition = Vector2f(Mouse::getPosition(sceneView.scene));
 				debug(mouseClickPosition);
 				break;
 
@@ -514,10 +514,9 @@ void ArriveAlignAnimation()  {
 		if(mouseClickPosition != Vector2f(0.f, 0.f)) {
 			SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 			character.update(arrive, dt, clip);
-			// debug(mouseClickPosition);
-			// debug(character.sprite.getPosition());
-			// debug(character.getKinematic().position);
-			// cout << endl;
+			debug(character.sprite.getPosition());
+			debug(character.getKinematic().position);
+			cout << endl;
 		}
 
 		// Re-render scene.

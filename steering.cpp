@@ -104,14 +104,6 @@ class SteeringBehavior {
          * @return steering output
          */
         virtual SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) = 0;
-
-        // /**
-        //  * Calculates accelerations for variable matching of relative variable (when implemented concretely).
-        //  * @param character the character kinematic (immutable)
-        //  * @param target the target kinematic (immutable)
-        //  * @return steering output
-        //  */
-        // virtual SteeringOutput calculateAcceleration(const Kinematic& character, const Vector2f target) = 0;
 };
 
 /** Represents position-matching steering behavior. */
@@ -147,7 +139,6 @@ class Position: SteeringBehavior {
             //Extract direction and distance from character to target.
             Vector2f direction = targetP - character.position;
             float distance = vmath::length(direction);
-            // cout << distance << endl;
    
             //  Set goal speed.
             if (distance < radiusOfArrival) {
@@ -164,11 +155,14 @@ class Position: SteeringBehavior {
             goalLinearVelocity = direction;
             goalLinearVelocity = vmath::normalized(goalLinearVelocity);
             goalLinearVelocity *= goalLinearSpeed;
+            // cout << goalLinearVelocity.x << " " << goalLinearVelocity.y << endl;
         
             // Return. Create acceleration such that we can apply and get to goal velocity.
             output.linearAcceleration = goalLinearVelocity - character.linearVelocity;
             output.linearAcceleration /= timeToReachTargetSpeed;
             output.angularAcceleration = 0;
+
+            // cout << output.linearAcceleration.x << " " << output.linearAcceleration.y << endl;
             return output;
         }
 };
@@ -218,29 +212,23 @@ class Orientation: SteeringBehavior {
 class Velocity: SteeringBehavior {
 
     private:
-
         /** Free parameter: estimation of time to reach target velocity. */
         float timeToReachTargetVelocity;
 
     public:
+        /** Constructs the class with all fields. */
+        Velocity(const float f) {
+            timeToReachTargetVelocity = f;
+        }
 
-    Velocity(float f) {
-        timeToReachTargetVelocity = f;
-    }
-    void debugy(Vector2f v)
-{
-	cout << v.x << " " << v.y << endl;
-}
-
-    /** Returns variable-matching steering output relative to orientation. */
-    SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-        SteeringOutput output = SteeringOutput();
-        output.linearAcceleration = target.linearVelocity - character.linearVelocity;
-        output.linearAcceleration = output.linearAcceleration / timeToReachTargetVelocity;
-        output.angularAcceleration = 0;
-        // debugy(output.linearVelocity);
-        return output;
-    }
+        /** Returns variable-matching steering output relative to orientation. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+            SteeringOutput output = SteeringOutput();
+            output.linearAcceleration = target.linearVelocity - character.linearVelocity;
+            output.linearAcceleration = output.linearAcceleration / timeToReachTargetVelocity;
+            output.angularAcceleration = 0;
+            return output;
+        }
 };
 
 /** Represents rotation-matching steering behavior. */
