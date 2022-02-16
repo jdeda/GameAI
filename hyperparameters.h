@@ -22,4 +22,18 @@ const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SP
 /* Number of sprites. */
 const int NUM_CHARACTERS = 4;
 
+const float TIME_TO_TARGET_VELOCITY = 0.1;
+
+/** Maximim possible velocity for a sprite. */
+const float MAX_VELOCITY_POS = 15.f;
+
+/** Maximim possible velocity for a sprite. */
+const float MAX_VELOCITY_NEG = -15.f;
+
+/** Maximim possible velocity for a sprite. */
+const float MAX_ACCELERATION_POS = 15.f;
+
+/** Maximim possible velocity for a sprite. */
+const float MAX_ACCELERATION_NEG = -15.f;
+
 #endif

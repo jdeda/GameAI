@@ -7,7 +7,9 @@
 #include <SFML/Graphics.hpp>
 #include <bits/stdc++.h>
 #include "hyperparameters.h"
+#include <iostream>
 using namespace sf;
+using namespace std;
 
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
@@ -42,18 +44,30 @@ public:
     // TODO: Store clipping parameters somewhere as static constant variables.
     inline void clip()
     {
-        if(position.x >= SCENE_WINDOW_X) {
-            position.x = SCENE_WINDOW_X;
-        }
-        if(position.x < 0) {
-            position.x = 0;
-        }
-        if(position.y >= SCENE_WINDOW_Y) {
-            position.y = SCENE_WINDOW_Y;
-        }
-        if(position.y < 0) {
-            position.y = 0;
-        }
+        // Clip position in x plane.
+        if(position.x >= SCENE_WINDOW_X) { position.x = SCENE_WINDOW_X; }
+        if(position.x <= 0) { position.x = 0; }
+
+        // Clip position in y plane.
+        if(position.y >= SCENE_WINDOW_Y) { position.y = SCENE_WINDOW_Y;}
+        if(position.y <= 0) { position.y = 0;}
+
+        // Clip linearVelocity in x plane.
+        if(linearVelocity.x >= MAX_VELOCITY_POS) { linearVelocity.x = MAX_VELOCITY_POS; }
+        if(linearVelocity.x <= MAX_VELOCITY_NEG) { linearVelocity.x = MAX_VELOCITY_NEG; }
+
+        // Clip linearVelocity in y plane.
+        if(linearVelocity.y >= MAX_VELOCITY_POS) { linearVelocity.y = MAX_VELOCITY_POS; }
+        if(linearVelocity.y <= MAX_VELOCITY_NEG) { linearVelocity.y = MAX_VELOCITY_NEG; }
+        
+        // Clip angularVelocity.
+        if(angularVelocity >= MAX_ACCELERATION_POS) { angularVelocity = MAX_ACCELERATION_POS; }
+        if(angularVelocity <= MAX_VELOCITY_NEG) { angularVelocity = MAX_VELOCITY_NEG; }
+
+        // Clip if you move out of bounds.
+        // if(position.x + linearVelocity.x >= SCENE_WINDOW_X) {
+
+        // }
     }
 
     /**
@@ -65,11 +79,11 @@ public:
      * @param time the change in time since last update (immutable)
      * @param clip if true clip, else no do not clip (immutable)
      */
-    inline void update(const SteeringOutput& steering, const float time, const bool clip) {
-        position += linearVelocity * time; // do these operations actually work properly? maybe...
-        orientation += angularVelocity * time;
-        linearVelocity += steering.linearAcceleration * time;
-        angularVelocity += steering.angularAcceleration * time;
+    inline void update(const SteeringOutput& steering, const float dt, const bool clip) {
+        position += linearVelocity * dt; // do these operations actually work properly? maybe...
+        orientation += angularVelocity * dt;
+        linearVelocity += steering.linearAcceleration * dt;
+        angularVelocity += steering.angularAcceleration * dt;
         if (clip) { this->clip(); }
     } 
 };
@@ -134,7 +148,7 @@ public:
     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
         SteeringOutput output = SteeringOutput();
         output.linearAcceleration = target.linearVelocity - character.linearVelocity;
-        output.linearAcceleration /= timeToTargeVelocity;
+        output.linearAcceleration = output.linearAcceleration / timeToTargeVelocity;
         output.angularAcceleration = 0;
         return output;
     }

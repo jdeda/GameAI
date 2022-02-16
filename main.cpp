@@ -125,11 +125,23 @@ public:
      * @param time the change in time since last update (immutable)
 	 * @param clip if true clip otherwise don't (immutable)
 	*/
-	void update(const SteeringOutput& steering, const float time, const bool clip) {
-		kinematic.update(steering, time, clip);
-		sprite.setPosition(kinematic.position.x, kinematic.position.y);
+	void update(const SteeringOutput& steering, const float dt, const bool clip) {
+		kinematic.update(steering, dt, clip);
+		sprite.move(kinematic.linearVelocity); // THIS WAS THE WHOLE PROBLEM. UPDATE WITH VELOCITY DUMBASS.
 		sprite.setRotation(kinematic.orientation);
 
+		// If moving moves you out of bounds, don't move.
+		// const sf::Vector2f spriteSize(
+        //     sprite.getTexture()->getSize().x * sprite.getScale().x,
+        //     sprite.getTexture()->getSize().y * sprite.getScale().y
+        // );
+
+		// cout << sprite.getPosition().x << " " << sprite.getPosition().y << endl;
+		// kinematic.update(steering, dt, clip);
+		// sprite.setPosition(kinematic.position); // THIS WAS THE WHOLE PROBLEM. UPDATE WITH VELOCITY DUMBASS.
+		// sprite.setRotation(kinematic.orientation);
+		// cout << sprite.getPosition().x << " " << sprite.getPosition().y << endl;
+		// cout << endl;
 		// TODO: 
 		// Notice, the sprite should only accessible here, for now,
 		// we will leave it public for simplicity.
@@ -342,6 +354,7 @@ public:
 
 	inline void setKinematics(float dt, const PositionTable& positions, const OrientationTable& orientations) {
 		for(auto & character: characters) {
+			Kinematic kinematic = character->getKinematic();
 			character->setKinematic(computeKinematic(
 				dt, positions.getOldPosition(*character), character->getPosition(),
 				orientations.getOldOrientation(*character), character->getOrientation()
@@ -366,7 +379,7 @@ void sanity()
 void ArriveAnimation() {
 
 	// Setup Arrive algorithm.
-	Velocity velocityMatcher(0.01);
+	Velocity velocityMatcher(TIME_TO_TARGET_VELOCITY);
 
 	// Setup character.
 	float scale = 0.05;
@@ -378,6 +391,7 @@ void ArriveAnimation() {
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
+	character.sprite.setPosition(0.f, 0.f);
 
 	// Setup mouse.
 	Mouse mouse;
@@ -417,15 +431,25 @@ void ArriveAnimation() {
 
 		// Generate kinematics for every character.
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
-		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0);
+		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
 		mouseKinematic.update(SteeringOutput(), dt, clip);
-		cout << mouseKinematic.position.x << " " << mouseKinematic.position.y << endl;
-		characterTable.setKinematics(dt, positionTable, orientationTable);
+		// characterTable.setKinematics(dt, positionTable, orientationTable);
 
 		// Velocity match character to the mouse.
-		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		// cout << match.linearAcceleration << endl;
+		// SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		// character.update(match, dt, clip);
+		// Vector2f characterPos = character.getKinematic().position;
+		// cout << characterPos.x << " " << characterPos.y << endl;
+		// cout << endl;
+		
+		// Move accordingly.
+		SteeringOutput match;
+		match.linearAcceleration = Vector2f(1.f, 1.f);
+		match.angularAcceleration = 0.f;
 		character.update(match, dt, clip);
+		Vector2f characterPos = character.getKinematic().position;
+		cout << characterPos.x << " " << characterPos.y << endl;
+		cout << endl;
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
