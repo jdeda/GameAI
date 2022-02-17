@@ -22,7 +22,7 @@ class SteeringOutput {
 
         /** Angular acceleration (theta/t^2). */
         float angularAcceleration;
-    };
+};
 
 /** Represents kinematic data for steering behaviors. Units are not defined. */
 class Kinematic {
@@ -175,8 +175,9 @@ class Orientation: SteeringBehavior {
         float timeToReachTargetRotation;
         float radiusOfArrival;
         float radiusOfDeceleration;
+        float maxRotation;
     
-        int mapToRange(const int rotation) {
+        float mapToRange(int rotation) {
             int r = rotation % 360;
             if (abs(r) <= 180) {
                 return r;
@@ -192,18 +193,41 @@ class Orientation: SteeringBehavior {
     public:
 
         /** Constructs class with all fields. */
-        Orientation(const float t, const float r1, const float r2) {
+        Orientation(const float t, const float r1, const float r2, float m) {
             timeToReachTargetRotation = t;
             radiusOfArrival = r1;
             radiusOfDeceleration = r2;
+            maxRotation = m;
         }
 
         /** Returns variable-matching steering output relative to orientation. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-            SteeringOutput output = SteeringOutput();
 
-            // Only use target position from target kinematic.
-            Vector2f targetP = target.position;
+            // Setup output.
+            SteeringOutput output = SteeringOutput();
+            float goalAngularVelocity = 0;
+
+            // Extract direction and distance from character to target.
+            float angularVelocity = target.orientation - character.orientation;
+            angularVelocity = mapToRange(angularVelocity);
+            float angularVelocityLength = abs(angularVelocity);
+            
+            // Set rotation.
+            if (angularVelocityLength < radiusOfArrival) {
+                goalAngularVelocity = 0;
+            }
+            else if (angularVelocityLength > radiusOfDeceleration) {
+                goalAngularVelocity = maxRotation;
+            }
+            else {
+                goalAngularVelocity = maxRotation * (angularVelocityLength / radiusOfDeceleration);
+            }
+            
+            // Make into acceleration such that we can apply and get to goal velocity.
+            output.angularAcceleration = goalAngularVelocity - character.angularVelocity;
+            output.angularAcceleration /= timeToReachTargetRotation;
+            output.linearAcceleration = Vector2f(0.f, 0.f);
+
             return output;
         }
 };

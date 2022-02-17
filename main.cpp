@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include "steering.cpp"
 #include "hyperparameters.h"
+#include <cmath>
 
 using namespace sf;
 using namespace std;
@@ -448,7 +449,7 @@ void ArriveAlignAnimation()  {
 
 	// Setup arrive-align matchers.
 	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION);
+	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 	SteeringComposer steeringComposer;
 
 	// Setup character.
@@ -461,9 +462,11 @@ void ArriveAlignAnimation()  {
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 
 	// Setup click position data.
 	Vector2f mouseClickPosition(0.f, 0.f);
+	float mouseClickOrientation = 0;
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -493,7 +496,10 @@ void ArriveAlignAnimation()  {
 			// Mouse clicked.
 			case Event::MouseButtonPressed:
 				mouseClickPosition = Vector2f(Mouse::getPosition(sceneView.scene));
-				debug(mouseClickPosition);
+				// mouseClickOrientation = (atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI)) - 45;
+				mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
+				cout << mouseClickOrientation << endl;
+				// debug(mouseClickPosition);
 				break;
 
 			// Close scene.
@@ -506,17 +512,13 @@ void ArriveAlignAnimation()  {
 		// Have mouse arrive-align wherever the latest mouse click was.
 		Kinematic mouseKinematic;
 		mouseKinematic.position = mouseClickPosition;
-		mouseKinematic.orientation = 0;
-		// SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		// SteeringOutput align = orientationMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		// SteeringOutput composed = steeringComposer.compose(arrive, align);
-		// character.update(arrivealign, dt, clip);
+		mouseKinematic.orientation = mouseClickOrientation;
+		// cout << mouseClickOrientation << endl;
 		if(mouseClickPosition != Vector2f(0.f, 0.f)) {
 			SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+			SteeringOutput align = orientationMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 			character.update(arrive, dt, clip);
-			debug(character.sprite.getPosition());
-			debug(character.getKinematic().position);
-			cout << endl;
+			character.update(align, dt, clip);
 		}
 
 		// Re-render scene.
