@@ -361,6 +361,11 @@ void sanity()
 	cout << "sanity" << endl;
 }
 
+bool outOfBounds(const Vector2f& p) {
+	return p.x >= SCENE_WINDOW_X || p.x < 0 ||
+		   p.y >= SCENE_WINDOW_Y || p.y < 0;
+}
+
 /** Animates the velocity match steering behavior. */
 void VelocityMatchAnimation() {
 
@@ -377,7 +382,10 @@ void VelocityMatchAnimation() {
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
-
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Kinematic initialState;
+	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	character.setKinematic(initialState);
 	// Setup mouse.
 	Mouse mouse;
 	Kinematic mouseKinematic;
@@ -423,10 +431,12 @@ void VelocityMatchAnimation() {
 		 * It does not move itself, it moves from the matcher function: it is simply following the provided calculations to velocity match the mouse.
 		 */
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
-		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
-		mouseKinematic.update(SteeringOutput(), dt, clip);
-		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-		character.update(match, dt, clip);
+		if(!outOfBounds(mousePositionNew)) {
+			mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
+			mouseKinematic.update(SteeringOutput(), dt, clip);
+			SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+			character.update(match, dt, clip);
+		}
 
 		// debug(character);
 		// debug(character.getKinematic().position);
@@ -462,6 +472,9 @@ void ArriveAlignAnimation()  {
 	character.sprite.setScale(scale, scale);
 	character.status = CharacterStatus::running;
 	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Kinematic initialState;
+	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	character.setKinematic(initialState);
 
 	// Setup click position data.
 	Vector2f mouseClickPosition(0.f, 0.f);

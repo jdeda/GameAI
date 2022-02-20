@@ -13,9 +13,9 @@
 using namespace sf;
 using namespace std;
 
-    random_device rd;
-    mt19937 gen(rd());
-    binomial_distribution<> d(5, 1.0/6.0);
+    // random_device rd;
+    // mt19937 gen(rd());
+    // binomial_distribution<> d(5, 1.0/6.0);
 
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
@@ -315,7 +315,7 @@ class Wander: SteeringBehavior {
         SteeringOutput output = SteeringOutput();
 
         // Calcualte target to delegate.
-        wanderOrientation += d(gen) * wanderRate;
+        wanderOrientation += -1 * wanderRate;
         
         // Calculate the combined target orientation.
         float targetOrientation = wanderOrientation + character.orientation;
