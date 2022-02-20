@@ -9,8 +9,13 @@
 #include "hyperparameters.h"
 #include "vectormath.cpp"
 #include <iostream>
+#include <random>
 using namespace sf;
 using namespace std;
+
+    random_device rd;
+    mt19937 gen(rd());
+    binomial_distribution<> d(5, 1.0/6.0);
 
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
@@ -261,6 +266,74 @@ class Rotation: SteeringBehavior {
     /** Returns variable-matching steering output relative to orientation. */
     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
         SteeringOutput output = SteeringOutput();
+        return output;
+    }
+};
+
+// class Face: Align {
+
+//      /** Returns variable-matching steering output to achieve Face. */
+//     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+//         SteeringOutput output = SteeringOutput();
+
+//         // Calculate targe to delegate to align.
+//         vector direction = target.position - character.position;
+
+//         // Check for a zero direction, make no change if so.
+//         if(vmath::length(direction) == 0) {
+//             return target;
+//         }
+
+//         // Delegate to align.
+//         Align.tar
+//         return output;
+//     }
+// };
+
+class Wander: SteeringBehavior {
+
+    private:
+        // Position positionMatcher;
+        // Orientation orientationMatcher;
+        float wanderOffset;
+        float wanderRadius;
+        float wanderRate;
+        float wanderOrientation;
+        float maxAcceleration;
+
+    public:
+        Wander(const float off, const float radius, const float rate, const float orient, const float accel) {
+            wanderOffset = off;
+            wanderRadius = radius;
+            wanderRate = rate;
+            wanderOrientation = orient;
+            maxAcceleration = accel;
+        }
+
+    /** Returns variable-matching steering output to achieve Wander. */
+    SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+        SteeringOutput output = SteeringOutput();
+
+        // Calcualte target to delegate.
+        wanderOrientation += d(gen) * wanderRate;
+        
+        // Calculate the combined target orientation.
+        float targetOrientation = wanderOrientation + character.orientation;
+        
+        // Calculate the center of the wander circle.
+        Vector2f target = character.position + wanderOffset * vmath::asVector(character.orientation);
+
+        // Calculate the target location.
+        target += wanderRadius * vmath::asVector(targetOrientation);
+
+        // Delegate to face.
+        // output = Face.calculateAcceleration();
+
+        // Now set the linear acceleration to be full at
+        // acceleration in the direction of the orientation.
+        output.linearAcceleration = maxAcceleration * vmath::asVector(character.orientation);
+
+
         return output;
     }
 };
