@@ -369,7 +369,7 @@ bool outOfBounds(const Vector2f& p) {
 void VelocityMatchAnimation() {
 
 	// Setup velocity matcher.
-	Velocity velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
+	VelocityMatch velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
 
 	// Setup character.
 	float scale = 0.05;
@@ -455,8 +455,8 @@ void VelocityMatchAnimation() {
 void ArriveAlignAnimation()  {
 
 	// Setup arrive-align matchers.
-	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
+	Arrive positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	Align orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
 	// Setup character.
 	float scale = 0.05;
@@ -549,127 +549,9 @@ void ArriveAlignAnimation()  {
 	}
 }
 
-/** Amimates the wander steering behavior. */
-void WanderAnimation()  {
+void WanderAnimation() {}
+void FlockAnimation() {}
 
-	// Setup arrive-align matchers.
-	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
-
-	// Setup character.
-	float scale = 0.05;
-	Texture texture;
-	texture.loadFromFile("assets/boid.png");
-	Character character;
-	character.scale = scale;
-	character.texture = texture;
-	character.sprite = *(new Sprite(texture));
-	character.sprite.setScale(scale, scale);
-	character.status = CharacterStatus::running;
-	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
-
-	// Setup click position data.
-	Vector2f mouseClickPosition(0.f, 0.f);
-	float mouseClickOrientation = 0;
-
-	// Setup SceneView.
-	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-
-	// Setup CharacterTable and PositionTable.
-	vector<Character*> characters;
-	characters.push_back(&character);
-	CharacterTable characterTable(characters);
-	PositionTable positionTable = characterTable.generatePositionTable();
-	OrientationTable orientationTable = characterTable.generateOrientationTable();
-	bool clip = true;
-
-	Vector2f currentCharacterPosition;
-	Vector2f distVector;
-
-	// Render scene and measure time.
-	Clock clock;
-	while (sceneView.scene.isOpen())
-	{
-		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
-		float dt = clock.restart().asSeconds();
-
-		// Handle scene poll event.
-		Event event;
-		while (sceneView.scene.pollEvent(event))
-		{
-			switch (event.type)
-			{
-
-			// Mouse clicked.
-			case Event::MouseButtonPressed:
-				mouseClickPosition = Vector2f(Mouse::getPosition(sceneView.scene));
-				currentCharacterPosition = character.getKinematic().position;
-				distVector = mouseClickPosition - currentCharacterPosition;
-				mouseClickOrientation = atan2(distVector.y, distVector.x) * (180.f / M_PI) - 45;
-
-				// mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
-				// disp = mouseK.getKinematic().linearVelocity - character.getKinematic().linearVelocity;
-				// mouseClickOrientation = atan2(disp.x, disp.y) * (180.f / M_PI);
-				cout << mouseClickOrientation << endl;
-				// debug(mouseClickPosition);
-				break;
-
-			// Close scene.
-			case Event::Closed:
-				sceneView.scene.close();
-				break;
-			}
-		}
-
-		// Have mouse arrive-align wherever the latest mouse click was.
-		Kinematic mouseKinematic;
-		mouseKinematic.position = mouseClickPosition;
-		mouseKinematic.orientation = mouseClickOrientation;
-		// cout << mouseClickOrientation << endl;
-		if(mouseClickPosition != Vector2f(0.f, 0.f)) {
-			SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-			SteeringOutput align = orientationMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
-			character.update(arrive, dt, clip);
-			character.update(align, dt, clip);
-		}
-
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		sceneView.scene.draw(character.sprite);
-		sceneView.scene.display();
-
-		// Update positions and orientations of previous loop.
-		positionTable = characterTable.generatePositionTable();
-		orientationTable = characterTable.generateOrientationTable();
-	}
-}
-/** Animates the flocking steering behavior. */
-void FlockAnimation() {
-
-	// Setup SceneView.
-	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-
-	// Render scene and measure time.
-	Clock clock;
-	while (sceneView.scene.isOpen())
-	{
-		// Handle scene poll event.
-		Event event;
-		while (sceneView.scene.pollEvent(event))
-		{
-			switch (event.type)
-			{
-			case Event::Closed:
-				sceneView.scene.close();
-				break;
-			}
-		}
-
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		sceneView.scene.display();
-	}
-}
 
 /** Represents possible steering behavior algorithms for switching over and running animations. */
 enum Algorithm {

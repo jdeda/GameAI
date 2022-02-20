@@ -13,10 +13,6 @@
 using namespace sf;
 using namespace std;
 
-    // random_device rd;
-    // mt19937 gen(rd());
-    // binomial_distribution<> d(5, 1.0/6.0);
-
 /** Represents steering output parameters modeled by steering behavior. */
 class SteeringOutput {
 
@@ -89,6 +85,7 @@ class Kinematic {
         } 
 };
  
+/** Generates and returns a kinematic. */
 inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const Vector2f& positionNew, float orientationOld, float orientationNew) {
 	Kinematic newKinematic;
     newKinematic.position = positionNew;
@@ -98,7 +95,7 @@ inline Kinematic computeKinematic(float dt, const Vector2f& positionOld, const V
 	return newKinematic;
 }
 
-/** Represents steering behaviors. */
+/** Interface representing steering behaviors. */
 class SteeringBehavior {
     public:         
 
@@ -111,7 +108,7 @@ class SteeringBehavior {
         virtual SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) = 0;
 };
 
-/** Represents position-matching steering behavior. */
+/** Abstract class representing position-matching steering behavior. */
 class Position: SteeringBehavior {
 
     private:
@@ -130,49 +127,13 @@ class Position: SteeringBehavior {
             maxSpeed = s;
         }
 
-        /** Returns variable-matching steering output relative to position. */
-        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-            
-            // Only use target position from target kinematic.
-            Vector2f targetP = target.position;
-
-            // Setup output.
-            SteeringOutput output = SteeringOutput();
-            float goalLinearSpeed = 0;
-            Vector2f goalLinearVelocity;
-            
-            //Extract direction and distance from character to target.
-            Vector2f direction = targetP - character.position;
-            float distance = vmath::length(direction);
-   
-            //  Set goal speed.
-            if (distance < radiusOfArrival) {
-                goalLinearSpeed = 0;
-            }
-            else if (distance > radiusOfDeceleration) {
-                goalLinearSpeed = maxSpeed;
-            }
-            else {
-                goalLinearSpeed = maxSpeed * (distance / radiusOfDeceleration);
-            }
- 
-            // Set goal velocity in direction of character to target with goal speed.
-            goalLinearVelocity = direction;
-            goalLinearVelocity = vmath::normalized(goalLinearVelocity);
-            goalLinearVelocity *= goalLinearSpeed;
-            // cout << goalLinearVelocity.x << " " << goalLinearVelocity.y << endl;
-        
-            // Return. Create acceleration such that we can apply and get to goal velocity.
-            output.linearAcceleration = goalLinearVelocity - character.linearVelocity;
-            output.linearAcceleration /= timeToReachTargetSpeed;
-            output.angularAcceleration = 0;
-
-            // cout << output.linearAcceleration.x << " " << output.linearAcceleration.y << endl;
-            return output;
-        }
+        float getTimeToReachTargetSpeed() { return this->timeToReachTargetSpeed; }
+        float getRadiusOfArrival() { return this->radiusOfArrival; }
+        float getRadiusOfDeceleration() { return this->radiusOfDeceleration; }
+        float getMaxSpeed() { return this->maxSpeed; }
 };
 
-/** Represents orientation-matching steering behavior. */
+/** Abstract class representing orientation-matching steering behavior. */
 class Orientation: SteeringBehavior {
 
     private:
@@ -182,6 +143,18 @@ class Orientation: SteeringBehavior {
         float radiusOfDeceleration;
         float maxRotation;
     
+
+    public:
+
+        /** Constructs class with all fields. */
+        Orientation(const float t, const float r1, const float r2, float m) {
+            timeToReachTargetRotation = t;
+            radiusOfArrival = r1;
+            radiusOfDeceleration = r2;
+            maxRotation = m;
+        }
+
+        // Fits rotation into ranges between 180 degrees.
         float mapToRange(int rotation) {
             int r = rotation % 360;
             if (abs(r) <= 180) {
@@ -195,49 +168,13 @@ class Orientation: SteeringBehavior {
             }
         }
 
-    public:
-
-        /** Constructs class with all fields. */
-        Orientation(const float t, const float r1, const float r2, float m) {
-            timeToReachTargetRotation = t;
-            radiusOfArrival = r1;
-            radiusOfDeceleration = r2;
-            maxRotation = m;
-        }
-
-        /** Returns variable-matching steering output relative to orientation. */
-        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-
-            // Setup output.
-            SteeringOutput output = SteeringOutput();
-            float goalAngularVelocity = 0;
-
-            // Extract direction and distance from character to target.
-            float angularVelocity = target.orientation - character.orientation;
-            angularVelocity = mapToRange(angularVelocity);
-            float angularVelocityLength = abs(angularVelocity);
-            
-            // Set rotation.
-            if (angularVelocityLength < radiusOfArrival) {
-                goalAngularVelocity = 0;
-            }
-            else if (angularVelocityLength > radiusOfDeceleration) {
-                goalAngularVelocity = maxRotation;
-            }
-            else {
-                goalAngularVelocity = maxRotation * (angularVelocityLength / radiusOfDeceleration);
-            }
-            
-            // Make into acceleration such that we can apply and get to goal velocity.
-            output.angularAcceleration = goalAngularVelocity - character.angularVelocity;
-            output.angularAcceleration /= timeToReachTargetRotation;
-            output.linearAcceleration = Vector2f(0.f, 0.f);
-
-            return output;
-        }
+        float getTimeToReachTargetRotation() { return this->timeToReachTargetRotation;}
+        float getRadiusOfArrival() { return this->radiusOfArrival;}
+        float getRadiusOfDeceleration() { return this->radiusOfDeceleration;}
+        float getMaxRotation() { return this->maxRotation;}
 };
 
-/** Represents velocity-matching steering behavior. */
+/** Abstract class representing velocity-matching steering behavior. */
 class Velocity: SteeringBehavior {
 
     private:
@@ -258,9 +195,13 @@ class Velocity: SteeringBehavior {
             output.angularAcceleration = 0;
             return output;
         }
+
+        float getTimeToReachTargetVelocity() {
+            return this->timeToReachTargetVelocity;
+        }
 };
 
-/** Represents rotation-matching steering behavior. */
+/** Abstract class representing rotation-matching steering behavior. */
 class Rotation: SteeringBehavior {
 
     /** Returns variable-matching steering output relative to orientation. */
@@ -270,70 +211,110 @@ class Rotation: SteeringBehavior {
     }
 };
 
-// class Face: Align {
-
-//      /** Returns variable-matching steering output to achieve Face. */
-//     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-//         SteeringOutput output = SteeringOutput();
-
-//         // Calculate targe to delegate to align.
-//         vector direction = target.position - character.position;
-
-//         // Check for a zero direction, make no change if so.
-//         if(vmath::length(direction) == 0) {
-//             return target;
-//         }
-
-//         // Delegate to align.
-//         Align.tar
-//         return output;
-//     }
-// };
-
-class Wander: SteeringBehavior {
-
-    private:
-        // Position positionMatcher;
-        // Orientation orientationMatcher;
-        float wanderOffset;
-        float wanderRadius;
-        float wanderRate;
-        float wanderOrientation;
-        float maxAcceleration;
+/** Velocity-matching algorithm. */
+class VelocityMatch: Velocity {
 
     public:
-        Wander(const float off, const float radius, const float rate, const float orient, const float accel) {
-            wanderOffset = off;
-            wanderRadius = radius;
-            wanderRate = rate;
-            wanderOrientation = orient;
-            maxAcceleration = accel;
+
+        VelocityMatch(float f) : Velocity(f) {}
+
+        /** VelocityMatch algorithm implementation of velocity matching. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+            SteeringOutput output = SteeringOutput();
+            output.linearAcceleration = target.linearVelocity - character.linearVelocity;
+            output.linearAcceleration = output.linearAcceleration / this->getTimeToReachTargetVelocity();
+            output.angularAcceleration = 0;
+            return output;
         }
+};
 
-    /** Returns variable-matching steering output to achieve Wander. */
-    SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
-        SteeringOutput output = SteeringOutput();
+/** Position-matching algorithm implemented via Arrive. */
+class Arrive: Position {
 
-        // Calcualte target to delegate.
-        wanderOrientation += -1 * wanderRate;
+    public:
+            
+        Arrive(const float t, const float r1, const float r2, float s) : Position(t, r1, r2, s) {}
+
+
+        /** Arrive algorithm implementation of position matching. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+            
+            // Only use target position from target kinematic.
+            Vector2f targetP = target.position;
+
+            // Setup output.
+            SteeringOutput output = SteeringOutput();
+            float goalLinearSpeed = 0;
+            Vector2f goalLinearVelocity;
+            
+            //Extract direction and distance from character to target.
+            Vector2f direction = targetP - character.position;
+            float distance = vmath::length(direction);
+   
+            //  Set goal speed.
+            if (distance < this->getRadiusOfArrival()) {
+                goalLinearSpeed = 0;
+            }
+            else if (distance > this->getRadiusOfDeceleration()) {
+                goalLinearSpeed = this->getMaxSpeed();
+            }
+            else {
+                goalLinearSpeed = this->getMaxSpeed() * (distance / this->getRadiusOfDeceleration());
+            }
+ 
+            // Set goal velocity in direction of character to target with goal speed.
+            goalLinearVelocity = direction;
+            goalLinearVelocity = vmath::normalized(goalLinearVelocity);
+            goalLinearVelocity *= goalLinearSpeed;
+            // cout << goalLinearVelocity.x << " " << goalLinearVelocity.y << endl;
         
-        // Calculate the combined target orientation.
-        float targetOrientation = wanderOrientation + character.orientation;
-        
-        // Calculate the center of the wander circle.
-        Vector2f target = character.position + wanderOffset * vmath::asVector(character.orientation);
+            // Return. Create acceleration such that we can apply and get to goal velocity.
+            output.linearAcceleration = goalLinearVelocity - character.linearVelocity;
+            output.linearAcceleration /= this->getTimeToReachTargetSpeed();
+            output.angularAcceleration = 0;
 
-        // Calculate the target location.
-        target += wanderRadius * vmath::asVector(targetOrientation);
+            // cout << output.linearAcceleration.x << " " << output.linearAcceleration.y << endl;
+            return output;
+        }
+};
 
-        // Delegate to face.
-        // output = Face.calculateAcceleration();
+/** Orientation-matching algorithm implemented via Orientation. */
+class Align: Orientation {
 
-        // Now set the linear acceleration to be full at
-        // acceleration in the direction of the orientation.
-        output.linearAcceleration = maxAcceleration * vmath::asVector(character.orientation);
+    public:
+    
+
+        Align(const float t, const float r1, const float r2, float m) : Orientation(t, r1, r2, m) {}
 
 
-        return output;
-    }
+        /** Align algorithm implementation of orientation matching. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+
+            // Setup output.
+            SteeringOutput output = SteeringOutput();
+            float goalAngularVelocity = 0;
+
+            // Extract direction and distance from character to target.
+            float angularVelocity = target.orientation - character.orientation;
+            angularVelocity = this->mapToRange(angularVelocity);
+            float angularVelocityLength = abs(angularVelocity);
+            
+            // Set rotation.
+            if (angularVelocityLength < this->getRadiusOfArrival()) {
+                goalAngularVelocity = 0;
+            }
+            else if (angularVelocityLength > this->getRadiusOfDeceleration()) {
+                goalAngularVelocity = this->getMaxRotation();
+            }
+            else {
+                goalAngularVelocity = this->getMaxRotation() * (angularVelocityLength / this->getRadiusOfDeceleration());
+            }
+            
+            // Make into acceleration such that we can apply and get to goal velocity.
+            output.angularAcceleration = goalAngularVelocity - character.angularVelocity;
+            output.angularAcceleration /= this->getTimeToReachTargetRotation();
+            output.linearAcceleration = Vector2f(0.f, 0.f);
+
+            return output;
+        }
 };
