@@ -126,18 +126,18 @@ class Character
 			this->kinematic = kinematic;
 		}
 
-   /**
-	* Updates character's sprite and kinematic.
-     * @param steering the steering output to apply (immutable)
-     * @param time the change in time since last update (immutable)
-	 * @param clip if true clip otherwise don't (immutable)
-	*/
-	void update(const SteeringOutput& steering, const float dt, const bool clip) {
-		kinematic.update(steering, dt, clip);
-		sprite.setPosition(kinematic.position);
-		sprite.setRotation(kinematic.orientation);
-		// debug(kinematic.linearVelocity);
-	}
+	/**
+		* Updates character's sprite and kinematic.
+		* @param steering the steering output to apply (immutable)
+		* @param time the change in time since last update (immutable)
+		* @param clip if true clip otherwise don't (immutable)
+		*/
+		void update(const SteeringOutput& steering, const float dt, const bool clip) {
+			kinematic.update(steering, dt, clip);
+			sprite.setPosition(kinematic.position);
+			sprite.setRotation(kinematic.orientation);
+			// debug(kinematic.linearVelocity);
+		}
 };
 
 /** Represents view where scene will take place. */
@@ -434,6 +434,8 @@ void VelocityMatchAnimation() {
 		if(!outOfBounds(mousePositionNew)) {
 			mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
 			mouseKinematic.update(SteeringOutput(), dt, clip);
+			mouseKinematic.linearVelocity.x *= 10; // Needs a boost.
+			mouseKinematic.linearVelocity.y *= 10; // Needs a boost.
 			SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 			character.update(match, dt, clip);
 		}
