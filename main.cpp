@@ -136,7 +136,6 @@ class Character
 			kinematic.update(steering, dt, clip);
 			sprite.setPosition(kinematic.position);
 			sprite.setRotation(kinematic.orientation);
-			// debug(kinematic.linearVelocity);
 		}
 };
 
@@ -432,17 +431,13 @@ void VelocityMatchAnimation() {
 		 */
 		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
 		if(!outOfBounds(mousePositionNew)) {
-			mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
+			mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0);
 			mouseKinematic.update(SteeringOutput(), dt, clip);
 			mouseKinematic.linearVelocity.x *= 10; // Needs a boost.
 			mouseKinematic.linearVelocity.y *= 10; // Needs a boost.
 			SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
 			character.update(match, dt, clip);
 		}
-
-		// debug(character);
-		// debug(character.getKinematic().position);
-		// BIG PROLEM. THESE DO NOT MATCH AT ALL.
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
