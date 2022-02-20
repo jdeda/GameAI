@@ -287,7 +287,7 @@ class Align: Orientation {
         Align(const float t, const float r1, const float r2, float m) : Orientation(t, r1, r2, m) {}
 
 
-        /** Align algorithm implementation of orientation matching. */
+        /** Wander algorithm implementation. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
 
             // Setup output.
@@ -316,5 +316,49 @@ class Align: Orientation {
             output.linearAcceleration = Vector2f(0.f, 0.f);
 
             return output;
+        }
+};
+
+class Wander: Arrive {
+
+    private:
+        float wanderOffset;
+        float wanderRadius;
+        float wanderRate;
+        float wanderOrientation;
+        float maxAcceleration;
+
+    public:
+
+        /** Constructor for  Wander. */
+        Wander(const float off, const float radius, const float rate, const float orient, const float accel,
+               const float t, const float r1, const float r2, float s) : Arrive(t, r1, r2, s) {
+            this->wanderOffset = off;
+            this->wanderRadius = radius;
+            this->wanderRate = rate;
+            this->wanderOrientation = orient;
+            this->maxAcceleration = accel;
+        }
+
+        float getWanderOffset() { return this->wanderOffset; }
+        float getWanderRadius() { return this->wanderRadius; }
+        float getWanderRate() { return this->wanderRate; }
+        float getWanderOrientation() { return this->wanderOrientation; }
+        float getmaxAcceleration() { return this->maxAcceleration; }
+
+        /** Returns variable-matching steering output to achieve Wander. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+            SteeringOutput output = SteeringOutput();
+            Kinematic target;
+            std::random_device rd;
+            mt19937 gen(rd());
+            uniform_real_distribution<> dis(0, 1);
+            float randomBinomial = dis(gen);
+            target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;    
+            Vector2f charOrient = vmath::asVector(character.orientation);
+            target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;
+            target.position.y = (character.position.y + this->getWanderOffset()) *  charOrient.y;
+            target.position += this->getWanderRadius() * vmath::asVector(target.orientation);
+            return Arrive::calculateAcceleration(character, target);
         }
 };

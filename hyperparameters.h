@@ -7,7 +7,7 @@ const int SCENE_WINDOW_X = 640;
 const int SCENE_WINDOW_Y = 480;
 const int SCENE_WINDOW_FR = 100;
 
-const float MAX_SPEED = 500.f;
+const float MAX_SPEED = 100.f;
 
 const float MAX_VELOCITY_POS = 1500.f;
 const float MAX_VELOCITY_NEG = -3000.f;
@@ -29,5 +29,11 @@ const float TIME_TO_REACH_TARGET_VELOCITY = 1.f;
 
 const float RADIUS_OF_ARRIVAL = 50.f;
 const float RADIUS_OF_DECELERATION = 500.f;
+
+const float WANDER_OFFSET = 10.f;
+const float WANDER_RADIUS = 10.f;
+const float WANDER_RATE = 10.f;
+const float WANDER_ORIENTATION = 90.f;
+const float WANDER_MAX_ACCELERATION = 10.f;
 
 #endif

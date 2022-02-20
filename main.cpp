@@ -549,7 +549,80 @@ void ArriveAlignAnimation()  {
 	}
 }
 
-void WanderAnimation() {}
+/** Amimates the arrive and align steering behavior. */
+void WanderAnimation()  {
+
+	// Setup wander algorithm.
+	Wander wander(
+		WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
+		TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED
+	);
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character;
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Kinematic initialState;
+	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	character.setKinematic(initialState);
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup CharacterTable and PositionTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = true;
+
+	Vector2f currentCharacterPosition;
+	Vector2f distVector;
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
+		{
+			switch (event.type)
+			{
+
+			// Close scene.
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
+			}
+		}
+
+		// Apply wander.
+		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
+		character.update(wanderAccelerations, dt, clip);
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
+		sceneView.scene.display();
+
+		// Update positions and orientations of previous loop.
+		positionTable = characterTable.generatePositionTable();
+		orientationTable = characterTable.generateOrientationTable();
+	}
+}
+
 void FlockAnimation() {}
 
 
