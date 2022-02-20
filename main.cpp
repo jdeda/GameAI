@@ -8,32 +8,40 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "steering.cpp"
 #include <stdlib.h>
+#include "steering.cpp"
+#include "hyperparameters.h"
+#include <cmath>
 
 using namespace sf;
 using namespace std;
 
-/** Number of arguments for program. */
-const int ARGC = 2;
+/* Debug output (prints the vector coordinates). */
+void debug(Vector2f v)
+{
+	cout << v.x << " " << v.y << endl;
+}
 
-/* SceneView X length. */
-const int SCENE_WINDOW_X = 640;
+/** Represents a unique ID. */
+class ID {
+	private:
+		static int count;
+		int id;
+	public:
 
-/* SceneView Y length. */
-const int SCENE_WINDOW_Y = 480;
+	 	/** Sets the id of the instance and increments the static count (pattern to preserve uniqueness). */
+		ID()
+		{
+			id = count + 1;
+			count += 1;
+		}
 
-/* SceneView frame rate. */
-const int SCENE_WINDOW_FR = 100;
-
-/* Expected speed for sprite moving in X dimensions. */
-const float SPEED_X = 10.f;
-
-/* Expected speed for sprite moving in Y dimensions. */
-const float SPEED_Y = (float(SCENE_WINDOW_Y) / float(SCENE_WINDOW_X)) * float(SPEED_X);
-
-/* Number of sprites. */
-const int NUM_CHARACTERS = 4;
+		int getID() const
+		{
+			return id;
+		}
+};
+int ID::count = 0;
 
 /** Exits program and displays message to console*/
 void fail(string message) {
@@ -54,234 +62,345 @@ enum CharacterStatus
 class Character
 {
 
-public:
-	/** Constructs a Character. */
-	Character() {}
+	private:
 
-	/** Character's texture. */
-	Texture texture;
+		/** Character's kinematic data. */
+		Kinematic kinematic;
 
-	/** Character's sprite. */
-	Sprite sprite;
+		/** Character's unique ID. */
+		ID id;
 
-	/** Character's scale (how large or small character is). */
-	float scale;
+	public:
+		/** Constructs a Character with a unique ID. */
+		Character() {
+			id = ID();
+		}
 
-	/** Character's status (used for rendering purposes). */
-	CharacterStatus status;
+		/** Character's texture. */
+		Texture texture;
 
-	/** Character's kinematic data. */
-	Kinematic kinematic;
+		/** Character's sprite. */
+		Sprite sprite;
 
-	/** Returns the character's x position. */
-	int x() const
-	{
-		return sprite.getPosition().x;
-	}
+		/** Character's scale (how large or small character is). */
+		float scale;
 
-	/** Returns the character's y position. */
-	int y() const
-	{
-		return sprite.getPosition().y;
+		/** Character's status (used for rendering purposes). */
+		CharacterStatus status;
+
+		/** Returns the character's x position. */
+		int x() const
+		{
+			return sprite.getPosition().x;
+		}
+
+		/** Returns the character's y position. */
+		int y() const
+		{
+			return sprite.getPosition().y;
+		}
+
+		Vector2f getPosition() const
+		{
+			return sprite.getPosition();
+		}
+
+		float getOrientation() const
+		{
+			return sprite.getRotation();
+		}
+
+		/** Returns the character's id. */
+		int getID() const
+		{
+			return id.getID();
+		}
+
+		/** Returns the character's kinematic. */
+		Kinematic getKinematic() {
+			return kinematic;
+		}
+
+		/** Sets the character's kinematic.*/
+		void setKinematic(Kinematic kinematic) {
+			this->kinematic = kinematic;
+		}
+
+   /**
+	* Updates character's sprite and kinematic.
+     * @param steering the steering output to apply (immutable)
+     * @param time the change in time since last update (immutable)
+	 * @param clip if true clip otherwise don't (immutable)
+	*/
+	void update(const SteeringOutput& steering, const float dt, const bool clip) {
+		kinematic.update(steering, dt, clip);
+		sprite.setPosition(kinematic.position);
+		sprite.setRotation(kinematic.orientation);
+		// debug(kinematic.linearVelocity);
 	}
 };
 
 /** Represents view where scene will take place. */
 class SceneView
 {
-private:
-	/** Width of SceneView. */
-	int width;
+	private:
+		/** Width of SceneView. */
+		int width;
 
-	/** Height of SceneView. */
-	int height;
+		/** Height of SceneView. */
+		int height;
 
-	/** Frames per second of SceneView. */
-	int frames;
+		/** Frames per second of SceneView. */
+		int frames;
 
-	/** SceneView top left corner point. */
-	Vector2f topLeft = Vector2f(0, 0);
+		/** SceneView top left corner point. */
+		Vector2f topLeft = Vector2f(0, 0);
 
-	/** SceneView top right corner point. */
-	Vector2f topRight = Vector2f(width, 0);
+		/** SceneView top right corner point. */
+		Vector2f topRight = Vector2f(width, 0);
 
-	/** SceneView bottom left corner point. */
-	Vector2f botRight = Vector2f(width, height);
+		/** SceneView bottom left corner point. */
+		Vector2f botRight = Vector2f(width, height);
 
-	/** SceneView bottom left corner point. */
-	Vector2f botLeft = Vector2f(0, height);
+		/** SceneView bottom left corner point. */
+		Vector2f botLeft = Vector2f(0, height);
 
-public:
-	/** Scene of SceneView. For now, it will be kept public. */
-	RenderWindow scene;
+	public:
+		/** Scene of SceneView. For now, it will be kept public. */
+		RenderWindow scene;
 
-	/** Constructs the SceneView. */
-	SceneView(int w, int h, int fps)
-	{
-		// Set dimensions and fps.
-		width = w;
-		height = h;
-		frames = fps;
+		/** Constructs the SceneView. */
+		SceneView(int w, int h, int fps)
+		{
+			// Set dimensions and fps.
+			width = w;
+			height = h;
+			frames = fps;
 
-		// Create empty scene.
-		scene.create(VideoMode(width, height), "CSC484");
-		scene.setFramerateLimit(frames);
+			// Create empty scene.
+			scene.create(VideoMode(width, height), "CSC484");
+			scene.setFramerateLimit(frames);
 
-		// Set corners.
-		topLeft = Vector2f(0, 0);
-		topRight = Vector2f(width, 0);
-		botRight = Vector2f(width, height);
-		botLeft = Vector2f(0, height);
-	}
+			// Set corners.
+			topLeft = Vector2f(0, 0);
+			topRight = Vector2f(width, 0);
+			botRight = Vector2f(width, height);
+			botLeft = Vector2f(0, height);
+		}
 
-	/** Getters. */
-	int getWidth() { return width; }
-	int getHeight() { return height; }
-	int getFrames() { return frames; }
-	Vector2f getTopRight() { return topRight; }
-	Vector2f getBotRight() { return botRight; }
-	Vector2f getBotLeft() { return botLeft; }
-	Vector2f getTopLeft() { return topLeft; }
+		/** Getters. */
+		int getWidth() { return width; }
+		int getHeight() { return height; }
+		int getFrames() { return frames; }
+		Vector2f getTopRight() { return topRight; }
+		Vector2f getBotRight() { return botRight; }
+		Vector2f getBotLeft() { return botLeft; }
+		Vector2f getTopLeft() { return topLeft; }
 
-	/**
- 	* Returns true if character is at a point otherwise false.
-  	* @param point the point to compare sprite position to (immutable reference)
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is at a point otherwise false.
-  	*/
-	bool at(const Vector2f &point, const Character &character)
-	{
-		return character.x() == point.x && character.y() == point.y;
-	}
+		/**
+		* Returns true if character is at a point otherwise false.
+		* @param point the point to compare sprite position to (immutable reference)
+		* @param character the character to check (immutable reference)
+		* @return true if character is at a point otherwise false.
+		*/
+		bool at(const Vector2f &point, const Character &character)
+		{
+			return character.x() == point.x && character.y() == point.y;
+		}
 
-	bool atCorner(const Character &character)
-	{
-		return at(topLeft, character) || at(topRight, character) || at(botRight, character) || at(botLeft, character);
-	}
+		bool atCorner(const Character &character)
+		{
+			return at(topLeft, character) || at(topRight, character) || at(botRight, character) || at(botLeft, character);
+		}
 
-	/**
-    * Returns true if character is in the SceneView top region otherwise false.
-    * @param character the character to check (immutable reference)
-    * @return true if character is in the top region otherwise false.
-    */
-	bool inTopRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return x >= 0 && x <= width && y == 0;
-	}
-	/**
-    * Returns true if character is in the SceneView right region otherwise false.
-    * @param character the character to check (immutable reference)
-    * @return true if character is in the right region otherwise false.
-    */
-	bool inRightRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return y >= 0 && y <= height && x == width;
-	}
+		/**
+		* Returns true if character is in the SceneView top region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the top region otherwise false.
+		*/
+		bool inTopRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return x >= 0 && x <= width && y == 0;
+		}
+		/**
+		* Returns true if character is in the SceneView right region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the right region otherwise false.
+		*/
+		bool inRightRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return y >= 0 && y <= height && x == width;
+		}
 
-	/**
-  	* Returns true if character is in the SceneView bottom region otherwise false.
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is in the bottom region otherwise false.
-  	*/
-	bool inBotRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return x >= 0 && x <= width && y == height;
-	}
+		/**
+		* Returns true if character is in the SceneView bottom region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the bottom region otherwise false.
+		*/
+		bool inBotRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return x >= 0 && x <= width && y == height;
+		}
 
-	/**
-  	* Returns true if character is in the SceneView left region otherwise false.
-  	* @param character the character to check (immutable reference)
-  	* @return true if character is in the left region otherwise false.
-  	*/
-	bool inLeftRegion(const Character &character)
-	{
-		int x = character.x();
-		int y = character.y();
-		return y >= 0 && y <= height && x == 0;
-	}
+		/**
+		* Returns true if character is in the SceneView left region otherwise false.
+		* @param character the character to check (immutable reference)
+		* @return true if character is in the left region otherwise false.
+		*/
+		bool inLeftRegion(const Character &character)
+		{
+			int x = character.x();
+			int y = character.y();
+			return y >= 0 && y <= height && x == 0;
+		}
 };
 
-/**
-  * Moves the referenced character via mutation according to its SceneView region and trajectory.
-  * @param character the character to move (mutable)
-  * @param sceneView view to check regions of (immutable)
-  */
-void move(Character &character, SceneView &sceneView)
-{
-	// Move right.
-	if (sceneView.inTopRegion(character) && !sceneView.at(sceneView.getTopRight(), character) && character.sprite.getRotation() == 0)
-	{
-		character.sprite.move(SPEED_X, 0);
-	}
-
-	// Move down.
-	if (sceneView.inRightRegion(character) && !sceneView.at(sceneView.getBotRight(), character) && character.sprite.getRotation() == 90)
-	{
-		character.sprite.move(0, SPEED_Y);
-	}
-
-	// Move left.
-	if (sceneView.inBotRegion(character) && !sceneView.at(sceneView.getBotLeft(), character) && character.sprite.getRotation() == 180)
-	{
-		character.sprite.move(-SPEED_X, 0);
-	}
-
-	// Move up.
-	if (sceneView.inLeftRegion(character) && !sceneView.at(sceneView.getTopLeft(), character) && character.sprite.getRotation() == 270)
-	{
-		character.sprite.move(0, -SPEED_Y);
-	}
+/** Returns the distance between the two vectors. */
+float distance(Vector2f p1, Vector2f p2) {
+	return sqrt(pow(p2.y - p1.y, 2) + pow(p2.x - p1.x, 2));
 }
 
-/**
-  * Rotates the referenced character via mutation respective to corner point it has reached.
-  * @param character the character to move (mutable)
-  * @param sceneView view to check regions of (immutable)
-  */
-void rotate(Character &character, SceneView &sceneView)
-{
-
-	// Don't rotate (just started).
-	if (sceneView.at(sceneView.getTopLeft(), character))
-	{
-		character.sprite.setRotation(0);
-	}
-
-	// Face down (time to move down).
-	if (sceneView.at(sceneView.getTopRight(), character))
-	{
-		character.sprite.setRotation(90);
-	}
-
-	// Face left (time to move left).
-	if (sceneView.at(sceneView.getBotRight(), character))
-	{
-		character.sprite.setRotation(180);
-	}
-
-	// Face up (time to move up).
-	if (sceneView.at(sceneView.getBotLeft(), character))
-	{
-		character.sprite.setRotation(270);
-	}
+/** Returns the distance between the two vectors. */
+float distance(Character c1, Character c2) {
+	return sqrt(pow(c1.y() - c1.y(), 2) + pow(c2.x() - c1.x(), 2));
 }
 
-/** Animates the arrive steering behavior. */
-void ArriveAnimation() {
+class OrientationTable
+{
+	private:
+		unordered_map<int, float> table;
+
+	public:
+		OrientationTable(const unordered_map<int, float>& orientations)
+		{
+			table = orientations;
+		}
+
+		float getOldOrientation(const Character &character) const
+		{
+			return table.at(character.getID());
+		}
+
+		void debug(const Character &character) const
+		{
+			float o = table.at(character.getID());
+			cout << character.getID() << " " << o << endl;
+		}
+};
+
+class PositionTable
+{
+	private:
+		unordered_map<int, Vector2f> table;
+
+	public:
+		PositionTable(const unordered_map<int, Vector2f>& positions)
+		{
+			table = positions;
+		}
+
+		Vector2f getOldPosition(const Character &character) const
+		{
+			return table.at(character.getID());
+		}
+
+		void debug(const Character &character) const
+		{
+			Vector2f p = table.at(character.getID());
+			cout << character.getID() << " " << p.x << " " << p.y << endl;
+		}
+};
+
+class CharacterTable
+{
+	private:
+		unordered_map<int, Character*> table;
+		vector<Character*> characters;
+
+	public:
+		CharacterTable(const vector<Character*>& characters)
+		{
+			for(auto & character: characters) {
+				this->table.insert({character->getID(), character});
+				this->characters.push_back(character);
+			}
+		}
+
+		inline PositionTable generatePositionTable() {
+			unordered_map<int, Vector2f> positions;
+			for(auto & character: characters) {
+				positions.insert({character->getID(), character->getPosition()});
+			}
+			return PositionTable(positions);
+		}
+
+		inline OrientationTable generateOrientationTable() {
+			unordered_map<int, float> orientations;
+			for(auto & character: characters) {
+				orientations.insert({character->getID(), character->getOrientation()});
+			}
+			return OrientationTable(orientations);
+		}
+};
+
+/* Debug output (prints the sprites coordinates). */
+void debug(const Character &character)
+{
+	cout << character.x() << " " << character.y() << endl;
+}
+
+/* Debug output (for sanity check). */
+void sanity()
+{
+	cout << "sanity" << endl;
+}
+
+/** Animates the velocity match steering behavior. */
+void VelocityMatchAnimation() {
+
+	// Setup velocity matcher.
+	Velocity velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character;
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+
+	// Setup mouse.
+	Mouse mouse;
+	Kinematic mouseKinematic;
+	Vector2f mousePositionOld(mouse.getPosition());
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup CharacterTable and PositionTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = false;
 
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
 	{
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
 		// Handle scene poll event.
 		Event event;
 		while (sceneView.scene.pollEvent(event))
@@ -294,11 +413,133 @@ void ArriveAnimation() {
 			}
 		}
 
+		/**
+		 * Update mouse kinematic and velocity match charcter to mouse.
+		 *
+		 * Notes on this behavior:
+		 * Mouse will generate a new kinematic and update itself with an empty steering behavior. The mouse moves automatically and thus its kinematic needs to be computed
+		 * (AKA set its velocities) and updated (AKA needs to apply its own movement). The character's however do not need to do any of this. Why? The character's movements
+		 * rely soly on the mouse's movements. The character is velocity matching the mouse, so all it needs to do is apply the accelerations computed from the matcher function.
+		 * It does not move itself, it moves from the matcher function: it is simply following the provided calculations to velocity match the mouse.
+		 */
+		Vector2f mousePositionNew(mouse.getPosition(sceneView.scene));
+		mouseKinematic = computeKinematic(dt, mousePositionOld, mousePositionNew, 0, 0); // TODO: 0s may need to be computed mathematically
+		mouseKinematic.update(SteeringOutput(), dt, clip);
+		SteeringOutput match = velocityMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+		character.update(match, dt, clip);
+
+		// debug(character);
+		// debug(character.getKinematic().position);
+		// BIG PROLEM. THESE DO NOT MATCH AT ALL.
+
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
+
+		// Update positions and orientations of previous loop.
+		positionTable = characterTable.generatePositionTable();
+		orientationTable = characterTable.generateOrientationTable();
+		mousePositionOld = Vector2f(mouse.getPosition(sceneView.scene));
 	}
 }
+
+/** Amimates the arrive and align steering behavior. */
+void ArriveAlignAnimation()  {
+
+	// Setup arrive-align matchers.
+	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
+	SteeringComposer steeringComposer;
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character;
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+
+	// Setup click position data.
+	Vector2f mouseClickPosition(0.f, 0.f);
+	float mouseClickOrientation = 0;
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup CharacterTable and PositionTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = true;
+
+	Vector2f currentCharacterPosition;
+	Vector2f distVector;
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
+		{
+			switch (event.type)
+			{
+
+			// Mouse clicked.
+			case Event::MouseButtonPressed:
+				mouseClickPosition = Vector2f(Mouse::getPosition(sceneView.scene));
+				currentCharacterPosition = character.getKinematic().position;
+				distVector = mouseClickPosition - currentCharacterPosition;
+				mouseClickOrientation = atan2(distVector.y, distVector.x) * (180.f / M_PI) - 45;
+
+				// mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
+				// disp = mouseK.getKinematic().linearVelocity - character.getKinematic().linearVelocity;
+				// mouseClickOrientation = atan2(disp.x, disp.y) * (180.f / M_PI);
+				cout << mouseClickOrientation << endl;
+				// debug(mouseClickPosition);
+				break;
+
+			// Close scene.
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
+			}
+		}
+
+		// Have mouse arrive-align wherever the latest mouse click was.
+		Kinematic mouseKinematic;
+		mouseKinematic.position = mouseClickPosition;
+		mouseKinematic.orientation = mouseClickOrientation;
+		// cout << mouseClickOrientation << endl;
+		if(mouseClickPosition != Vector2f(0.f, 0.f)) {
+			SteeringOutput arrive = positionMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+			SteeringOutput align = orientationMatcher.calculateAcceleration(character.getKinematic(), mouseKinematic);
+			character.update(arrive, dt, clip);
+			character.update(align, dt, clip);
+		}
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
+		sceneView.scene.display();
+
+		// Update positions and orientations of previous loop.
+		positionTable = characterTable.generatePositionTable();
+		orientationTable = characterTable.generateOrientationTable();
+	}
+}
+
 /** Animates the wander steering behavior. */
 void WanderAnimation() {
 
@@ -357,6 +598,7 @@ void FlockAnimation() {
 
 /** Represents possible steering behavior algorithms for switching over and running animations. */
 enum Algorithm {
+	VelocityMatch,
 	ArriveAlign,
 	Wander,
 	Flock,
@@ -365,6 +607,7 @@ enum Algorithm {
 
 /** Algorithms represented as strings. */
 vector<string> AlgorithmStrings = {
+	"VelocityMatch",
 	"ArriveAlign",
 	"Wander",
 	"Flock",
@@ -395,26 +638,17 @@ Algorithm getAlg() {
 	else { return Algorithm(caseNum); }
 }
 
-/* Debug output (prints the sprites coordinates). */
-void debug(const Character &character)
-{
-	cout << character.x() << " " << character.y() << endl;
-}
-
-/* Debug output (for sanity check). */
-void sanity()
-{
-	cout << "sanity" << endl;
-}
-
 /** Runs the program.*/
 int main(int argc, char *argv[])
 {
 	// Get algorithm and run corresponding algorithm.
 	Algorithm alg = getAlg();
 	switch (alg) {
+		case Algorithm::VelocityMatch:
+			VelocityMatchAnimation();
+			break;
 		case Algorithm::ArriveAlign:
-			ArriveAnimation();
+			ArriveAlignAnimation();
 			break;
 		case Algorithm::Wander:
 			WanderAnimation();
