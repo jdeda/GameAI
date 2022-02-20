@@ -264,12 +264,3 @@ class Rotation: SteeringBehavior {
         return output;
     }
 };
-
-
-class SteeringComposer {
-
-    public:
-        SteeringOutput compose(SteeringOutput a, SteeringOutput b) {
-            return SteeringOutput();
-        }
-};

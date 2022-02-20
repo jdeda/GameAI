@@ -450,7 +450,6 @@ void ArriveAlignAnimation()  {
 	// Setup arrive-align matchers.
 	Position positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 	Orientation orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
-	SteeringComposer steeringComposer;
 
 	// Setup character.
 	float scale = 0.05;
