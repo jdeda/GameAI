@@ -479,6 +479,9 @@ void ArriveAlignAnimation()  {
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
 	bool clip = true;
 
+	Vector2f currentCharacterPosition;
+	Vector2f distVector;
+
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
@@ -496,8 +499,13 @@ void ArriveAlignAnimation()  {
 			// Mouse clicked.
 			case Event::MouseButtonPressed:
 				mouseClickPosition = Vector2f(Mouse::getPosition(sceneView.scene));
-				// mouseClickOrientation = (atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI)) - 45;
-				mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
+				currentCharacterPosition = character.getKinematic().position;
+				distVector = mouseClickPosition - currentCharacterPosition;
+				mouseClickOrientation = atan2(distVector.y, distVector.x) * (180.f / M_PI) - 45;
+
+				// mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
+				// disp = mouseK.getKinematic().linearVelocity - character.getKinematic().linearVelocity;
+				// mouseClickOrientation = atan2(disp.x, disp.y) * (180.f / M_PI);
 				cout << mouseClickOrientation << endl;
 				// debug(mouseClickPosition);
 				break;

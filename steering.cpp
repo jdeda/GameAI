@@ -62,8 +62,8 @@ class Kinematic {
             if(linearVelocity.y <= MAX_VELOCITY_NEG) { linearVelocity.y = MAX_VELOCITY_NEG; }
             
             // Clip angularVelocity.
-            if(angularVelocity >= MAX_VELOCITY_POS) { angularVelocity = MAX_ACCELERATION_POS; }
-            if(angularVelocity <= MAX_VELOCITY_NEG) { angularVelocity = MAX_VELOCITY_NEG; }
+            if(angularVelocity >= MAX_VELOCITY_ANGULAR_POS) { angularVelocity = MAX_VELOCITY_ANGULAR_POS; }
+            if(angularVelocity <= MAX_VELOCITY_ANGULAR_NEG) { angularVelocity = MAX_VELOCITY_ANGULAR_NEG; }
         }
 
         /**
