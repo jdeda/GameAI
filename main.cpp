@@ -361,8 +361,10 @@ void sanity()
 }
 
 bool outOfBounds(const Vector2f& p) {
-	return p.x >= SCENE_WINDOW_X || p.x < 0 ||
-		   p.y >= SCENE_WINDOW_Y || p.y < 0;
+	return p.x >= SCENE_WINDOW_X - BOUND_BUFFER|| 
+		   p.x < 0 + BOUND_BUFFER||
+		   p.y >= SCENE_WINDOW_Y - BOUND_BUFFER ||
+		   p.y < 0 + BOUND_BUFFER;
 }
 
 /** Animates the velocity match steering behavior. */
@@ -515,7 +517,6 @@ void ArriveAlignAnimation()  {
 				// mouseClickOrientation = atan2(character.getKinematic().position.x,character.getKinematic().position.y) * (180 / M_PI);
 				// disp = mouseK.getKinematic().linearVelocity - character.getKinematic().linearVelocity;
 				// mouseClickOrientation = atan2(disp.x, disp.y) * (180.f / M_PI);
-				cout << mouseClickOrientation << endl;
 				// debug(mouseClickPosition);
 				break;
 
@@ -549,6 +550,11 @@ void ArriveAlignAnimation()  {
 	}
 }
 
+/** Returns a random number. */
+float randNum() {
+	return ((double) rand() / (RAND_MAX)) * 25.f;
+}
+
 /** Amimates the arrive and align steering behavior. */
 void WanderAnimation()  {
 
@@ -557,6 +563,8 @@ void WanderAnimation()  {
 		WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
 		TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED
 	);
+
+	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
 	// Setup character.
 	float scale = 0.05;
@@ -610,6 +618,22 @@ void WanderAnimation()  {
 		// Apply wander.
 		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
 		character.update(wanderAccelerations, dt, clip);
+		Kinematic wanderKinematic;
+		wanderKinematic.position = wander.getWanderTargetPosition();
+		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
+		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI));
+		wanderKinematic.orientation = distOrient;
+		SteeringOutput alignAcclerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
+		alignAcclerations.angularAcceleration *= -1.f;
+		character.update(alignAcclerations, dt, clip);
+
+		// Deal with out of bounds.
+		// if(outOfBounds(character.getKinematic().position)) {
+		// 	Vector2f hotFix = Vector2f(randNum(), randNum());
+		// 	wander.setWanderTargetPosition(hotFix);
+		// 	wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
+		// 	character.update(wanderAccelerations, dt, clip);
+		// }
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));

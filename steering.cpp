@@ -47,23 +47,23 @@ class Kinematic {
         inline void clip()
         {
             // Clip position in x plane.
-            if(position.x >= SCENE_WINDOW_X) {
-                cout << "hi" << endl; 
-                position.x = SCENE_WINDOW_X;
+            if(position.x >= SCENE_WINDOW_X - BOUND_BUFFER) {
+                // cout << "hi" << endl; 
+                position.x = SCENE_WINDOW_X - BOUND_BUFFER;
             }
-            if(position.x <= 0) { 
-                cout << "hi" << endl;
-                position.x = 0;
+            if(position.x <= 0 + BOUND_BUFFER) { 
+                // cout << "hi" << endl;
+                position.x = 0 + BOUND_BUFFER;
             }
 
             // Clip position in y plane.
-            if(position.y >= SCENE_WINDOW_Y) { 
-                cout << "hi" << endl;
-                position.y = SCENE_WINDOW_Y;
+            if(position.y >= SCENE_WINDOW_Y - BOUND_BUFFER) { 
+                // cout << "hi" << endl;
+                position.y = SCENE_WINDOW_Y - BOUND_BUFFER;
             }
-            if(position.y <= 0) {
-                cout << "hi" << endl; 
-                position.y = 0;
+            if(position.y <= 0 + BOUND_BUFFER) {
+                // cout << "hi" << endl; 
+                position.y = 0 + BOUND_BUFFER;
             }
 
             // Clip linearVelocity in x plane.
@@ -339,8 +339,11 @@ class Wander: Arrive {
         float wanderRate;
         float wanderOrientation;
         float maxAcceleration;
+        Vector2f wanderTargetPosition; // This is cheese...
 
     public:
+
+
 
         /** Constructor for  Wander. */
         Wander(const float off, const float radius, const float rate, const float orient, const float accel,
@@ -368,6 +371,10 @@ class Wander: Arrive {
             target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;
             target.position.y = (character.position.y + this->getWanderOffset()) *  charOrient.y;
             target.position += this->getWanderRadius() * vmath::asVector(target.orientation);
-            return Arrive::calculateAcceleration(character, target);
+            this->wanderTargetPosition = target.position;
+            return Arrive::calculateAcceleration(character, target);    
         }
+
+        Vector2f getWanderTargetPosition() { return this->wanderTargetPosition; }
+        void setWanderTargetPosition(const Vector2f& p) { this->wanderTargetPosition = p; }
 };
