@@ -32,7 +32,7 @@ const float RADIUS_OF_DECELERATION = 500.f;
 
 const float WANDER_OFFSET = 10.f;
 const float WANDER_RADIUS = 10.f;
-const float WANDER_RATE = 10.f;
+const float WANDER_RATE = 50.f;
 const float WANDER_ORIENTATION = 90.f;
 const float WANDER_MAX_ACCELERATION = 10.f;
 

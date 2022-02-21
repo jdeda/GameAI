@@ -350,10 +350,7 @@ class Wander: Arrive {
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
             SteeringOutput output = SteeringOutput();
             Kinematic target;
-            std::random_device rd;
-            mt19937 gen(rd());
-            uniform_real_distribution<> dis(0, 1);
-            float randomBinomial = dis(gen);
+            float randomBinomial = ((double) rand() / (RAND_MAX)) * 25.f;
             target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;    
             Vector2f charOrient = vmath::asVector(character.orientation);
             target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;

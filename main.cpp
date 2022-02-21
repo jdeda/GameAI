@@ -584,8 +584,7 @@ void WanderAnimation()  {
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
 	bool clip = true;
 
-	Vector2f currentCharacterPosition;
-	Vector2f distVector;
+	srand(1);
 
 	// Render scene and measure time.
 	Clock clock;
