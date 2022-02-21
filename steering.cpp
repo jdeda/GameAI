@@ -47,12 +47,24 @@ class Kinematic {
         inline void clip()
         {
             // Clip position in x plane.
-            if(position.x >= SCENE_WINDOW_X) { position.x = SCENE_WINDOW_X; }
-            if(position.x <= 0) { position.x = 0; }
+            if(position.x >= SCENE_WINDOW_X) {
+                cout << "hi" << endl; 
+                position.x = SCENE_WINDOW_X;
+            }
+            if(position.x <= 0) { 
+                cout << "hi" << endl;
+                position.x = 0;
+            }
 
             // Clip position in y plane.
-            if(position.y >= SCENE_WINDOW_Y) { position.y = SCENE_WINDOW_Y;}
-            if(position.y <= 0) { position.y = 0;}
+            if(position.y >= SCENE_WINDOW_Y) { 
+                cout << "hi" << endl;
+                position.y = SCENE_WINDOW_Y;
+            }
+            if(position.y <= 0) {
+                cout << "hi" << endl; 
+                position.y = 0;
+            }
 
             // Clip linearVelocity in x plane.
             if(linearVelocity.x >= MAX_VELOCITY_POS) { linearVelocity.x = MAX_VELOCITY_POS; }
