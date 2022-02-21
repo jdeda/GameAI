@@ -555,6 +555,21 @@ float randNum() {
 	return ((double) rand() / (RAND_MAX)) * 25.f;
 }
 
+        // Fits rotation into ranges between 180 degrees.
+        float mapToRange(int rotation) {
+            int r = rotation % 360;
+            if (abs(r) <= 180) {
+                return r;
+            }
+            else if (abs(r) > 180) {
+                return 180 - r;
+            }
+            else {
+                return 180 + r;
+            }
+        }
+
+
 /** Amimates the arrive and align steering behavior. */
 void WanderAnimation()  {
 
@@ -580,6 +595,7 @@ void WanderAnimation()  {
 	Kinematic initialState;
 	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -615,17 +631,27 @@ void WanderAnimation()  {
 			}
 		}
 
-		// Apply wander.
+		// Calculate Wander.
 		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
-		character.update(wanderAccelerations, dt, clip);
+		
+		// Calculate align.
 		Kinematic wanderKinematic;
 		wanderKinematic.position = wander.getWanderTargetPosition();
 		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
-		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI));
+		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
 		wanderKinematic.orientation = distOrient;
+		// cout << wanderKinematic.orientation << endl;
 		SteeringOutput alignAcclerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
-		alignAcclerations.angularAcceleration *= -1.f;
+		// alignAcclerations.angularAcceleration *= -1; // Multiply as rotating in wrong direction...
+		cout << alignAcclerations.angularAcceleration << endl;
+		// alignAcclerations.angularAcceleration *= 10.f;
+		cout << endl;
+		
+		// Apply accelerations.
+		// cout << character.getKinematic().orientation << endl;
 		character.update(alignAcclerations, dt, clip);
+		character.update(wanderAccelerations, dt, clip);
+
 
 		// Deal with out of bounds.
 		// if(outOfBounds(character.getKinematic().position)) {

@@ -29,6 +29,7 @@ class SteeringOutput {
 class Kinematic {
 
     public:
+
         // TODO: these variables should be private with getters, and can only be set via an update.
 
         /** Current point in space (x, y). */
@@ -42,6 +43,13 @@ class Kinematic {
 
         /** Current angular velocity (theta/t). */
         float angularVelocity;
+
+        Kinematic() {
+            position = Vector2f(0.f, 0.f);
+            orientation = 0.f;
+            linearVelocity = Vector2f(0.f, 0.f);
+            angularVelocity = 0.f;
+        }
 
         // TODO: Store clipping parameters somewhere as static constant variables.
         inline void clip()
@@ -77,6 +85,18 @@ class Kinematic {
             // Clip angularVelocity.
             if(angularVelocity >= MAX_VELOCITY_ANGULAR_POS) { angularVelocity = MAX_VELOCITY_ANGULAR_POS; }
             if(angularVelocity <= MAX_VELOCITY_ANGULAR_NEG) { angularVelocity = MAX_VELOCITY_ANGULAR_NEG; }
+
+            // Clip angularVelocity.
+            int r = (int) angularVelocity % 360;
+            if (abs(r) <= 180) {
+                angularVelocity = r;
+            }
+            else if (abs(r) > 180) {
+                angularVelocity = 180 - r;
+            }
+            else {
+                angularVelocity = 180 + r;
+            }
         }
 
         /**
@@ -91,6 +111,7 @@ class Kinematic {
         inline void update(const SteeringOutput& steering, const float dt, const bool clip) {
             position += linearVelocity * dt; // do these operations actually work properly? maybe...
             orientation += angularVelocity * dt;
+            // cout << orientation << endl;
             linearVelocity += steering.linearAcceleration * dt;
             angularVelocity += steering.angularAcceleration * dt;
             if (clip) { this->clip(); }
@@ -343,8 +364,6 @@ class Wander: Arrive {
 
     public:
 
-
-
         /** Constructor for  Wander. */
         Wander(const float off, const float radius, const float rate, const float orient, const float accel,
                const float t, const float r1, const float r2, float s) : Arrive(t, r1, r2, s) {
@@ -361,12 +380,30 @@ class Wander: Arrive {
         float getWanderOrientation() { return this->wanderOrientation; }
         float getmaxAcceleration() { return this->maxAcceleration; }
 
+        float mapToRange(int rotation) {
+            int r = rotation % 360;
+            if (abs(r) <= 180) {
+                return r;
+            }
+            else if (abs(r) > 180) {
+                return 180 - r;
+            }
+            else {
+                return 180 + r;
+            }
+        }
+
         /** Returns variable-matching steering output to achieve Wander. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
             SteeringOutput output = SteeringOutput();
             Kinematic target;
-            float randomBinomial = ((double) rand() / (RAND_MAX)) * 25.f;
-            target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;    
+            float randomBinomial = ((double) rand() / (RAND_MAX));
+            if(((double) rand() / (RAND_MAX)) < 0.5) {
+                randomBinomial *= -1;
+            }
+
+            // cout << character.orientation << endl;
+            target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;
             Vector2f charOrient = vmath::asVector(character.orientation);
             target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;
             target.position.y = (character.position.y + this->getWanderOffset()) *  charOrient.y;

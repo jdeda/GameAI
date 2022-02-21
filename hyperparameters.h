@@ -13,7 +13,7 @@ const float MAX_SPEED = 75.f;
 const float MAX_VELOCITY_POS = 75.f;
 const float MAX_VELOCITY_NEG = -75.f;
 
-const float MAX_ROTATION = 25.f;
+const float MAX_ROTATION = 200.f;
 
 const float MAX_VELOCITY_ANGULAR_POS = 75.f;
 const float MAX_VELOCITY_ANGULAR_NEG = -75.f;
@@ -25,7 +25,7 @@ const float MAX_ACCELERATION_ANGULAR_POS = 270.f;
 const float MAX_ACCELERATION_ANGULAR_NEG = -270.f;
 
 const float TIME_TO_REACH_TARGET_SPEED = 0.25;
-const float TIME_TO_REACH_TARGET_ROTATION = 0.5;
+const float TIME_TO_REACH_TARGET_ROTATION = 0.25;
 const float TIME_TO_REACH_TARGET_VELOCITY = 0.5;
 
 const float RADIUS_OF_ARRIVAL = 50.f;
