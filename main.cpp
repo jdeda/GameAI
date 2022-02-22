@@ -367,6 +367,25 @@ bool outOfBounds(const Vector2f& p) {
 		   p.y < 0 + BOUND_BUFFER;
 }
 
+/** Returns a random number. */
+float randNum() {
+	return ((double) rand() / (RAND_MAX)) * 25.f;
+}
+
+// Fits rotation into ranges between 180 degrees.
+float mapToRange(int rotation) {
+            int r = rotation % 360;
+            if (abs(r) <= 180) {
+                return r;
+            }
+            else if (abs(r) > 180) {
+                return 180 - r;
+            }
+            else {
+                return 180 + r;
+            }
+}
+
 /** Animates the velocity match steering behavior. */
 void VelocityMatchAnimation() {
 
@@ -453,7 +472,7 @@ void VelocityMatchAnimation() {
 	}
 }
 
-/** Amimates the arrive and align steering behavior. */
+/** Animates the arrive and align steering behavior. */
 void ArriveAlignAnimation()  {
 
 	// Setup arrive-align matchers.
@@ -550,27 +569,7 @@ void ArriveAlignAnimation()  {
 	}
 }
 
-/** Returns a random number. */
-float randNum() {
-	return ((double) rand() / (RAND_MAX)) * 25.f;
-}
-
-        // Fits rotation into ranges between 180 degrees.
-        float mapToRange(int rotation) {
-            int r = rotation % 360;
-            if (abs(r) <= 180) {
-                return r;
-            }
-            else if (abs(r) > 180) {
-                return 180 - r;
-            }
-            else {
-                return 180 + r;
-            }
-        }
-
-
-/** Amimates the arrive and align steering behavior. */
+/** Animates the wander steering behavior. */
 void WanderAnimation()  {
 
 	// Setup wander algorithm.
@@ -634,32 +633,23 @@ void WanderAnimation()  {
 		// Calculate Wander.
 		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
 		
+		// TODO: Velocities are always positive.
+
 		// Calculate align.
 		Kinematic wanderKinematic;
 		wanderKinematic.position = wander.getWanderTargetPosition();
 		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
 		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
+		distOrient = mapToRange(distOrient);
 		wanderKinematic.orientation = distOrient;
-		// cout << wanderKinematic.orientation << endl;
-		SteeringOutput alignAcclerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
-		// alignAcclerations.angularAcceleration *= -1; // Multiply as rotating in wrong direction...
-		cout << alignAcclerations.angularAcceleration << endl;
-		// alignAcclerations.angularAcceleration *= 10.f;
+		SteeringOutput alignAccelerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
+		cout << alignAccelerations.angularAcceleration << endl;
+		cout << character.getKinematic().angularVelocity << endl;
 		cout << endl;
-		
+
 		// Apply accelerations.
-		// cout << character.getKinematic().orientation << endl;
-		character.update(alignAcclerations, dt, clip);
 		character.update(wanderAccelerations, dt, clip);
-
-
-		// Deal with out of bounds.
-		// if(outOfBounds(character.getKinematic().position)) {
-		// 	Vector2f hotFix = Vector2f(randNum(), randNum());
-		// 	wander.setWanderTargetPosition(hotFix);
-		// 	wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
-		// 	character.update(wanderAccelerations, dt, clip);
-		// }
+		character.update(alignAccelerations, dt, clip);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
@@ -673,7 +663,6 @@ void WanderAnimation()  {
 }
 
 void FlockAnimation() {}
-
 
 /** Represents possible steering behavior algorithms for switching over and running animations. */
 enum Algorithm {

@@ -23,6 +23,12 @@ class SteeringOutput {
 
         /** Angular acceleration (theta/t^2). */
         float angularAcceleration;
+
+         SteeringOutput() {
+            this->linearAcceleration = Vector2f(0.f, 0.f);
+            this->angularAcceleration = 0.f;
+        }
+
 };
 
 /** Represents kinematic data for steering behaviors. Units are not defined. */
@@ -87,15 +93,20 @@ class Kinematic {
             if(angularVelocity <= MAX_VELOCITY_ANGULAR_NEG) { angularVelocity = MAX_VELOCITY_ANGULAR_NEG; }
 
             // Clip angularVelocity.
-            int r = (int) angularVelocity % 360;
-            if (abs(r) <= 180) {
-                angularVelocity = r;
-            }
-            else if (abs(r) > 180) {
-                angularVelocity = 180 - r;
-            }
-            else {
-                angularVelocity = 180 + r;
+            // int r = (int) angularVelocity % 360;
+            // if (abs(r) <= 180) {
+            //     angularVelocity = r;
+            // }
+            // else if (abs(r) > 180) {
+            //     angularVelocity = 180 - r;
+            // }
+            // else {
+            //     angularVelocity = 180 + r;
+            // }
+
+            // Clip orientation.
+            if(orientation >= 360) {
+                orientation = (int)orientation % 360;
             }
         }
 
@@ -109,9 +120,13 @@ class Kinematic {
         * @param clip if true clip, else no do not clip (immutable)
         */
         inline void update(const SteeringOutput& steering, const float dt, const bool clip) {
+            
+            // cout << steering.angularAcceleration << endl;
+            // cout << angularVelocity << endl;
+            // cout << orientation  << endl;
+            // cout << endl;
             position += linearVelocity * dt; // do these operations actually work properly? maybe...
             orientation += angularVelocity * dt;
-            // cout << orientation << endl;
             linearVelocity += steering.linearAcceleration * dt;
             angularVelocity += steering.angularAcceleration * dt;
             if (clip) { this->clip(); }
@@ -222,7 +237,7 @@ class Velocity: SteeringBehavior {
 
         /** Returns variable-matching steering output relative to orientation. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-            SteeringOutput output = SteeringOutput();
+            SteeringOutput output;
             output.linearAcceleration = target.linearVelocity - character.linearVelocity;
             output.linearAcceleration = output.linearAcceleration / timeToReachTargetVelocity;
             output.angularAcceleration = 0;
@@ -239,7 +254,7 @@ class Rotation: SteeringBehavior {
 
     /** Returns variable-matching steering output relative to orientation. */
     SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-        SteeringOutput output = SteeringOutput();
+        SteeringOutput output;
         return output;
     }
 };
@@ -253,7 +268,7 @@ class VelocityMatch: Velocity {
 
         /** VelocityMatch algorithm implementation of velocity matching. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-            SteeringOutput output = SteeringOutput();
+            SteeringOutput output;
             output.linearAcceleration = target.linearVelocity - character.linearVelocity;
             output.linearAcceleration = output.linearAcceleration / this->getTimeToReachTargetVelocity();
             output.angularAcceleration = 0;
@@ -276,7 +291,7 @@ class Arrive: Position {
             Vector2f targetP = target.position;
 
             // Setup output.
-            SteeringOutput output = SteeringOutput();
+            SteeringOutput output;
             float goalLinearSpeed = 0;
             Vector2f goalLinearVelocity;
             
@@ -299,14 +314,12 @@ class Arrive: Position {
             goalLinearVelocity = direction;
             goalLinearVelocity = vmath::normalized(goalLinearVelocity);
             goalLinearVelocity *= goalLinearSpeed;
-            // cout << goalLinearVelocity.x << " " << goalLinearVelocity.y << endl;
         
             // Return. Create acceleration such that we can apply and get to goal velocity.
             output.linearAcceleration = goalLinearVelocity - character.linearVelocity;
             output.linearAcceleration /= this->getTimeToReachTargetSpeed();
             output.angularAcceleration = 0;
 
-            // cout << output.linearAcceleration.x << " " << output.linearAcceleration.y << endl;
             return output;
         }
 };
@@ -324,7 +337,7 @@ class Align: Orientation {
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
 
             // Setup output.
-            SteeringOutput output = SteeringOutput();
+            SteeringOutput output;
             float goalAngularVelocity = 0;
 
             // Extract direction and distance from character to target.
@@ -395,14 +408,12 @@ class Wander: Arrive {
 
         /** Returns variable-matching steering output to achieve Wander. */
         SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
-            SteeringOutput output = SteeringOutput();
+            SteeringOutput output;
             Kinematic target;
             float randomBinomial = ((double) rand() / (RAND_MAX));
-            if(((double) rand() / (RAND_MAX)) < 0.5) {
-                randomBinomial *= -1;
-            }
+            float randomDirection = ((double) rand() / (RAND_MAX));
+            if(randomDirection < 0.5) { randomBinomial *= -1; }
 
-            // cout << character.orientation << endl;
             target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;
             Vector2f charOrient = vmath::asVector(character.orientation);
             target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;
