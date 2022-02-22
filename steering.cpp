@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <bits/stdc++.h>
 #include "hyperparameters.h"
-#include "vectormath.cpp"
+#include "vmath.cpp"
 #include <iostream>
 #include <random>
 using namespace sf;
@@ -421,6 +421,94 @@ class Wander: Arrive {
             target.position += this->getWanderRadius() * vmath::asVector(target.orientation);
             this->wanderTargetPosition = target.position;
             return Arrive::calculateAcceleration(character, target);    
+        }
+
+        Vector2f getWanderTargetPosition() { return this->wanderTargetPosition; }
+        void setWanderTargetPosition(const Vector2f& p) { this->wanderTargetPosition = p; }
+};
+
+class Face: Align {
+
+    public:
+
+    /** Constructor for Face. */
+    Face(const float t, const float r1, const float r2, float m) : Align(t, r1, r2, m) {}
+
+    /** Returns variable-matching steering output to achieve Face. */
+    SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+        // Calculate target to delegate to align.
+        Vector2f direction = target.position - character.position;
+
+        // Check for a zero direction, make no change if so.
+        if(vmath::length(direction) == 0) {
+            return SteeringOutput();
+        }
+
+        // Delegate to align.
+        Kinematic explicitTarget = target;
+        explicitTarget.orientation = atan2(-direction.x, direction.y);
+        return Align::calculateAcceleration(character, explicitTarget);
+    }
+};
+
+class WanderFace: Face {
+
+    private:
+        float wanderOffset;
+        float wanderRadius;
+        float wanderRate;
+        float wanderOrientation;
+        float maxAcceleration;
+        Vector2f wanderTargetPosition; // This is cheese...
+
+    public:
+
+        /** Constructor for  Wander. */
+        WanderFace(const float off, const float radius, const float rate, const float orient, const float accel,
+               const float t, const float r1, const float r2, float s) : Face(t, r1, r2, s) {
+            this->wanderOffset = off;
+            this->wanderRadius = radius;
+            this->wanderRate = rate;
+            this->wanderOrientation = orient;
+            this->maxAcceleration = accel;
+        }
+
+        float getWanderOffset() { return this->wanderOffset; }
+        float getWanderRadius() { return this->wanderRadius; }
+        float getWanderRate() { return this->wanderRate; }
+        float getWanderOrientation() { return this->wanderOrientation; }
+        float getmaxAcceleration() { return this->maxAcceleration; }
+
+        /** Returns variable-matching steering output to achieve Wander. */
+        SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+            
+            // Setup components.
+            Kinematic target;
+            float randomBinomial = ((double) rand() / (RAND_MAX));
+            float randomDirection = ((double) rand() / (RAND_MAX));
+            if(randomDirection < 0.5) { randomBinomial *= -1; }
+
+            // Calculate target to delegate.
+            wanderOrientation += randomBinomial * wanderRate;
+            
+            // Calculate the combined target orientation.
+            target.orientation = wanderOrientation + character.orientation;
+            
+            // Calculate the center of the wander circle.
+            Vector2f charOrient = vmath::asVector(character.orientation);
+            target.position.x = (character.position.x + wanderOffset) * charOrient.x;
+            target.position.y = (character.position.y + wanderOffset) * charOrient.y;
+
+            // Calculate the target location.
+            target.position += wanderRadius * vmath::asVector(target.orientation);
+
+            // Delegate to face.
+            SteeringOutput output = Face::calculateAcceleration(character, target);
+
+            // Now set the linear acceleration to be full at
+            // acceleration in the direction of the orientation.
+            output.linearAcceleration = maxAcceleration * vmath::asVector(character.orientation);
+            return output;
         }
 
         Vector2f getWanderTargetPosition() { return this->wanderTargetPosition; }
