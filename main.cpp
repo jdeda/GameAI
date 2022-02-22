@@ -9,9 +9,10 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
-#include "steering.cpp"
-#include "hyperparameters.h"
 #include <cmath>
+#include "hyperparameters.h"
+#include "steering.cpp"
+#include "breadcrumbs.cpp"
 
 using namespace sf;
 using namespace std;
@@ -72,8 +73,11 @@ class Character
 
 	public:
 		/** Constructs a Character with a unique ID. */
-		Character() {
+		Character(vector<Crumb>* crumbs) {
 			id = ID();
+            crumb_idx == 100.f;
+            crumb_idx = 1;
+            breadcrumbs = crumbs;
 		}
 
 		/** Character's texture. */
@@ -87,6 +91,15 @@ class Character
 
 		/** Character's status (used for rendering purposes). */
 		CharacterStatus status;
+
+        /** Breadcrumbs to render. */
+        vector<Crumb>* breadcrumbs;
+
+        /** Breadcrumb index (for rendering). */
+        int crumb_idx;
+
+        /** Breadcrumb timer for when to render breadcrumb.*/
+        float crumb_drop_timer;
 
 		/** Returns the character's x position. */
 		int x() const
@@ -126,7 +139,7 @@ class Character
 			this->kinematic = kinematic;
 		}
 
-	/**
+	    /**
 		* Updates character's sprite and kinematic.
 		* @param steering the steering output to apply (immutable)
 		* @param time the change in time since last update (immutable)
@@ -136,9 +149,27 @@ class Character
 			kinematic.update(steering, dt, clip);
 			sprite.setPosition(kinematic.position);
 			sprite.setRotation(kinematic.orientation);
-		}
-};
+			if (crumb_drop_timer > 0)
+            {
+                crumb_drop_timer -= 0.1f;
+            }
+            else
+            {
+                crumb_drop_timer = 1.f;
+                breadcrumbs->at(crumb_idx).drop(kinematic.position);
 
+                if (crumb_idx < NUM_CRUMBS - 1)
+                    crumb_idx++;
+                else
+                    crumb_idx = 0;
+            }
+		}
+
+        /** Returns the breadcrumbs from the character. */
+        vector<Crumb>* getBreadCrumbs() {
+            return breadcrumbs;
+        }
+};
 /** Represents view where scene will take place. */
 class SceneView
 {
@@ -392,11 +423,19 @@ void VelocityMatchAnimation() {
 	// Setup velocity matcher.
 	VelocityMatch velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -463,6 +502,11 @@ void VelocityMatchAnimation() {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
 		sceneView.scene.display();
 
 		// Update positions and orientations of previous loop.
@@ -479,11 +523,19 @@ void ArriveAlignAnimation()  {
 	Arrive positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 	Align orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -561,7 +613,12 @@ void ArriveAlignAnimation()  {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
-		sceneView.scene.display();
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
+		sceneView.scene.display();;
 
 		// Update positions and orientations of previous loop.
 		positionTable = characterTable.generatePositionTable();
@@ -580,11 +637,19 @@ void WanderAnimation()  {
 
 	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -651,7 +716,13 @@ void WanderAnimation()  {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
 		sceneView.scene.display();
+
 
 		// Update positions and orientations of previous loop.
 		positionTable = characterTable.generatePositionTable();
@@ -670,11 +741,19 @@ void WanderFaceAnimation()  {
 
 	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -741,6 +820,11 @@ void WanderFaceAnimation()  {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
 		sceneView.scene.display();
 
 		// Update positions and orientations of previous loop.
