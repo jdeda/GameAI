@@ -9,9 +9,10 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
-#include "steering.cpp"
-#include "hyperparameters.h"
 #include <cmath>
+#include "hyperparameters.h"
+#include "steering.cpp"
+#include "breadcrumbs.cpp"
 
 using namespace sf;
 using namespace std;
@@ -72,8 +73,11 @@ class Character
 
 	public:
 		/** Constructs a Character with a unique ID. */
-		Character() {
+		Character(vector<Crumb>* crumbs) {
 			id = ID();
+            crumb_idx == 100.f;
+            crumb_idx = 1;
+            breadcrumbs = crumbs;
 		}
 
 		/** Character's texture. */
@@ -87,6 +91,15 @@ class Character
 
 		/** Character's status (used for rendering purposes). */
 		CharacterStatus status;
+
+        /** Breadcrumbs to render. */
+        vector<Crumb>* breadcrumbs;
+
+        /** Breadcrumb index (for rendering). */
+        int crumb_idx;
+
+        /** Breadcrumb timer for when to render breadcrumb.*/
+        float crumb_drop_timer;
 
 		/** Returns the character's x position. */
 		int x() const
@@ -126,7 +139,7 @@ class Character
 			this->kinematic = kinematic;
 		}
 
-	/**
+	    /**
 		* Updates character's sprite and kinematic.
 		* @param steering the steering output to apply (immutable)
 		* @param time the change in time since last update (immutable)
@@ -136,9 +149,27 @@ class Character
 			kinematic.update(steering, dt, clip);
 			sprite.setPosition(kinematic.position);
 			sprite.setRotation(kinematic.orientation);
-		}
-};
+			if (crumb_drop_timer > 0)
+            {
+                crumb_drop_timer -= 0.1f;
+            }
+            else
+            {
+                crumb_drop_timer = 1.f;
+                breadcrumbs->at(crumb_idx).drop(kinematic.position);
 
+                if (crumb_idx < NUM_CRUMBS - 1)
+                    crumb_idx++;
+                else
+                    crumb_idx = 0;
+            }
+		}
+
+        /** Returns the breadcrumbs from the character. */
+        vector<Crumb>* getBreadCrumbs() {
+            return breadcrumbs;
+        }
+};
 /** Represents view where scene will take place. */
 class SceneView
 {
@@ -367,17 +398,44 @@ bool outOfBounds(const Vector2f& p) {
 		   p.y < 0 + BOUND_BUFFER;
 }
 
+/** Returns a random number. */
+float randNum() {
+	return ((double) rand() / (RAND_MAX)) * 25.f;
+}
+
+// Fits rotation into ranges between 180 degrees.
+float mapToRange(int rotation) {
+            int r = rotation % 360;
+            if (abs(r) <= 180) {
+                return r;
+            }
+            else if (abs(r) > 180) {
+                return 180 - r;
+            }
+            else {
+                return 180 + r;
+            }
+}
+
 /** Animates the velocity match steering behavior. */
 void VelocityMatchAnimation() {
 
 	// Setup velocity matcher.
 	VelocityMatch velocityMatcher(TIME_TO_REACH_TARGET_VELOCITY);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -444,6 +502,11 @@ void VelocityMatchAnimation() {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
 		sceneView.scene.display();
 
 		// Update positions and orientations of previous loop.
@@ -453,18 +516,26 @@ void VelocityMatchAnimation() {
 	}
 }
 
-/** Amimates the arrive and align steering behavior. */
+/** Animates the arrive and align steering behavior. */
 void ArriveAlignAnimation()  {
 
 	// Setup arrive-align matchers.
 	Arrive positionMatcher(TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 	Align orientationMatcher(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -542,7 +613,12 @@ void ArriveAlignAnimation()  {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
-		sceneView.scene.display();
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
+		sceneView.scene.display();;
 
 		// Update positions and orientations of previous loop.
 		positionTable = characterTable.generatePositionTable();
@@ -550,12 +626,7 @@ void ArriveAlignAnimation()  {
 	}
 }
 
-/** Returns a random number. */
-float randNum() {
-	return ((double) rand() / (RAND_MAX)) * 25.f;
-}
-
-/** Amimates the arrive and align steering behavior. */
+/** Animates the wander steering behavior. */
 void WanderAnimation()  {
 
 	// Setup wander algorithm.
@@ -566,11 +637,19 @@ void WanderAnimation()  {
 
 	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
 	// Setup character.
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
-	Character character;
+	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
@@ -580,6 +659,7 @@ void WanderAnimation()  {
 	Kinematic initialState;
 	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -615,29 +695,136 @@ void WanderAnimation()  {
 			}
 		}
 
-		// Apply wander.
+		// Calculate Wander.
 		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
-		character.update(wanderAccelerations, dt, clip);
+		
+		// TODO: Velocities are always positive.
+
+		// Calculate align.
 		Kinematic wanderKinematic;
 		wanderKinematic.position = wander.getWanderTargetPosition();
 		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
-		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI));
+		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
+		distOrient = mapToRange(distOrient);
 		wanderKinematic.orientation = distOrient;
-		SteeringOutput alignAcclerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
-		alignAcclerations.angularAcceleration *= -1.f;
-		character.update(alignAcclerations, dt, clip);
+		SteeringOutput alignAccelerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
 
-		// Deal with out of bounds.
-		// if(outOfBounds(character.getKinematic().position)) {
-		// 	Vector2f hotFix = Vector2f(randNum(), randNum());
-		// 	wander.setWanderTargetPosition(hotFix);
-		// 	wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
-		// 	character.update(wanderAccelerations, dt, clip);
-		// }
+		// Apply accelerations.
+		character.update(wanderAccelerations, dt, clip);
+		character.update(alignAccelerations, dt, clip);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
+		sceneView.scene.display();
+
+
+		// Update positions and orientations of previous loop.
+		positionTable = characterTable.generatePositionTable();
+		orientationTable = characterTable.generateOrientationTable();
+	}
+}
+
+/** Animates the wander steering behavior. */
+void WanderFaceAnimation()  {
+
+	// Setup wander-face algorithm.
+	WanderFace wander(
+		WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
+		TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED
+	);
+
+	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
+
+	// Setup character crumbs.
+	vector<Crumb> crumbs = vector<Crumb>();
+    for(int i = 0; i < NUM_CRUMBS; i++)
+    {
+        Crumb c(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2));
+        crumbs.push_back(c);
+    }
+
+	// Setup character.
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character(&crumbs);
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.status = CharacterStatus::running;
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Kinematic initialState;
+	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// Setup CharacterTable and PositionTable.
+	vector<Character*> characters;
+	characters.push_back(&character);
+	CharacterTable characterTable(characters);
+	PositionTable positionTable = characterTable.generatePositionTable();
+	OrientationTable orientationTable = characterTable.generateOrientationTable();
+	bool clip = true;
+
+	srand(1);
+
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen())
+	{
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event))
+		{
+			switch (event.type)
+			{
+
+			// Close scene.
+			case Event::Closed:
+				sceneView.scene.close();
+				break;
+			}
+		}
+
+		// Calculate Wander.
+		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
+		
+		// TODO: Velocities are always positive.
+
+		// Calculate align.
+		Kinematic wanderKinematic;
+		wanderKinematic.position = wander.getWanderTargetPosition();
+		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
+		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
+		distOrient = mapToRange(distOrient);
+		wanderKinematic.orientation = distOrient;
+		SteeringOutput alignAccelerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
+
+		// Apply accelerations.
+		character.update(wanderAccelerations, dt, clip);
+		// character.update(alignAccelerations, dt, clip);
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		sceneView.scene.draw(character.sprite);
+
+		// Draw bread crumbs.
+		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+
+		// Display new drawings.
 		sceneView.scene.display();
 
 		// Update positions and orientations of previous loop.
@@ -648,12 +835,12 @@ void WanderAnimation()  {
 
 void FlockAnimation() {}
 
-
 /** Represents possible steering behavior algorithms for switching over and running animations. */
 enum Algorithm {
 	VelocityMatch,
 	ArriveAlign,
 	Wander,
+	WanderFace,
 	Flock,
 	INVALID
 };
@@ -663,6 +850,7 @@ vector<string> AlgorithmStrings = {
 	"VelocityMatch",
 	"ArriveAlign",
 	"Wander",
+	"WanderFace"
 	"Flock",
 	"INVALID"
 };
@@ -705,6 +893,9 @@ int main(int argc, char *argv[])
 			break;
 		case Algorithm::Wander:
 			WanderAnimation();
+			break;
+		case Algorithm::WanderFace:
+			WanderFaceAnimation();
 			break;
 		case Algorithm::Flock:
 			FlockAnimation();

@@ -2,7 +2,6 @@
 #include <cmath>
 using namespace sf;
 
-
 namespace vmath {
     /** Returns dot product of the two given vectors. */
     inline float dot_product(const Vector2f& v1, const Vector2f& v2)
