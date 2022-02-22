@@ -62,21 +62,18 @@ class Kinematic {
         {
             // Clip position in x plane.
             if(position.x >= SCENE_WINDOW_X - BOUND_BUFFER) {
-                // cout << "hi" << endl; 
                 position.x = SCENE_WINDOW_X - BOUND_BUFFER;
             }
             if(position.x <= 0 + BOUND_BUFFER) { 
-                // cout << "hi" << endl;
                 position.x = 0 + BOUND_BUFFER;
             }
 
             // Clip position in y plane.
             if(position.y >= SCENE_WINDOW_Y - BOUND_BUFFER) { 
-                // cout << "hi" << endl;
                 position.y = SCENE_WINDOW_Y - BOUND_BUFFER;
             }
+
             if(position.y <= 0 + BOUND_BUFFER) {
-                // cout << "hi" << endl; 
                 position.y = 0 + BOUND_BUFFER;
             }
 
@@ -106,7 +103,7 @@ class Kinematic {
 
             // Clip orientation.
             if(orientation >= 360) {
-                orientation = (int)orientation % 360;
+                orientation = (int)orientation % 180;
             }
         }
 
@@ -120,12 +117,7 @@ class Kinematic {
         * @param clip if true clip, else no do not clip (immutable)
         */
         inline void update(const SteeringOutput& steering, const float dt, const bool clip) {
-            
-            // cout << steering.angularAcceleration << endl;
-            // cout << angularVelocity << endl;
-            // cout << orientation  << endl;
-            // cout << endl;
-            position += linearVelocity * dt; // do these operations actually work properly? maybe...
+            position += linearVelocity * dt;
             orientation += angularVelocity * dt;
             linearVelocity += steering.linearAcceleration * dt;
             angularVelocity += steering.angularAcceleration * dt;
@@ -205,6 +197,7 @@ class Orientation: SteeringBehavior {
         // Fits rotation into ranges between 180 degrees.
         float mapToRange(int rotation) {
             int r = rotation % 360;
+            cout << rotation << endl;
             if (abs(r) <= 180) {
                 return r;
             }
@@ -342,9 +335,9 @@ class Align: Orientation {
 
             // Extract direction and distance from character to target.
             float angularVelocity = target.orientation - character.orientation;
-            angularVelocity = this->mapToRange(angularVelocity);
-            float angularVelocityLength = abs(angularVelocity);
-            
+            angularVelocity = Orientation::mapToRange(angularVelocity);
+            float angularVelocityLength = abs(angularVelocity);      
+
             // Set rotation.
             if (angularVelocityLength < this->getRadiusOfArrival()) {
                 goalAngularVelocity = 0;
@@ -415,11 +408,9 @@ class Wander: Arrive {
             if(randomDirection < 0.5) { randomBinomial *= -1; }
 
             target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;
-            Vector2f charOrient = vmath::asVector(character.orientation);
-            target.position.x = (character.position.x + this->getWanderOffset()) *  charOrient.x;
-            target.position.y = (character.position.y + this->getWanderOffset()) *  charOrient.y;
+            target.position = character.position + wanderOffset * vmath::asVector(character.orientation);
             target.position += this->getWanderRadius() * vmath::asVector(target.orientation);
-            this->wanderTargetPosition = target.position;
+            this->wanderTargetPosition = target.position; // Set wanderTargetPosition for applying align.
             return Arrive::calculateAcceleration(character, target);    
         }
 
@@ -447,7 +438,9 @@ class Face: Align {
         // Delegate to align.
         Kinematic explicitTarget = target;
         explicitTarget.orientation = atan2(-direction.x, direction.y);
-        return Align::calculateAcceleration(character, explicitTarget);
+        SteeringOutput o = Align::calculateAcceleration(character, explicitTarget);
+        o.angularAcceleration *= 10.f;
+        return o;
     }
 };
 
@@ -459,7 +452,6 @@ class WanderFace: Face {
         float wanderRate;
         float wanderOrientation;
         float maxAcceleration;
-        Vector2f wanderTargetPosition; // This is cheese...
 
     public:
 
@@ -495,9 +487,7 @@ class WanderFace: Face {
             target.orientation = wanderOrientation + character.orientation;
             
             // Calculate the center of the wander circle.
-            Vector2f charOrient = vmath::asVector(character.orientation);
-            target.position.x = (character.position.x + wanderOffset) * charOrient.x;
-            target.position.y = (character.position.y + wanderOffset) * charOrient.y;
+            target.position = character.position + wanderOffset * vmath::asVector(character.orientation);
 
             // Calculate the target location.
             target.position += wanderRadius * vmath::asVector(target.orientation);
@@ -510,7 +500,4 @@ class WanderFace: Face {
             output.linearAcceleration = maxAcceleration * vmath::asVector(character.orientation);
             return output;
         }
-
-        Vector2f getWanderTargetPosition() { return this->wanderTargetPosition; }
-        void setWanderTargetPosition(const Vector2f& p) { this->wanderTargetPosition = p; }
 };

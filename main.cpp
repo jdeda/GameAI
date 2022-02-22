@@ -17,6 +17,8 @@
 using namespace sf;
 using namespace std;
 
+const bool BREAD_CRUMBS = false;
+
 /* Debug output (prints the vector coordinates). */
 void debug(Vector2f v)
 {
@@ -445,6 +447,8 @@ void VelocityMatchAnimation() {
 	Kinematic initialState;
 	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
+
 	// Setup mouse.
 	Mouse mouse;
 	Kinematic mouseKinematic;
@@ -504,7 +508,7 @@ void VelocityMatchAnimation() {
 		sceneView.scene.draw(character.sprite);
 
 		// Draw bread crumbs.
-		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+		if(BREAD_CRUMBS) { for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); } }
 
 		// Display new drawings.
 		sceneView.scene.display();
@@ -545,6 +549,7 @@ void ArriveAlignAnimation()  {
 	Kinematic initialState;
 	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
 
 	// Setup click position data.
 	Vector2f mouseClickPosition(0.f, 0.f);
@@ -615,7 +620,7 @@ void ArriveAlignAnimation()  {
 		sceneView.scene.draw(character.sprite);
 
 		// Draw bread crumbs.
-		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+		if(BREAD_CRUMBS) { for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); } }
 
 		// Display new drawings.
 		sceneView.scene.display();;
@@ -672,8 +677,6 @@ void WanderAnimation()  {
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
 	bool clip = true;
 
-	srand(1);
-
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
@@ -718,7 +721,7 @@ void WanderAnimation()  {
 		sceneView.scene.draw(character.sprite);
 
 		// Draw bread crumbs.
-		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+		if(BREAD_CRUMBS) { for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); } }
 
 		// Display new drawings.
 		sceneView.scene.display();
@@ -738,8 +741,6 @@ void WanderFaceAnimation()  {
 		WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
 		TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED
 	);
-
-	Align align(TIME_TO_REACH_TARGET_ROTATION, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_ROTATION);
 
 	// Setup character crumbs.
 	vector<Crumb> crumbs = vector<Crumb>();
@@ -776,8 +777,6 @@ void WanderFaceAnimation()  {
 	OrientationTable orientationTable = characterTable.generateOrientationTable();
 	bool clip = true;
 
-	srand(1);
-
 	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen())
@@ -799,30 +798,16 @@ void WanderFaceAnimation()  {
 			}
 		}
 
-		// Calculate Wander.
+		// Apply Wander.
 		SteeringOutput wanderAccelerations = wander.calculateAcceleration(character.getKinematic(), character.getKinematic());
-		
-		// TODO: Velocities are always positive.
-
-		// Calculate align.
-		Kinematic wanderKinematic;
-		wanderKinematic.position = wander.getWanderTargetPosition();
-		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
-		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
-		distOrient = mapToRange(distOrient);
-		wanderKinematic.orientation = distOrient;
-		SteeringOutput alignAccelerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
-
-		// Apply accelerations.
 		character.update(wanderAccelerations, dt, clip);
-		// character.update(alignAccelerations, dt, clip);
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		sceneView.scene.draw(character.sprite);
 
 		// Draw bread crumbs.
-		for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); }
+		if(BREAD_CRUMBS) { for(int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); } }
 
 		// Display new drawings.
 		sceneView.scene.display();
@@ -850,7 +835,7 @@ vector<string> AlgorithmStrings = {
 	"VelocityMatch",
 	"ArriveAlign",
 	"Wander",
-	"WanderFace"
+	"WanderFace",
 	"Flock",
 	"INVALID"
 };
@@ -882,6 +867,9 @@ Algorithm getAlg() {
 /** Runs the program.*/
 int main(int argc, char *argv[])
 {
+	// Set random seed.
+	srand(1);
+
 	// Get algorithm and run corresponding algorithm.
 	Algorithm alg = getAlg();
 	switch (alg) {
