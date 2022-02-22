@@ -26,4 +26,9 @@ namespace vmath {
         }
         return z;
     }
+
+    /** Returns vector representation of the given orientation (given in angles).*/
+    inline Vector2f asVector(const float angle) {
+        return Vector2f(cos(angle*(M_PI/180.f)), sin(angle*(M_PI/180.f)));
+    }
 };
