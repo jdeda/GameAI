@@ -708,7 +708,6 @@ void WanderAnimation()  {
 		wanderKinematic.position = wander.getWanderTargetPosition();
 		Vector2f distVector = wanderKinematic.position - character.getKinematic().position;
 		float distOrient = (atan2(distVector.y, distVector.x) * (180.f / M_PI)) - 45;
-		distOrient = mapToRange(distOrient);
 		wanderKinematic.orientation = distOrient;
 		SteeringOutput alignAccelerations = align.calculateAcceleration(character.getKinematic(), wanderKinematic);
 

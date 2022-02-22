@@ -86,8 +86,14 @@ class Kinematic {
             if(linearVelocity.y <= MAX_VELOCITY_NEG) { linearVelocity.y = MAX_VELOCITY_NEG; }
             
             // Clip angularVelocity.
-            if(angularVelocity >= MAX_VELOCITY_ANGULAR_POS) { angularVelocity = MAX_VELOCITY_ANGULAR_POS; }
-            if(angularVelocity <= MAX_VELOCITY_ANGULAR_NEG) { angularVelocity = MAX_VELOCITY_ANGULAR_NEG; }
+            if(angularVelocity >= MAX_VELOCITY_ANGULAR_POS) { 
+                angularVelocity = MAX_VELOCITY_ANGULAR_POS;
+                cout << "hi1" << endl;
+                }
+            if(angularVelocity <= MAX_VELOCITY_ANGULAR_NEG) {
+                angularVelocity = MAX_VELOCITY_ANGULAR_NEG;
+                cout << "hi2" << endl;
+                 }
 
             // Clip angularVelocity.
             // int r = (int) angularVelocity % 360;
@@ -102,9 +108,10 @@ class Kinematic {
             // }
 
             // Clip orientation.
-            if(orientation >= 360) {
-                orientation = (int)orientation % 180;
-            }
+            // if(orientation >= 360) {
+            //     cout << "hi3" << endl;
+            //     orientation = (int)orientation % 180;
+            // }
         }
 
         /**
@@ -339,7 +346,6 @@ class Align: Orientation {
 
             // Set rotation.
             if (angularVelocityLength < this->getRadiusOfArrival()) {
-                // Always stuck here... why?
                 goalAngularVelocity = 0;
             }
             else if (angularVelocityLength > this->getRadiusOfDeceleration()) {

@@ -26,15 +26,15 @@ const float MAX_ACCELERATION_ANGULAR_NEG = -270.f;
 
 const float TIME_TO_REACH_TARGET_SPEED = 0.25;
 const float TIME_TO_REACH_TARGET_ROTATION = 0.25;
-const float TIME_TO_REACH_TARGET_VELOCITY = 0.5;
+const float TIME_TO_REACH_TARGET_VELOCITY = 0.25;
 
-const float RADIUS_OF_ARRIVAL = 50.f;
+const float RADIUS_OF_ARRIVAL = 25.f;
 const float RADIUS_OF_DECELERATION = 500.f;
 
-const float WANDER_OFFSET = 5.f;
-const float WANDER_RADIUS = 500.f;
-const float WANDER_RATE = 100.f;
-const float WANDER_ORIENTATION = 50.f;
-const float WANDER_MAX_ACCELERATION = 100.f;
+const float WANDER_OFFSET = 600.f;
+const float WANDER_RADIUS = 200.f;
+const float WANDER_RATE = 200.f;
+const float WANDER_ORIENTATION = -90.f;
+const float WANDER_MAX_ACCELERATION = 200.f;
 
 #endif
