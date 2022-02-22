@@ -197,7 +197,6 @@ class Orientation: SteeringBehavior {
         // Fits rotation into ranges between 180 degrees.
         float mapToRange(int rotation) {
             int r = rotation % 360;
-            cout << rotation << endl;
             if (abs(r) <= 180) {
                 return r;
             }
@@ -340,6 +339,7 @@ class Align: Orientation {
 
             // Set rotation.
             if (angularVelocityLength < this->getRadiusOfArrival()) {
+                // Always stuck here... why?
                 goalAngularVelocity = 0;
             }
             else if (angularVelocityLength > this->getRadiusOfDeceleration()) {
