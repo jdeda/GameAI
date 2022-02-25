@@ -16,6 +16,7 @@ public:
     /** Angular acceleration (theta/t^2). */
     float angularAcceleration;
 
+    /** Default constructor for SteeringOutput. */
     SteeringOutput();
 };
 
