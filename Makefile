@@ -1,10 +1,7 @@
-# Makefile for SteeringBehaviors.
+rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
+src := $(call rwildcard,./,*.cpp)
 
-src = $(wildcard *.cpp) # \
-	  # $(wildcard subdir1/*.cpp) \
-	  # $(wildcard subdir2/*.ccp)
-
-obj = $(src:.cpp=.o)
+obj = $(patsubst %.cpp,%.o,$(src))
 
 LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system 
 
@@ -39,9 +36,9 @@ endif
 uname_s := $(shell uname -s)
 %.o: %.cpp
 ifeq ($(uname_s),Darwin)
-	$(MACOS_COMPILER) -c $^ -I$(MACOS_INCLUDE)
+	$(MACOS_COMPILER) -c $^ -o $@ -I$(MACOS_INCLUDE)
 else ifeq ($(uname_s),Linux)
-	$(UBUNTU_COMPILER) -c $^ -I$(UBUNTU_INCLUDE)
+	$(UBUNTU_COMPILER) -c $^ -o $@ -I$(UBUNTU_INCLUDE)
 endif
 
 .PHONY: clean
