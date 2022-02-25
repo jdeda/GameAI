@@ -12,8 +12,6 @@ class Kinematic
 {
 
 public:
-    // TODO: these variables should be private with getters, and can only be set via an update.
-
     /** Current point in space (x, y). */
     Vector2f position;
 
@@ -26,8 +24,10 @@ public:
     /** Current angular velocity (theta/t). */
     float angularVelocity;
 
+    /** Default constructor for Kinematic. */
     Kinematic();
 
+    /** Clips all kinematic accordingly. */
     inline void clip()
     {
         if (position.x >= SCENE_WINDOW_X - BOUND_BUFFER)
