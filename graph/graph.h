@@ -58,13 +58,10 @@ class Graph
 {
 
     /** Index into map given a vertex's unique id, and return the list of its outgoing edges. */
-    unordered_map<int, vector<Edge>> lookupTable;
+    unordered_map<int, vector<Edge>> edges;
 
-    /** Graph is represented by a list of edgess. */
-    vector<Edge> edges;
-
-    /** Constructs a new graph initializing all its fields given the list of edges.*/
-    Graph(const vector<Edge>& e);
+    /** Constructs a new graph initializing all its fields given the map of edges.*/
+    Graph(const unordered_map<int, vector<Edge>>& e);
 
     /**
      * @brief Returns the list of outgoing edges from the given vertex.
@@ -73,7 +70,7 @@ class Graph
      * @return vector<Edge> the outgoing edges from the given vetex
      */
     inline vector<Edge> getOutgoingEdges(const Vertex& of) {
-        return lookupTable.at(of.getID());
+        return edges.at(of.getID());
     }
 };
 

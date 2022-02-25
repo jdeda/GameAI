@@ -24,7 +24,7 @@ float Edge::getCost() const {
 }
 
 // TODO: How do you initialize this?
-Graph::Graph(const vector<Edge>& e) {
+Graph::Graph(const unordered_map<int, vector<Edge>>& e) {
     edges = e; // TODO: what about lookupTable?
 }
 
@@ -37,4 +37,10 @@ VertexState VertexRecord::getState() const { return state; }
 
 void VertexRecord::setState(VertexState newState) {
     state = newState;
+}
+
+
+/** Generates a hard-coded graph. */
+void GenerateG1() {
+
 }
