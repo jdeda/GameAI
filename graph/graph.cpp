@@ -1,46 +1,47 @@
+// #include <vector>
+// #include <unordered_map>
+// #include <stack>
+// #include "../id/id.h"
+// #include "graph.h"
 
-#include <vector>
-#include <unordered_map>
-#include "../id/id.h"
-#include "graph.h"
+// using namespace std;
 
-using namespace std;
+// Vertex::Vertex() {
+//     id = ID();
+// }
 
-Vertex::Vertex() {
-    id = ID(); // TODO: Make sure this works... Also this is really a side-effect.
-}
+// int Vertex::getID() const { return id.getID(); }
 
-int Vertex::getID() const { return id.getID(); }
+// Edge::Edge(float w, float c, Vertex f, Vertex t) {
+//     weight = w;
+//     cost = c;
+//     from = f;
+//     to = t;
+// }
 
-Edge::Edge(float w, float c, Vertex f, Vertex t) {
-    weight = w;
-    cost = c;
-    from = f;
-    to = t;
-}
+// float Edge::getCost() const {
+//     return cost;
+// }
 
-float Edge::getCost() const {
-    return cost;
-}
+// Graph::Graph(const unordered_map<int, vector<Edge>>& e) {
+//     edges = e;
+// }
 
-// TODO: How do you initialize this?
-Graph::Graph(const unordered_map<int, vector<Edge>>& e) {
-    edges = e; // TODO: what about lookupTable?
-}
+// VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {
+//     vertex = v;
+//     state = s;
+// }
 
-VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {
-    vertex = v;
-    state = s;
-}
+// VertexState VertexRecord::getState() const { return state; }
 
-VertexState VertexRecord::getState() const { return state; }
-
-void VertexRecord::setState(VertexState newState) {
-    state = newState;
-}
+// void VertexRecord::setState(VertexState newState) {
+//     state = newState;
+// }
 
 
-/** Generates a hard-coded graph. */
-void GenerateG1() {
+// /** Generates a hard-coded graph. */
+// unordered_map<int, vector<Edge>> GenerateG1() {
 
-}
+//     // Create adjanency lists representing graph.
+
+// }

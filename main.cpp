@@ -15,6 +15,8 @@
 #include "kinematic/kinematic.h"
 #include "steering/steering.h"
 #include "steering/steeringoutput.h"
+#include "graph/graph.h"
+#include "maze/maze.h"
 
 using namespace sf;
 using namespace std;
