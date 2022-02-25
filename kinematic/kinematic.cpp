@@ -5,9 +5,10 @@
 
 using namespace sf;
 
-        Kinematic::Kinematic() {
-            position = Vector2f(0.f, 0.f);
-            orientation = 0.f;
-            linearVelocity = Vector2f(0.f, 0.f);
-            angularVelocity = 0.f;
-        }
+Kinematic::Kinematic()
+{
+    position = Vector2f(0.f, 0.f);
+    orientation = 0.f;
+    linearVelocity = Vector2f(0.f, 0.f);
+    angularVelocity = 0.f;
+}

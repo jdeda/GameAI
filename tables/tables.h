@@ -10,54 +10,58 @@ using namespace sf;
 
 class OrientationTable
 {
-	private:
-		unordered_map<int, float> table;
+private:
+	unordered_map<int, float> table;
 
-	public:
-		OrientationTable(const unordered_map<int, float>& orientations);
+public:
+	OrientationTable(const unordered_map<int, float> &orientations);
 
-		float getOldOrientation(const Character &character) const;
+	float getOldOrientation(const Character &character) const;
 
-		void debug(const Character &character) const;
+	void debug(const Character &character) const;
 };
 
 class PositionTable
 {
-	private:
-		unordered_map<int, Vector2f> table;
+private:
+	unordered_map<int, Vector2f> table;
 
-	public:
-		PositionTable(const unordered_map<int, Vector2f>& positions);
+public:
+	PositionTable(const unordered_map<int, Vector2f> &positions);
 
-		Vector2f getOldPosition(const Character &character) const;
+	Vector2f getOldPosition(const Character &character) const;
 
-		void debug(const Character &character) const;
+	void debug(const Character &character) const;
 };
 
 class CharacterTable
 {
-	private:
-		unordered_map<int, Character*> table;
-		vector<Character*> characters;
+private:
+	unordered_map<int, Character *> table;
+	vector<Character *> characters;
 
-	public:
-		CharacterTable(const vector<Character*>& characters);
+public:
+	CharacterTable(const vector<Character *> &characters);
 
-		inline PositionTable generatePositionTable() {
-			unordered_map<int, Vector2f> positions;
-			for(auto & character: characters) {
-				positions.insert({character->getID(), character->getPosition()});
-			}
-			return PositionTable(positions);
+	inline PositionTable generatePositionTable()
+	{
+		unordered_map<int, Vector2f> positions;
+		for (auto &character : characters)
+		{
+			positions.insert({character->getID(), character->getPosition()});
 		}
+		return PositionTable(positions);
+	}
 
-		inline OrientationTable generateOrientationTable() {
-			unordered_map<int, float> orientations;
-			for(auto & character: characters) {
-				orientations.insert({character->getID(), character->getOrientation()});
-			}
-			return OrientationTable(orientations);
+	inline OrientationTable generateOrientationTable()
+	{
+		unordered_map<int, float> orientations;
+		for (auto &character : characters)
+		{
+			orientations.insert({character->getID(), character->getOrientation()});
 		}
+		return OrientationTable(orientations);
+	}
 };
 
 #endif

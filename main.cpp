@@ -6,12 +6,15 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include <string>
-#include <iostream>
-#include <stdlib.h>
-#include <cmath>
+#include "debug/debug.h"
+#include "debug/breadcrumbs.h"
 #include "id/id.h"
+#include "scene/scene.h"
+#include "tables/tables.h"
+#include "character/character.h"
 #include "kinematic/kinematic.h"
+#include "steering/steering.h"
+#include "steering/steeringoutput.h"
 
 using namespace sf;
 using namespace std;
@@ -19,14 +22,9 @@ using namespace std;
 /** Start unique IDs at 0. */
 int ID::count = 0;
 
-
 /** Runs the program.*/
 int main(int argc, char *argv[])
 {
-	// Set random seed.
-	srand(1);
-
-	// Get algorithm and run corresponding algorithm.
 
 	// Exit progam.
 	return EXIT_SUCCESS;

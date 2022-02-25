@@ -16,7 +16,6 @@ void debug(const Character &character);
 /** Exits program and displays message to console*/
 void fail(string message);
 
-
 /* Debug output (for sanity check). */
 void sanity();
 
