@@ -4,8 +4,7 @@
 
 using namespace sf;
 
-SceneView::SceneView(int w, int h, int fps)
-{
+SceneView::SceneView(int w, int h, int fps) {
 	// Set dimensions and fps.
 	width = w;
 	height = h;

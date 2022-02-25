@@ -10,17 +10,17 @@ using namespace sf;
 
 class OrientationTable
 {
-private:
+	private:
 	/** Map of character's orientation indexing by the respective character's unique ID. */
 	unordered_map<int, float> table;
 
-public:
+	public:
 	/**
 	 * @brief Construct a new Orientation Table object
 	 *
 	 * @param orientations
 	 */
-	OrientationTable(const unordered_map<int, float> &orientations);
+	OrientationTable(const unordered_map<int, float>& orientations);
 
 	/**
 	 * @brief Get the Old Orientation object
@@ -28,29 +28,29 @@ public:
 	 * @param character
 	 * @return float
 	 */
-	float getOldOrientation(const Character &character) const;
+	float getOldOrientation(const Character& character) const;
 
 	/**
 	 * @brief Display message to console about character orientation
 	 *
 	 * @param character the u
 	 */
-	void debug(const Character &character) const;
+	void debug(const Character& character) const;
 };
 
 class PositionTable
 {
-private:
+	private:
 	/** Map of character's position indexing by the respective character's unique ID. */
 	unordered_map<int, Vector2f> table;
 
-public:
+	public:
 	/**
 	 * @brief Construct a new PositionTable
 	 *
 	 * @param positions the positions to construct fill map with
 	 */
-	PositionTable(const unordered_map<int, Vector2f> &positions);
+	PositionTable(const unordered_map<int, Vector2f>& positions);
 
 	/**
 	 * @brief Get the old position of the character
@@ -58,21 +58,21 @@ public:
 	 * @param character
 	 * @return Vector2f
 	 */
-	Vector2f getOldPosition(const Character &character) const;
+	Vector2f getOldPosition(const Character& character) const;
 
 	/**
 	 * @brief Display message to console about character position
 	 *
 	 * @param character
 	 */
-	void debug(const Character &character) const;
+	void debug(const Character& character) const;
 };
 
 class CharacterTable
 {
-private:
+	private:
 	/** Map of characters indexing by their unique ID. */
-	unordered_map<int, Character *> table;
+	unordered_map<int, Character*> table;
 
 	/**
 	 * Vector of Character pointers, so that table can have constant access to
@@ -80,10 +80,10 @@ private:
 	 * positions or orientations, with intention to be used for velocity generation
 	 * (need delta position and orientation to generate linear and angular velocities)
 	 */
-	vector<Character *> characters;
+	vector<Character*> characters;
 
-public:
-	CharacterTable(const vector<Character *> &characters);
+	public:
+	CharacterTable(const vector<Character*>& characters);
 
 	/**
 	 * @brief Generates a position table at the instance of being called
@@ -91,12 +91,10 @@ public:
 	 * @return PositionTable consisting map of character's orientations
 	 * indexable by the character's ID
 	 */
-	inline PositionTable generatePositionTable()
-	{
+	inline PositionTable generatePositionTable() {
 		unordered_map<int, Vector2f> positions;
-		for (auto &character : characters)
-		{
-			positions.insert({character->getID(), character->getPosition()});
+		for (auto& character : characters) {
+			positions.insert({ character->getID(), character->getPosition() });
 		}
 		return PositionTable(positions);
 	}
@@ -107,12 +105,10 @@ public:
 	 * @return OrientationTable table consisting map of character's orientations
 	 * indexable by the character's ID
 	 */
-	inline OrientationTable generateOrientationTable()
-	{
+	inline OrientationTable generateOrientationTable() {
 		unordered_map<int, float> orientations;
-		for (auto &character : characters)
-		{
-			orientations.insert({character->getID(), character->getOrientation()});
+		for (auto& character : characters) {
+			orientations.insert({ character->getID(), character->getOrientation() });
 		}
 		return OrientationTable(orientations);
 	}

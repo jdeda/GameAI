@@ -23,8 +23,7 @@ using namespace std;
 int ID::count = 0;
 
 /** Runs the program.*/
-int main(int argc, char *argv[])
-{
+int main(int argc, char* argv[]) {
 
 	// Exit progam.
 	return EXIT_SUCCESS;

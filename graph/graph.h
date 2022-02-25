@@ -9,11 +9,11 @@ using namespace std;
 class Vertex
 {
 
-private:
+    private:
     /** Unique ID for vertex. */
     ID id;
 
-public:
+    public:
     /** Default constructor for vertex. */
     Vertex();
 
@@ -25,7 +25,7 @@ public:
 class Edge
 {
 
-private:
+    private:
     /** Non-negative weight of this edge. */
     float weight;
 
@@ -38,7 +38,7 @@ private:
     /** Vertex edge leads to (ends). */
     Vertex to;
 
-public:
+    public:
     /**
      * @brief Construct an Edge initializing all its fields.
      *
@@ -64,7 +64,7 @@ class Graph
     vector<Edge> edges;
 
     /** Constructs a new graph initializing all its fields given the list of edges.*/
-    Graph(const vector<Edge> &e);
+    Graph(const vector<Edge>& e);
 
     /**
      * @brief Returns the list of outgoing edges from the given vertex.
@@ -72,8 +72,7 @@ class Graph
      * @param from the vertex to get outgoing edges from the given vertex
      * @return vector<Edge> the outgoing edges from the given vetex
      */
-    inline vector<Edge> getOutgoingEdges(const Vertex &of)
-    {
+    inline vector<Edge> getOutgoingEdges(const Vertex& of) {
         return lookupTable.at(of.getID());
     }
 };
@@ -91,16 +90,16 @@ enum VertexState
 class VertexRecord
 {
 
-private:
+    private:
     /** Vertex to record.*/
     Vertex vertex;
 
     /** Vertex state. */
     VertexState state;
 
-public:
+    public:
     /* Construct a Vertex Record with all its fields. */
-    VertexRecord(const Vertex &v, const VertexState &s);
+    VertexRecord(const Vertex& v, const VertexState& s);
 
     /** Returns state of vertex.*/
     VertexState getState() const;
