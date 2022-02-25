@@ -27,6 +27,9 @@ int ID::count = 0;
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
+	// Generate a small graph.
+	generateMaze(20, 20);
+
 	// Exit progam.
 	return EXIT_SUCCESS;
 }

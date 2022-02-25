@@ -1,6 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
 #include "breadcrumbs.h"
 
 using namespace sf;

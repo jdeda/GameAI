@@ -1,8 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include <stdlib.h>
+#include <unordered_map>
+#include <iostream>
 #include "../character/character.h"
 #include "tables.h"
-#include <unordered_map>
 
 using namespace std;
 using namespace sf;

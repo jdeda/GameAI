@@ -2,8 +2,8 @@
 #define TABLES_H
 
 #include <SFML/Graphics.hpp>
-#include "../character/character.h"
 #include <unordered_map>
+#include "../character/character.h"
 
 using namespace std;
 using namespace sf;

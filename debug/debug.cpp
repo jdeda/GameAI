@@ -1,9 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <iostream>
 #include "../character/character.h"
 #include "debug.h"
 
 using namespace sf;
+using namespace std;
 
 void debug(Vector2f v) {
 	cout << v.x << " " << v.y << endl;
