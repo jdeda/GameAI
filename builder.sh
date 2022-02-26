@@ -1,6 +1,5 @@
 #!/bin/sh
 # Makes.
-clear;
-make clean
+clear
 make
-
+./main

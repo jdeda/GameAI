@@ -1,6 +1,7 @@
 #ifndef MAZE_H
 #define MAZE_H
 
+#include <SFML/Graphics.hpp>
 #include <vector>
 using namespace std;
 
@@ -29,6 +30,15 @@ class Connections {
     char directions[4] = {false, false, false, false};
 };
 
+/** Represents cell in a Level. */
+class LevelCell: sf::RectangleShape {
+
+    public:
+    /** Constructs a level cell via a given connections and location.*/
+    LevelCell(const Location& location, const Connections& connections);
+
+};
+
 /** Represents a maze when using the mazeGenerator algorithm. */
 class Level {
 
@@ -37,11 +47,11 @@ class Level {
     /** Each list represents (dx, dy, direction delta). **/
     vector<vector<int>> NEIGHBORS = {{1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3}};
 
-    /** Height or rows of maze. */
-    int height;
+    /** rowss of maze. */
+    int rows;
 
-    /** Width or columns of maze. */
-    int width;
+    /** cols or columns of maze. */
+    int cols;
 
     /** 2D grid representing maze. */
     vector<vector<Connections>> cells;
@@ -57,12 +67,18 @@ class Level {
 
     /** Makes connections around a location. */
     Location makeConnections(Location location);
+
+    /** Returns Level cells as LevelCells. */
+    vector<vector<LevelCell>> toSFML();
+
+    /** Prints the level. */
+    void print();
 };
 
 /** Generates a maze by filling the level at a given start. */
-void maze(Level level, Location start);
+void generateMaze(Level level, Location start);
 
-/** Generates a maze of given width and height. */
-void generateMaze(int w, int h);
+/** Generates a maze of given cols and rows. */
+Level generateMaze(int r, int c);
 
 #endif

@@ -24,11 +24,48 @@ using namespace std;
 /** Start unique IDs at 0. */
 int ID::count = 0;
 
+/** Animates the velocity match steering behavior. */
+void SmallGraphVisualizer() {
+
+	// Generate graph.
+	Level maze = generateMaze(10, 10);
+	maze.print();
+
+	// Setup SceneView.
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+
+	// // Render scene and measure time.
+	// Clock clock;
+	// while (sceneView.scene.isOpen())
+	// {
+	// 	// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+	// 	float dt = clock.restart().asSeconds();
+
+	// 	// Handle scene poll event.
+	// 	Event event;
+	// 	while (sceneView.scene.pollEvent(event))
+	// 	{
+	// 		switch (event.type)
+	// 		{
+	// 		case Event::Closed:
+	// 			sceneView.scene.close();
+	// 			break;
+	// 		}
+	// 	}
+
+
+	// 	// Re-render scene.
+	// 	sceneView.scene.clear(Color(255, 255, 255));
+	// 	sceneView.scene.draw(maze.toSFML());
+	// 	sceneView.scene.display();
+	// }
+}
+
+
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
-	// Generate a small graph.
-	generateMaze(20, 20);
+	SmallGraphVisualizer();
 
 	// Exit progam.
 	return EXIT_SUCCESS;
