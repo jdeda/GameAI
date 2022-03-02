@@ -15,16 +15,16 @@ using namespace sf;
 class Character
 {
 
-private:
+	private:
 	/** Character's kinematic data. */
 	Kinematic kinematic;
 
 	/** Character's unique ID. */
 	ID id;
 
-public:
+	public:
 	/** Constructs a Character with a unique ID. */
-	Character(vector<Crumb> *crumbs);
+	Character(vector<Crumb>* crumbs);
 
 	/** Character's texture. */
 	Texture texture;
@@ -36,7 +36,7 @@ public:
 	float scale;
 
 	/** Breadcrumbs to render. */
-	vector<Crumb> *breadcrumbs;
+	vector<Crumb>* breadcrumbs;
 
 	/** Breadcrumb index (for rendering). */
 	int crumb_idx;
@@ -68,10 +68,10 @@ public:
 	 * the sprite by setting its to the new kinematic position (and orientation) and updates
 	 * bread crumbs.
 	 */
-	void update(const SteeringOutput &steering, const float dt, const bool clip);
+	void update(const SteeringOutput& steering, const float dt, const bool clip);
 
 	/** Returns the breadcrumbs from the character. */
-	vector<Crumb> *getBreadCrumbs();
+	vector<Crumb>* getBreadCrumbs();
 };
 
 #endif

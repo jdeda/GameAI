@@ -11,8 +11,7 @@
 using namespace sf;
 using namespace std;
 
-Position::Position(const float t, const float r1, const float r2, const float s)
-{
+Position::Position(const float t, const float r1, const float r2, const float s) {
     timeToReachTargetSpeed = t;
     radiusOfArrival = r1;
     radiusOfDeceleration = r2;
@@ -24,27 +23,22 @@ float Position::getRadiusOfArrival() { return this->radiusOfArrival; }
 float Position::getRadiusOfDeceleration() { return this->radiusOfDeceleration; }
 float Position::getMaxSpeed() { return this->maxSpeed; }
 
-Orientation::Orientation(const float t, const float r1, const float r2, float m)
-{
+Orientation::Orientation(const float t, const float r1, const float r2, float m) {
     timeToReachTargetRotation = t;
     radiusOfArrival = r1;
     radiusOfDeceleration = r2;
     maxRotation = m;
 }
 
-float Orientation::mapToRange(int rotation)
-{
+float Orientation::mapToRange(int rotation) {
     int r = rotation % 360;
-    if (abs(r) <= 180)
-    {
+    if (abs(r) <= 180) {
         return r;
     }
-    else if (abs(r) > 180)
-    {
+    else if (abs(r) > 180) {
         return 180 - r;
     }
-    else
-    {
+    else {
         return 180 + r;
     }
 }
@@ -54,13 +48,11 @@ float Orientation::getRadiusOfArrival() { return this->radiusOfArrival; }
 float Orientation::getRadiusOfDeceleration() { return this->radiusOfDeceleration; }
 float Orientation::getMaxRotation() { return this->maxRotation; }
 
-Velocity::Velocity(const float f)
-{
+Velocity::Velocity(const float f) {
     timeToReachTargetVelocity = f;
 }
 
-inline SteeringOutput Velocity::calculateAcceleration(const Kinematic &character, const Kinematic &target)
-{
+inline SteeringOutput Velocity::calculateAcceleration(const Kinematic& character, const Kinematic& target) {
     SteeringOutput output;
     output.linearAcceleration = target.linearVelocity - character.linearVelocity;
     output.linearAcceleration = output.linearAcceleration / timeToReachTargetVelocity;
@@ -68,13 +60,11 @@ inline SteeringOutput Velocity::calculateAcceleration(const Kinematic &character
     return output;
 }
 
-float Velocity::getTimeToReachTargetVelocity()
-{
+float Velocity::getTimeToReachTargetVelocity() {
     return Velocity::timeToReachTargetVelocity;
 }
 
-inline SteeringOutput Rotation::calculateAcceleration(const Kinematic &character, const Kinematic &target)
-{
+inline SteeringOutput Rotation::calculateAcceleration(const Kinematic& character, const Kinematic& target) {
     SteeringOutput output;
     return output;
 }
