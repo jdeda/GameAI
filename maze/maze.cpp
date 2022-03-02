@@ -38,22 +38,35 @@ void Level::startAt(Location location) {
     cells[location.x][location.y].inMaze = true;
 }
 
+// WHAT MAY BE WRONG
+// 1. CANPLACECORRIDOR FAILING
+// 2. CANPLACECORRIDORDEEP GOOF
 bool Level::canPlaceCorridor(int x, int y, int dirn) {
+
     return (x > 0 && x < rows - 1) && (y > 0 && y < cols - 1) && (cells[x][y].inMaze == false);
 }
 
 bool Level::canPlaceCorridorDeep(Location o, int x, int y, int dirn) {
+    cout << endl;
+    cout << x << " " << y << endl;
     for (auto neighbor : NEIGHBORS) {
         int dx = neighbor[0];
         int dy = neighbor[1];
-        int dirnD = neighbor[2];
         int nx = x + dx;
         int ny = y + dy;
-        int fromDirn = 3 - dirnD;
-        if (nx != o.x && ny != o.y) { // If neighbor not o.
-            if (!canPlaceCorridor(nx, ny, fromDirn)) { // And it has a neighbor that is already in the maze.
+        if (nx == 5 && ny == 5) {
+            cout << "oh no" << endl;
+            bool p1 = nx != o.x || ny != o.y ; // THIS IS WRONG NOT && BUT || !
+            bool p2 = canPlaceCorridor(nx, ny, dirn);
+            bool c = false && false;
+            cout << "bools = " << c << endl;
+            cout << p1 << " " << p2 << endl;
+        }
+        if ((nx != o.x || ny != o.y) && canPlaceCorridor(nx, ny, dirn) == false) {
+            cout << "yay!" << endl; 
+                 // If neighbor not o.
+                // And it has a neighbor that is already in the maze.
                 return false;
-            }
         }
     }
     return true;
@@ -64,6 +77,9 @@ Location Level::makeConnections(Location location) {
     random_shuffle(neighbors.begin(), neighbors.end());
     int x = location.x;
     int y = location.y;
+    if(x == 5 && y == 5) {
+        cout << "(5,5) = " << cells[x][y].inMaze << endl;
+    }
     for (auto neighbor : neighbors) {
 
         // Get neighbor.
@@ -75,25 +91,23 @@ Location Level::makeConnections(Location location) {
         int fromDirn = 3 - dirn;
 
         // Make sure it is not a node that already is in.
-        if (canPlaceCorridor(nx, ny, fromDirn)) {
-            if (canPlaceCorridorDeep(location, nx, ny, fromDirn)) {
+        if (canPlaceCorridor(nx, ny, fromDirn) && canPlaceCorridorDeep(location, nx, ny, fromDirn)) {
+                cout << "dammit" << endl;
                 cells[x][y].directions[dirn] = true;
                 cells[nx][ny].inMaze = true;
                 cells[nx][ny].directions[fromDirn] = true;
                 return Location(nx, ny);
-
-            }
         }
 
     }
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
 
-Level generateMaze(int w, int h) {
+Level generateMaze(int w, int h, RenderWindow* window) {
 
     // Initialize level and start.
     Level level = Level(w, h);
-    Location start = Location(w / 2, h / 2);
+    Location start = Location(2, 2);
 
     // Prepare DFS.
     stack<Location> locations;
@@ -104,6 +118,9 @@ Level generateMaze(int w, int h) {
     while (!locations.empty()) {
         Location current = locations.top();
         Location next = level.makeConnections(current);
+        window->clear(Color(255, 255, 255));
+        level.draw(window);
+        window->display();
         ((next.x != -1) && (next.y != -1)) ? locations.push(next) : locations.pop();
     }
 

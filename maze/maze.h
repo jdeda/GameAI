@@ -61,6 +61,10 @@ class Level
 
     /** Each list represents (dx, dy, direction delta). */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
+    vector<vector<int>> BLOCK_NEIGHBORS = {
+        {1, 0}, {0, 1}, {0, -1}, {-1, 0},
+        {1, 1}, {1, -1}, {1, -1}, {-1, -1}
+    };
 
     /** rows of maze. */
     int rows;
@@ -104,6 +108,6 @@ class Level
 };
 
 /** Generates a maze of given cols and rows. */
-Level generateMaze(int r, int c);
+Level generateMaze(int r, int c, RenderWindow* window);
 
 #endif

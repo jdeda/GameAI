@@ -33,10 +33,6 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer() {
 
-	// Generate graph.
-	Level maze = generateMaze(MAZE_X, MAZE_Y);
-	maze.print();
-
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
@@ -58,9 +54,7 @@ void SmallGraphVisualizer() {
 		}
 
 		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		maze.draw(&sceneView.scene);
-		sceneView.scene.display();
+		Level maze = generateMaze(MAZE_X, MAZE_Y, &sceneView.scene);
 	}
 }
 
