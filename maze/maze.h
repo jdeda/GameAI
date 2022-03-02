@@ -8,7 +8,7 @@ using namespace std;
 using namespace sf;
 
 
-/** X and Y coordinates in a maze. */
+/** X and Y coordinates in a level. */
 class Location
 {
     public:
@@ -16,20 +16,20 @@ class Location
     /** Constructs a location with all its fields. */
     Location(int a, int b);
 
-    /** X coordinate in maze. */
+    /** X coordinate in level. */
     int x;
 
-    /** Y coordinate in maze. */
+    /** Y coordinate in level. */
     int y;
 };
 
-/** Represents an edge in the maze. */
+/** Represents an edge in the level. */
 class Connections
 {
     public:
 
-    /** True if connection is within the maze. */
-    bool inMaze = false;
+    /** True if connection is within the level. */
+    bool inLevel = false;
 
     /** Possible directions at a given time (left, up, down, right). */
     char directions[4] = { false, false, false, false };
@@ -52,7 +52,7 @@ class LevelCell : RectangleShape
 
 };
 
-/** Represents a maze when using the mazeGenerator algorithm. */
+/** Basic tile grid level. Represents a maze when using the mazeGenerator algorithm. */
 class Level
 {
     public:
@@ -63,19 +63,19 @@ class Level
     /** Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left). */
     vector<vector<vector<int>>> BLOCK_NEIGHBORS = { {{1, 1}, {1, -1}}, {{1, 1}, {-1, 1}}, {{1, -1}, {-1, -1}}, {{-1, 1}, {-1, -1}} };
 
-    /** rows of maze. */
+    /** Number of rows of level. */
     int rows;
 
-    /** cols or columns of maze. */
+    /** Number of columns of level. */
     int cols;
 
-    /** 2D grid representing maze. */
+    /** 2D grid representing level. */
     vector<vector<Connections>> cells;
 
     /** Initializes level with all its fields. */
     Level(int w, int h);
 
-    /** Start maze generation at given location. */
+    /** Start level generation at given location. */
     void startAt(Location location);
 
     /** Return true if coordinates and direction allow a corridor. */
@@ -88,7 +88,7 @@ class Level
     Location makeConnections(Location location);
 
     /** Returns index repressenting direction of expansion from o to (x,y). */
-    int getDirIdx(Location o, int x, int y); 
+    int getDirIdx(Location o, int x, int y);
 
     /** Returns Level cells as LevelCells. */
     vector<vector<LevelCell>> toSFML();

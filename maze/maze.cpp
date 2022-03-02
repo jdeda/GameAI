@@ -18,7 +18,7 @@ LevelCell::LevelCell(const Location& location, const Connections& connections) {
     // if (!font.loadFromFile("arial.ttf")) { exit(99); }
     // auto text = Text{ id, font };
     setPosition((location.x * LevelCell::dims.x) / 2.f, (location.y * LevelCell::dims.y) / 2.f);
-    setFillColor(connections.inMaze ? sf::Color::Yellow : sf::Color::Black);
+    setFillColor(connections.inLevel ? sf::Color::Yellow : sf::Color::Black);
     setSize(LevelCell::dims);
 }
 
@@ -35,13 +35,12 @@ Level::Level(int w, int h) {
 }
 
 void Level::startAt(Location location) {
-    cells[location.x][location.y].inMaze = true;
+    cells[location.x][location.y].inLevel = true;
 }
 
 int Level::getDirIdx(Location o, int x, int y) {
     int dx = x - o.x;
     int dy = y - o.y;
-    cout << dx << " " << dy << endl;
 
     // Right.
     if (dx == 1 && dy == 0) {
@@ -71,7 +70,7 @@ int Level::getDirIdx(Location o, int x, int y) {
 
 
 bool Level::canPlaceCorridor(int x, int y) {
-    return (x > 0 && x < rows - 1) && (y > 0 && y < cols - 1) && (cells[x][y].inMaze == false);
+    return (x > 0 && x < rows - 1) && (y > 0 && y < cols - 1) && (cells[x][y].inLevel == false);
 }
 
 bool Level::canPlaceCorridorDeep(Location o, int x, int y, int fromDirIdx) {
@@ -96,7 +95,6 @@ bool Level::canPlaceCorridorDeep(Location o, int x, int y, int fromDirIdx) {
         int dy = neighbor[1];
         int nx = x + dx;
         int ny = y + dy;
-        // cout << idx << endl;
 
         // If not location to branch and has block neighbor in maze, fail.
         if ((nx != o.x || ny != o.y) && canPlaceCorridor(nx, ny) == false) {
@@ -126,7 +124,7 @@ Location Level::makeConnections(Location location) {
         // Make sure it is not a cell that already is in the level.
         if (canPlaceCorridor(nx, ny) && canPlaceCorridorDeep(location, nx, ny, dirIdx)) {
             cells[x][y].directions[dirIdx] = true;
-            cells[nx][ny].inMaze = true;
+            cells[nx][ny].inLevel = true;
             cells[nx][ny].directions[fromDirIdx] = true;
             return Location(nx, ny);
         }
@@ -160,7 +158,7 @@ Level generateMaze(int w, int h) {
 void Level::print() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            cout << cells[r][c].inMaze << " ";
+            cout << cells[r][c].inLevel << " ";
         }
         cout << "\n";
     }

@@ -58,8 +58,8 @@ void SmallGraphVisualizer() {
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
-        maze.draw(&sceneView.scene);
-        sceneView.scene.display();
+		maze.draw(&sceneView.scene);
+		sceneView.scene.display();
 	}
 }
 
