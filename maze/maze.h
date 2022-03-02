@@ -58,9 +58,8 @@ class Level
 
     public:
 
-    bool printy = false;
 
-    /** Each list represents (dx, dy, direction delta). **/
+    /** Each list represents (dx, dy, direction delta). */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
 
     /** rows of maze. */
@@ -92,14 +91,6 @@ class Level
 
     /** Level draws itself on the window. */
     inline void draw(RenderWindow* window) {
-        // auto cellsSFML = toSFML();
-        // for (int row = 0; row < rows; row++) {
-        //     for (int col = 0; col < cols; col++) {
-        //         cellsSFML[row][col].draw(window);
-        //     }
-        // }
-        LevelCell cell(Location(5, 5), cells[5][5]);
-        cell.draw(window);
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 LevelCell cell(Location(row, col), cells[row][col]);

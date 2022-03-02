@@ -27,13 +27,15 @@ const float MAZE_Y = 20.f;
 /** Start unique IDs at 0. */
 int ID::count = 0;
 
-Vector2f LevelCell::dims = Vector2f(SCENE_WINDOW_X / MAZE_X, SCENE_WINDOW_Y / MAZE_Y);
+const float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
+Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer() {
 
 	// Generate graph.
 	Level maze = generateMaze(MAZE_X, MAZE_Y);
+	maze.print();
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -54,7 +56,6 @@ void SmallGraphVisualizer() {
 					break;
 			}
 		}
-
 
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));

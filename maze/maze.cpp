@@ -8,22 +8,19 @@
 using namespace std;
 using namespace sf;
 
-// TODO: GOOFS
-// - canPlaceCorridor x/rows, y/cols bad?, not really
-// - makeConnections shuffle bad? assignment bad?
-
-
 Location::Location(int a, int b) {
     x = a;
     y = b;
 }
 
 LevelCell::LevelCell(const Location& location, const Connections& connections) {
-    setPosition(location.x, location.y);
-    setFillColor( connections.inMaze ? sf::Color::Blue : sf::Color::Black);
+    // Font font;
+    // if (!font.loadFromFile("arial.ttf")) { exit(99); }
+    // auto text = Text{ id, font };
+    setPosition((location.x * LevelCell::dims.x) / 2.f, (location.y * LevelCell::dims.y) / 2.f);
+    setFillColor(connections.inMaze ? sf::Color::Yellow : sf::Color::Black);
     setSize(LevelCell::dims);
 }
-
 
 Level::Level(int w, int h) {
     cols = w;
@@ -96,8 +93,6 @@ Level generateMaze(int w, int h) {
 
     // Initialize level and start.
     Level level = Level(w, h);
-    cout << "INIT" << endl;
-    level.print();
     Location start = Location(w / 2, h / 2);
 
     // Prepare DFS.
@@ -105,26 +100,14 @@ Level generateMaze(int w, int h) {
     locations.push(start);
     level.startAt(start);
 
-    cout << endl;
-    cout << "BEGIN" << endl;
-    level.print();
-
     // Perform DFS.
-    int i = 0;
     while (!locations.empty()) {
         Location current = locations.top();
         Location next = level.makeConnections(current);
         ((next.x != -1) && (next.y != -1)) ? locations.push(next) : locations.pop();
-        if (i > 200 && i < 250) {
-            level.printy = true;
-        }
-        i++;
     }
 
     // Return level that is now a maze.
-    cout << endl;
-    cout << "END" << endl;
-    level.print();
     return level;
 }
 
