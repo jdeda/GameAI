@@ -21,8 +21,8 @@
 using namespace std;
 using namespace sf;
 
-const float MAZE_X = 20.f;
-const float MAZE_Y = 20.f;
+const float MAZE_X = 50.f;
+const float MAZE_Y = 50.f;
 
 /** Start unique IDs at 0. */
 int ID::count = 0;
@@ -32,6 +32,9 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer() {
+
+	// Generate maze.
+	Level maze = generateMaze(MAZE_X, MAZE_Y);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -54,7 +57,9 @@ void SmallGraphVisualizer() {
 		}
 
 		// Re-render scene.
-		Level maze = generateMaze(MAZE_X, MAZE_Y, &sceneView.scene);
+		sceneView.scene.clear(Color(255, 255, 255));
+        maze.draw(&sceneView.scene);
+        sceneView.scene.display();
 	}
 }
 

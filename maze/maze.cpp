@@ -135,7 +135,7 @@ Location Level::makeConnections(Location location) {
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
 
-Level generateMaze(int w, int h, RenderWindow* window) {
+Level generateMaze(int w, int h) {
 
     // Initialize level and start.
     Level level = Level(w, h);
@@ -150,9 +150,6 @@ Level generateMaze(int w, int h, RenderWindow* window) {
     while (!locations.empty()) {
         Location current = locations.top();
         Location next = level.makeConnections(current);
-        window->clear(Color(255, 255, 255));
-        level.draw(window);
-        window->display();
         ((next.x != -1) && (next.y != -1)) ? locations.push(next) : locations.pop();
     }
 
