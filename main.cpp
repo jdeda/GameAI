@@ -18,47 +18,49 @@
 #include "graph/graph.h"
 #include "maze/maze.h"
 
-using namespace sf;
 using namespace std;
+using namespace sf;
+
+const float MAZE_X = 20.f;
+const float MAZE_Y = 20.f;
 
 /** Start unique IDs at 0. */
 int ID::count = 0;
+
+Vector2f LevelCell::dims = Vector2f(SCENE_WINDOW_X / MAZE_X, SCENE_WINDOW_Y / MAZE_Y);
 
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer() {
 
 	// Generate graph.
-	Level maze = generateMaze(10, 10);
-	maze.print();
+	Level maze = generateMaze(MAZE_X, MAZE_Y);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 
-	// // Render scene and measure time.
-	// Clock clock;
-	// while (sceneView.scene.isOpen())
-	// {
-	// 	// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
-	// 	float dt = clock.restart().asSeconds();
+	// Render scene and measure time.
+	Clock clock;
+	while (sceneView.scene.isOpen()) {
 
-	// 	// Handle scene poll event.
-	// 	Event event;
-	// 	while (sceneView.scene.pollEvent(event))
-	// 	{
-	// 		switch (event.type)
-	// 		{
-	// 		case Event::Closed:
-	// 			sceneView.scene.close();
-	// 			break;
-	// 		}
-	// 	}
+		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		float dt = clock.restart().asSeconds();
+
+		// Handle scene poll event.
+		Event event;
+		while (sceneView.scene.pollEvent(event)) {
+			switch (event.type) {
+				case Event::Closed:
+					sceneView.scene.close();
+					break;
+			}
+		}
 
 
-	// 	// Re-render scene.
-	// 	sceneView.scene.clear(Color(255, 255, 255));
-	// 	sceneView.scene.draw(maze.toSFML());
-	// 	sceneView.scene.display();
-	// }
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		maze.draw(&sceneView.scene);
+		sceneView.scene.display();
+	}
 }
 
 

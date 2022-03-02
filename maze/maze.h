@@ -3,10 +3,14 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+
 using namespace std;
+using namespace sf;
+
 
 /** X and Y coordinates in a maze. */
-class Location {
+class Location
+{
     public:
 
     /** Constructs a location with all its fields. */
@@ -20,34 +24,46 @@ class Location {
 };
 
 /** Represents an edge in the maze. */
-class Connections {
+class Connections
+{
     public:
 
     /** True if connection is within the maze. */
     bool inMaze = false;
 
     /** Possible directions at a given time (left, up, down, right). */
-    char directions[4] = {false, false, false, false};
+    char directions[4] = { false, false, false, false };
 };
 
 /** Represents cell in a Level. */
-class LevelCell: sf::RectangleShape {
+class LevelCell : RectangleShape
+{
 
     public:
+
+    static Vector2f dims;
+
     /** Constructs a level cell via a given connections and location.*/
     LevelCell(const Location& location, const Connections& connections);
+
+    inline void draw(RenderWindow* window) {
+        window->draw(*this);
+    }
 
 };
 
 /** Represents a maze when using the mazeGenerator algorithm. */
-class Level {
+class Level
+{
 
     public:
 
-    /** Each list represents (dx, dy, direction delta). **/
-    vector<vector<int>> NEIGHBORS = {{1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3}};
+    bool printy = false;
 
-    /** rowss of maze. */
+    /** Each list represents (dx, dy, direction delta). **/
+    vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
+
+    /** rows of maze. */
     int rows;
 
     /** cols or columns of maze. */
@@ -65,18 +81,36 @@ class Level {
     /** Return true if coordinates and direction allow a corridor. */
     bool canPlaceCorridor(int x, int y, int dirn);
 
+    /** Return true if coordinates and direction allow a corridor. */
+    bool canPlaceCorridorDeep(Location o, int x, int y, int dirn);
+
     /** Makes connections around a location. */
     Location makeConnections(Location location);
 
     /** Returns Level cells as LevelCells. */
     vector<vector<LevelCell>> toSFML();
 
+    /** Level draws itself on the window. */
+    inline void draw(RenderWindow* window) {
+        // auto cellsSFML = toSFML();
+        // for (int row = 0; row < rows; row++) {
+        //     for (int col = 0; col < cols; col++) {
+        //         cellsSFML[row][col].draw(window);
+        //     }
+        // }
+        LevelCell cell(Location(5, 5), cells[5][5]);
+        cell.draw(window);
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                LevelCell cell(Location(row, col), cells[row][col]);
+                cell.draw(window);
+            }
+        }
+    }
+
     /** Prints the level. */
     void print();
 };
-
-/** Generates a maze by filling the level at a given start. */
-void generateMaze(Level level, Location start);
 
 /** Generates a maze of given cols and rows. */
 Level generateMaze(int r, int c);
