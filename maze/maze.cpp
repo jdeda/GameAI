@@ -14,10 +14,7 @@ Location::Location(int a, int b) {
 }
 
 LevelCell::LevelCell(const Location& location, const Connections& connections) {
-    // Font font;
-    // if (!font.loadFromFile("arial.ttf")) { exit(99); }
-    // auto text = Text{ id, font };
-    setPosition((location.x * LevelCell::dims.x) / 2.f, (location.y * LevelCell::dims.y) / 2.f);
+    setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
     setFillColor(connections.inLevel ? sf::Color::Yellow : sf::Color::Black);
     setSize(LevelCell::dims);
 }
@@ -70,7 +67,7 @@ int Level::getDirIdx(Location o, int x, int y) {
 
 
 bool Level::canPlaceCorridor(int x, int y) {
-    return (x > 0 && x < rows - 1) && (y > 0 && y < cols - 1) && (cells[x][y].inLevel == false);
+    return (x >= 0 && x < rows) && (y >= 0 && y < cols) && (cells[x][y].inLevel == false);
 }
 
 bool Level::canPlaceCorridorDeep(Location o, int x, int y, int fromDirIdx) {

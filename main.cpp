@@ -21,8 +21,8 @@
 using namespace std;
 using namespace sf;
 
-const float MAZE_X = 50.f;
-const float MAZE_Y = 50.f;
+const float MAZE_X = 20.f;
+const float MAZE_Y = 20.f;
 
 /** Start unique IDs at 0. */
 int ID::count = 0;
