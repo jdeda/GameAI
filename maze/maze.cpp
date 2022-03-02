@@ -38,37 +38,73 @@ void Level::startAt(Location location) {
     cells[location.x][location.y].inMaze = true;
 }
 
-// WHAT MAY BE WRONG
-// 1. CANPLACECORRIDOR FAILING
-// 2. CANPLACECORRIDORDEEP GOOF
-bool Level::canPlaceCorridor(int x, int y, int dirn) {
+int Level::getDirIdx(Location o, int x, int y) {
+    int dx = x - o.x;
+    int dy = y - o.y;
+    cout << dx << " " << dy << endl;
 
+    // Right.
+    if (dx == 1 && dy == 0) {
+        return 0;
+    }
+
+    // Up.
+    else if (dx == 0 && dy == 1) {
+        return 1;
+    }
+
+    // Down.
+    else if (dx == 0 && dy == -1) {
+        return 2;
+    }
+
+    // Left.
+    else if (dx == -1 && dy == 0) {
+        return 3;
+    }
+
+    // Fail.
+    else {
+        exit(34);
+    }
+}
+
+
+bool Level::canPlaceCorridor(int x, int y) {
     return (x > 0 && x < rows - 1) && (y > 0 && y < cols - 1) && (cells[x][y].inMaze == false);
 }
 
-bool Level::canPlaceCorridorDeep(Location o, int x, int y, int dirn) {
-    cout << endl;
-    cout << x << " " << y << endl;
+bool Level::canPlaceCorridorDeep(Location o, int x, int y, int fromDirIdx) {
+
+    // Make sure can move right, up, down, left.
     for (auto neighbor : NEIGHBORS) {
         int dx = neighbor[0];
         int dy = neighbor[1];
         int nx = x + dx;
         int ny = y + dy;
-        if (nx == 5 && ny == 5) {
-            cout << "oh no" << endl;
-            bool p1 = nx != o.x || ny != o.y ; // THIS IS WRONG NOT && BUT || !
-            bool p2 = canPlaceCorridor(nx, ny, dirn);
-            bool c = false && false;
-            cout << "bools = " << c << endl;
-            cout << p1 << " " << p2 << endl;
-        }
-        if ((nx != o.x || ny != o.y) && canPlaceCorridor(nx, ny, dirn) == false) {
-            cout << "yay!" << endl; 
-                 // If neighbor not o.
-                // And it has a neighbor that is already in the maze.
-                return false;
+
+        // If not location to branch and has block neighbor in maze, fail.
+        if ((nx != o.x || ny != o.y) && canPlaceCorridor(nx, ny) == false) {
+            return false;
         }
     }
+
+    // Make sure direction of expansion doesn't rub into a corner.
+    int idx = getDirIdx(o, x, y);
+    for (auto neighbor : BLOCK_NEIGHBORS[idx]) {
+        int dx = neighbor[0];
+        int dy = neighbor[1];
+        int nx = x + dx;
+        int ny = y + dy;
+        // cout << idx << endl;
+
+        // If not location to branch and has block neighbor in maze, fail.
+        if ((nx != o.x || ny != o.y) && canPlaceCorridor(nx, ny) == false) {
+            return false;
+        }
+    }
+
+    // Passed all tests so it must be a valid corridor.
     return true;
 }
 
@@ -77,26 +113,22 @@ Location Level::makeConnections(Location location) {
     random_shuffle(neighbors.begin(), neighbors.end());
     int x = location.x;
     int y = location.y;
-    if(x == 5 && y == 5) {
-        cout << "(5,5) = " << cells[x][y].inMaze << endl;
-    }
     for (auto neighbor : neighbors) {
 
         // Get neighbor.
         int dx = neighbor[0];
         int dy = neighbor[1];
-        int dirn = neighbor[2];
+        int dirIdx = neighbor[2];
         int nx = x + dx;
         int ny = y + dy;
-        int fromDirn = 3 - dirn;
+        int fromDirIdx = 3 - dirIdx;
 
-        // Make sure it is not a node that already is in.
-        if (canPlaceCorridor(nx, ny, fromDirn) && canPlaceCorridorDeep(location, nx, ny, fromDirn)) {
-                cout << "dammit" << endl;
-                cells[x][y].directions[dirn] = true;
-                cells[nx][ny].inMaze = true;
-                cells[nx][ny].directions[fromDirn] = true;
-                return Location(nx, ny);
+        // Make sure it is not a cell that already is in the level.
+        if (canPlaceCorridor(nx, ny) && canPlaceCorridorDeep(location, nx, ny, dirIdx)) {
+            cells[x][y].directions[dirIdx] = true;
+            cells[nx][ny].inMaze = true;
+            cells[nx][ny].directions[fromDirIdx] = true;
+            return Location(nx, ny);
         }
 
     }
@@ -140,9 +172,9 @@ void Level::print() {
 vector<vector<LevelCell>> Level::toSFML() {
 
     vector<vector<LevelCell>> cellsSFML;
-    for(int row = 0; row < rows; row++) {
+    for (int row = 0; row < rows; row++) {
         vector<LevelCell> v;
-        for(int col = 0; col < cols; col++) { 
+        for (int col = 0; col < cols; col++) {
             v.push_back(LevelCell(Location(row, col), cells[row][col]));
         }
         cellsSFML.push_back(v);

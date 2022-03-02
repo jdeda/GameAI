@@ -58,13 +58,14 @@ class Level
 
     public:
 
-
-    /** Each list represents (dx, dy, direction delta). */
+    /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
-    vector<vector<int>> BLOCK_NEIGHBORS = {
-        {1, 0}, {0, 1}, {0, -1}, {-1, 0},
-        {1, 1}, {1, -1}, {1, -1}, {-1, -1}
-    };
+
+    /** Each list represents (dx, dy) for all cells surrounding a single cell. */
+    // vector<vector<int>> BLOCK_NEIGHBORS = { {1, 0}, {0, 1}, {0, -1}, {-1, 0}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1} };
+
+    // Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left)
+    vector<vector<vector<int>>> BLOCK_NEIGHBORS = { {{1, 1}, {1, -1}}, {{1, 1}, {-1, 1}}, {{1, -1}, {-1, -1}}, {{-1, 1}, {-1, -1}} };
 
     /** rows of maze. */
     int rows;
@@ -82,13 +83,17 @@ class Level
     void startAt(Location location);
 
     /** Return true if coordinates and direction allow a corridor. */
-    bool canPlaceCorridor(int x, int y, int dirn);
+    bool canPlaceCorridor(int x, int y);
 
     /** Return true if coordinates and direction allow a corridor. */
-    bool canPlaceCorridorDeep(Location o, int x, int y, int dirn);
+    bool canPlaceCorridorDeep(Location o, int x, int y, int fromDirIdx);
 
     /** Makes connections around a location. */
     Location makeConnections(Location location);
+
+
+    /** Returns index repressenting direction of expansion from o to (x,y). */
+    int getDirIdx(Location o, int x, int y); 
 
     /** Returns Level cells as LevelCells. */
     vector<vector<LevelCell>> toSFML();
