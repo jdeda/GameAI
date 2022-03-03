@@ -4,114 +4,147 @@
 #include <vector>
 #include <unordered_map>
 #include "../id/id.h"
+#include "../level/location.h"
 
 using namespace std;
 
 namespace graph {
 
-/** Represents a general graph vertex. */
-class Vertex
-{
-    private:
-    /** Unique ID for vertex. */
-    ID id;
+    /** Represents a general graph vertex. */
+    class Vertex
+    {
+        private:
+        /** Unique ID for vertex. */
+        ID id;
 
-    public:
-    /** Default constructor for vertex. */
-    Vertex();
+        public:
+        /** Default constructor for vertex. */
+        Vertex();
 
-    /** Returns the vertex's ID (as an int). */
-    int getID() const;
-};
+        /** Returns the vertex's ID (as an int). */
+        int getID() const;
+    };
 
-/** Represents a directed weighted graph edge. */
-class Edge
-{
+    /** Represents a directed weighted graph edge. */
+    class Edge
+    {
 
-    private:
-    /** Non-negative weight of this edge. */
-    float weight;
+        private:
+        /** Non-negative weight of this edge. */
+        float weight;
 
-    /** Non-negative cost of traversing this edge. */
-    float cost;
+        /** Non-negative cost of traversing this edge. */
+        float cost;
 
-    /** Vertex edge starts. */
-    Vertex from;
+        /** Vertex edge starts. */
+        Vertex from;
 
-    /** Vertex edge leads to (ends). */
-    Vertex to;
+        /** Vertex edge leads to (ends). */
+        Vertex to;
 
-    public:
-    /** Constructs an Edge with all its fields. */
-    Edge(float w, float c, Vertex f, Vertex t);
+        public:
+        /** Constructs an Edge with all its fields. */
+        Edge(float w, float c, Vertex f, Vertex t);
 
-    /** Returns non-negative cost of traversing edge. */
-    float getCost() const;
-};
+        /** Returns non-negative cost of traversing edge. */
+        float getCost() const;
+    };
 
-/** Represents a tile directed weighted graph. */
-class Graph
-{
-    private:
+    /** Represents node in graph (location, vertex, edges). */
+    class GraphNode
+    {
 
-    /** Index into map given a vertex's unique id, and return the list of its outgoing edges. */
-    unordered_map<int, vector<Edge>> edges;
+        private:
 
-    /** Verticies in graph. */
-    vector<vector<graph::Vertex>> verticies;
+        /** Represents (x,y) coordinates in tile graph. */
+        Location location;
 
-    /** Number of rows to represent graph. */
-    int rows;
+        /** Represents vertex in graph. */
+        Vertex vertex;
 
-    /** Number of columns to represent graph. */
-    int cols;
+        /** Represents outgoing edges associated with vertex in graph. */
+        vector<Edge> edges;
 
-    public:
+        public:
+
+        /** Constructs a GraphNode with all of its fields. */
+        GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges);
+
+        /** Getters. */
+        Vertex getVertex() const;
+        Location getLocation() const;
+        vector<Edge> getEdges() const;
+    };
+
+    /** Represents a tile directed weighted graph. */
+    class Graph
+    {
+        private:
+
+        /** Index into map given a vertex's unique id and return associated GraphNode. */
+        unordered_map<int, GraphNode> nodes; // Also called quantizer.
+
+        /** Index into map given a location and return associated GraphNode. */
+        unordered_map<Location, GraphNode> localizer;
+
+        /** Number of rows to represent graph. */
+        int rows;
+
+        /** Number of columns to represent graph. */
+        int cols;
+
+        public:
+
+        /** Constructs a new graph initializing all its fields given the map of edges.*/
+        Graph(const unordered_map<int, GraphNode>& nodes);
+
+        /** Returns the list of outgoing edges from the given vertex. */
+        inline vector<Edge> getOutgoingEdges(const Vertex& of) {
+            return nodes.at(of.getID()).getEdges();
+        }
     
-    /** Constructs a new graph initializing all its fields given the map of edges.*/
-    Graph(const unordered_map<int, vector<Edge>>& e, const vector<vector<graph::Vertex>>& v);
+        /** Maps vertex in graph to location in level. */
+        inline Location localize(const graph::Vertex& vertex) {
+            return nodes.at(vertex.getID()).getLocation();
 
-    /**
-     * @brief Returns the list of outgoing edges from the given vertex.
-     *
-     * @param from the vertex to get outgoing edges from the given vertex
-     * @return vector<Edge> the outgoing edges from the given vetex
-     */
-    inline vector<Edge> getOutgoingEdges(const Vertex& of) {
-        return edges.at(of.getID());
-    }
-};
+        }
 
-/** Any vertex in search is either open, closed, unvisited, or visited. */
-enum VertexState
-{
-    open,
-    closed,
-    unvisited,
-    visited
-};
+        /** Maps location in level to GraphNode in graph. */
+        inline GraphNode quantize(const Location& location) {
+            return localizer.at(location);
+        }
+    };
 
-/** Used for path finding algorithms. Stores a vertex and its relative state for pathfinding purposes. */
-class VertexRecord
-{
+    /** Any vertex in search is either open, closed, unvisited, or visited. */
+    enum VertexState
+    {
+        open,
+        closed,
+        unvisited,
+        visited
+    };
 
-    private:
-    /** Vertex to record.*/
-    Vertex vertex;
+    /** Used for path finding algorithms. Stores a vertex and its relative state for pathfinding purposes. */
+    class VertexRecord
+    {
 
-    /** Vertex state. */
-    VertexState state;
+        private:
+        /** Vertex to record.*/
+        Vertex vertex;
 
-    public:
-    /* Construct a Vertex Record with all its fields. */
-    VertexRecord(const Vertex& v, const VertexState& s);
+        /** Vertex state. */
+        VertexState state;
 
-    /** Returns state of vertex.*/
-    VertexState getState() const;
+        public:
+        /* Construct a Vertex Record with all its fields. */
+        VertexRecord(const Vertex& v, const VertexState& s);
 
-    /** Sets state of vertex. */
-    void setState(VertexState newState);
-};
+        /** Returns state of vertex.*/
+        VertexState getState() const;
+
+        /** Sets state of vertex. */
+        void setState(VertexState newState);
+    };
 
 };
 

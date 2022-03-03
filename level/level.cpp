@@ -4,17 +4,12 @@
 #include <stack>
 #include "../debug/debug.h"
 #include "../graph/graph.h"
+#include "location.h"
 #include "level.h"
 
 using namespace std;
 using namespace sf;
 using namespace graph;
-
-
-Location::Location(int a, int b) {
-    x = a;
-    y = b;
-}
 
 LevelCell::LevelCell(const Location& location, const Connections& connections) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
@@ -179,54 +174,48 @@ vector<vector<LevelCell>> Level::toSFML() {
     return cellsSFML;
 }
 
+
+
 Graph levelToGraph(const Level& level) {
-
-
-    // Create grid of verticies to create edges.
-    vector<vector<graph::Vertex>> verticies;
+    
+    unordered_map<int, GraphNode> nodes; 
     for (int i = 0; i < level.rows; i++) {
-        vector<graph::Vertex> v;
         for (int j = 0; j < level.cols; j++) {
+
+            // Make vertex and location for this point in the level.
             graph::Vertex vertex;
-            v.push_back(vertex);
-        }
-        verticies.push_back(v);
-    }
-
-    // Convert connections into edges.
-    unordered_map<int, vector<Edge>> edges;
-    for (int i = 0; i < level.rows; i++) {
-        for (int j = 0; j < level.cols; j++) {
+            Location location(i, j);
 
             // Makes edges for this vertex for the graph (take directions marked as true).
-            
-            vector<Edge> vertexEdges;
+            vector<Edge> edges;
             Connections connections = level.cells[i][j];
-            graph::Vertex vertex = verticies[i][j];
 
             // Connection not in level has no edges.
-            if (!connections.inLevel) { edges.insert({ vertex.getID(), vertexEdges }); }
+            // What might happen here is vertex is passed, copied, and the IDs are actually now mismatched...
+            if (!connections.inLevel) { 
+                // Does this graph node get a copy of the vertex...or does it construct one and increment id?
+                GraphNode node = GraphNode(location, vertex, edges);
+                nodes.insert({node.getVertex().getID(), node});
+                continue;
+            }
 
             // Connection in level has edges (for those that are marked as true).
             bool directions[4] = { connections.directions };
-            cout << "yay" << endl;
             for (int k = 0; k < 4; k++) {  // This is dangerous, assume 4 directions.
                 if (!directions[k]) { continue; } // Not marked true, continue.
                 int nx = i + level.NEIGHBORS[k][0]; // i + dx
                 int ny = j + level.NEIGHBORS[k][0]; // j + dy
 
-                // TODO: this check may be weird.
+                // TODO: ID property may not work as expected.
                 if(!level.inBounds(nx, ny)) { continue; }
-                cout << "god ";
-                graph::Vertex vertexNeighbor = verticies[nx][ny];
-                cout << "dammit\n";
+                graph::Vertex vertexNeighbor;
                 Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
-                vertexEdges.push_back(e);
+                edges.push_back(e);
             }
-            cout << i << " " << j << endl;
-            cout << "dammit" << endl << endl;
-            edges.insert({ verticies[i][j].getID(), vertexEdges });
+            GraphNode node = GraphNode(location, vertex, edges);
+            nodes.insert({node.getVertex().getID(), node});
+
         }
     }
-    return Graph(edges, verticies);
+    return Graph(nodes);
 }

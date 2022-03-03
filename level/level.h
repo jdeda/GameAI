@@ -4,26 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "../graph/graph.h"
+#include "location.h"
 
 using namespace std;
 using namespace sf;
 using namespace graph;
-
-
-/** X and Y coordinates in a level. */
-class Location
-{
-    public:
-
-    /** Constructs a location with all its fields. */
-    Location(int a, int b);
-
-    /** X coordinate in level. */
-    int x;
-
-    /** Y coordinate in level. */
-    int y;
-};
 
 /** Represents an edge in the level. */
 class Connections
