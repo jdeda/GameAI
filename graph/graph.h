@@ -49,7 +49,7 @@ class Edge
     float getCost() const;
 };
 
-/** Represents a directed weighted graph. */
+/** Represents a tile directed weighted graph. */
 class Graph
 {
     private:
@@ -57,9 +57,22 @@ class Graph
     /** Index into map given a vertex's unique id, and return the list of its outgoing edges. */
     unordered_map<int, vector<Edge>> edges;
 
+    /** Verticies in graph. */
+    vector<vector<graph::Vertex>> verticies;
+
+    /** Number of rows to represent graph. */
+    int rows;
+
+    /** Number of columns to represent graph. */
+    int cols;
+
     public:
+
+    /** Default constructor for graph. */
+    Graph();
+    
     /** Constructs a new graph initializing all its fields given the map of edges.*/
-    Graph(const unordered_map<int, vector<Edge>>& e);
+    Graph(const unordered_map<int, vector<Edge>>& e, const vector<vector<graph::Vertex>>& v);
 
     /**
      * @brief Returns the list of outgoing edges from the given vertex.

@@ -24,9 +24,11 @@ namespace graph {
     float Edge::getCost() const {
         return cost;
     }
+    
 
-    Graph::Graph(const unordered_map<int, vector<Edge>>& e) {
+    Graph::Graph(const unordered_map<int, vector<Edge>>& e, const vector<vector<graph::Vertex>>& v) {
         edges = e;
+        verticies = v;
     }
 
     VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {

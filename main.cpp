@@ -16,7 +16,7 @@
 #include "steering/steering.h"
 #include "steering/steeringoutput.h"
 #include "graph/graph.h"
-#include "maze/maze.h"
+#include "level/level.h"
 
 using namespace std;
 using namespace sf;
