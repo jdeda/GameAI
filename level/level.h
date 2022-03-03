@@ -74,9 +74,6 @@ class Level
     /** 2D grid representing level. */
     vector<vector<Connections>> cells;
 
-    /** Default constructor. */
-    Level();
-
     /** Initializes level with all its fields. */
     Level(int w, int h);
 

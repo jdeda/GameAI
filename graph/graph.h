@@ -67,9 +67,6 @@ class Graph
     int cols;
 
     public:
-
-    /** Default constructor for graph. */
-    Graph();
     
     /** Constructs a new graph initializing all its fields given the map of edges.*/
     Graph(const unordered_map<int, vector<Edge>>& e, const vector<vector<graph::Vertex>>& v);
