@@ -2,11 +2,14 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
-#include "maze.h"
 #include "../debug/debug.h"
+#include "../graph/graph.h"
+#include "maze.h"
 
 using namespace std;
 using namespace sf;
+using namespace graph;
+
 
 Location::Location(int a, int b) {
     x = a;
@@ -64,7 +67,6 @@ int Level::getDirIdx(Location o, int x, int y) {
         exit(34);
     }
 }
-
 
 bool Level::canPlaceCorridor(int x, int y) {
     return (x >= 0 && x < rows) && (y >= 0 && y < cols) && (cells[x][y].inLevel == false);
@@ -162,7 +164,6 @@ void Level::print() {
 }
 
 vector<vector<LevelCell>> Level::toSFML() {
-
     vector<vector<LevelCell>> cellsSFML;
     for (int row = 0; row < rows; row++) {
         vector<LevelCell> v;
@@ -172,4 +173,57 @@ vector<vector<LevelCell>> Level::toSFML() {
         cellsSFML.push_back(v);
     }
     return cellsSFML;
+}
+
+/** Converts level (tile level) into graph (tile graph). */
+Graph levelToGraph(const Level& level) {
+
+
+    // Create grid of verticies to create edges.
+    vector<vector<graph::Vertex>> verticies;
+    for (int i = 0; i < level.rows; i++) {
+        vector<graph::Vertex> v;
+        for (int j = 0; j < level.cols; j++) {
+            graph::Vertex vertex;
+            v.push_back(vertex);
+        }
+        verticies.push_back(v);
+    }
+
+    // Convert connections into edges.
+    unordered_map<int, vector<Edge>> edges;
+    for (int i = 0; i < level.rows; i++) {
+        for (int j = 0; j < level.cols; j++) {
+
+            // Makes edges for this vertex for the graph (take directions marked as true).
+            
+            vector<Edge> vertexEdges;
+            Connections connections = level.cells[i][j];
+            graph::Vertex vertex = verticies[i][j];
+
+            // Connection not in level has no edges.
+            if (!connections.inLevel) { edges.insert({ vertex.getID(), vertexEdges }); }
+
+            // Connection in level has edges (for those that are marked as true).
+            bool directions[4] = { connections.directions };
+            cout << "yay" << endl;
+            for (int k = 0; k < 4; k++) {  // This is dangerous, assume 4 directions.
+                if (!directions[k]) { continue; } // Not marked true, continue.
+                int nx = i + level.NEIGHBORS[k][0]; // i + dx
+                int ny = j + level.NEIGHBORS[k][0]; // j + dy
+
+                // TODO: this check may be weird.
+                if(nx < 0 || nx >= level.rows || ny < 0 || ny >= level.cols) { continue; }
+                cout << "god ";
+                graph::Vertex vertexNeighbor = verticies[nx][ny];
+                cout << "dammit\n";
+                Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
+                vertexEdges.push_back(e);
+            }
+            cout << i << " " << j << endl;
+            cout << "dammit" << endl << endl;
+            edges.insert({ verticies[i][j].getID(), vertexEdges });
+        }
+    }
+    return Graph(edges);
 }

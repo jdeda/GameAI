@@ -3,9 +3,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "../graph/graph.h"
 
 using namespace std;
 using namespace sf;
+using namespace graph;
 
 
 /** X and Y coordinates in a level. */
@@ -88,7 +90,7 @@ class Level
     Location makeConnections(Location location);
 
     /** Returns index repressenting direction of expansion from o to (x,y). */
-    int getDirIdx(Location o, int x, int y);
+    int getDirIdx(Location o, int x, int y); 
 
     /** Returns Level cells as LevelCells. */
     vector<vector<LevelCell>> toSFML();
@@ -109,5 +111,8 @@ class Level
 
 /** Generates a maze of given cols and rows. */
 Level generateMaze(int r, int c);
+
+/** Converts the given level into a graph and returns it.*/
+Graph levelToGraph(const Level& level);
 
 #endif

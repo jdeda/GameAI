@@ -35,6 +35,7 @@ void SmallGraphVisualizer() {
 
 	// Generate maze.
 	Level maze = generateMaze(MAZE_X, MAZE_Y);
+	Graph mazeGraph = levelToGraph(maze);
 
 	// Setup SceneView.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
