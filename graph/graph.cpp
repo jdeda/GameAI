@@ -47,15 +47,4 @@ namespace graph {
         for (const auto& kv : nodes) { localizer.insert({ kv.second.getLocation(), kv.second }); }
         Graph::localizer = localizer;
     }
-
-    VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {
-        vertex = v;
-        state = s;
-    }
-
-    VertexState VertexRecord::getState() const { return state; }
-
-    void VertexRecord::setState(VertexState newState) {
-        state = newState;
-    }
 };

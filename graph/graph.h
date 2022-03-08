@@ -99,53 +99,21 @@ namespace graph {
         Graph(const unordered_map<int, GraphNode>& nodes);
 
         /** Returns the list of outgoing edges from the given vertex. */
-        inline vector<Edge> getOutgoingEdges(const Vertex& of) {
+        inline vector<Edge> getOutgoingEdges(const Vertex& of) const{
             return nodes.at(of.getID()).getEdges();
         }
 
         /** Maps vertex in graph to location in level. */
-        inline Location localize(const graph::Vertex& vertex) {
+        inline Location localize(const graph::Vertex& vertex) const {
             return nodes.at(vertex.getID()).getLocation();
 
         }
 
         /** Maps location in level to GraphNode in graph. */
-        inline GraphNode quantize(const Location& location) {
+        inline GraphNode quantize(const Location& location) const{
             return localizer.at(location);
         }
     };
-
-    /** Any vertex in search is either open, closed, unvisited, or visited. */
-    enum VertexState
-    {
-        open,
-        closed,
-        unvisited,
-        visited
-    };
-
-    /** Used for path finding algorithms. Stores a vertex and its relative state for pathfinding purposes. */
-    class VertexRecord
-    {
-
-        private:
-        /** Vertex to record.*/
-        Vertex vertex;
-
-        /** Vertex state. */
-        VertexState state;
-
-        public:
-        /* Construct a Vertex Record with all its fields. */
-        VertexRecord(const Vertex& v, const VertexState& s);
-
-        /** Returns state of vertex.*/
-        VertexState getState() const;
-
-        /** Sets state of vertex. */
-        void setState(VertexState newState);
-    };
-
 };
 
 #endif
