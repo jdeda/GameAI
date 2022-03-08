@@ -17,6 +17,7 @@
 #include "steering/steeringoutput.h"
 #include "graph/graph.h"
 #include "level/level.h"
+#include "maze/maze.h"
 
 using namespace std;
 using namespace sf;
@@ -32,20 +33,10 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer() {
-
-	// Generate maze.
-	Level maze = generateMaze(MAZE_X, MAZE_Y);
-	Graph mazeGraph = levelToGraph(maze);
-
-	// Setup SceneView.
+	Maze maze = Maze(MAZE_X, MAZE_Y);
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-
-	// Render scene and measure time.
 	Clock clock;
 	while (sceneView.scene.isOpen()) {
-
-		// Delta time. 
-		float dt = clock.restart().asSeconds();
 
 		// Handle scene poll event.
 		Event event;
@@ -69,7 +60,5 @@ void SmallGraphVisualizer() {
 int main(int argc, char* argv[]) {
 
 	SmallGraphVisualizer();
-
-	// Exit progam.
 	return EXIT_SUCCESS;
 }

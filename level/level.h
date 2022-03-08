@@ -31,7 +31,7 @@ class LevelCell : RectangleShape
     static Vector2f dims;
 
     /** Constructs a level cell via a given connections and location.*/
-    LevelCell(const Location& location, const Connections& connections);
+    LevelCell(const Location& location, bool inLevel);
 
     inline void draw(RenderWindow* window) {
         window->draw(*this);
@@ -87,7 +87,7 @@ class Level
     inline void draw(RenderWindow* window) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                LevelCell cell(Location(row, col), cells[row][col]);
+                LevelCell cell(Location(row, col), cells[row][col].inLevel);
                 cell.draw(window);
             }
         }

@@ -11,9 +11,9 @@ using namespace std;
 using namespace sf;
 using namespace graph;
 
-LevelCell::LevelCell(const Location& location, const Connections& connections) {
+LevelCell::LevelCell(const Location& location, bool inLevel) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
-    setFillColor(connections.inLevel ? sf::Color::Yellow : sf::Color::Black);
+    setFillColor(inLevel ? sf::Color::Yellow : sf::Color::Black);
     setSize(LevelCell::dims);
 }
 
@@ -167,7 +167,7 @@ vector<vector<LevelCell>> Level::toSFML() {
     for (int row = 0; row < rows; row++) {
         vector<LevelCell> v;
         for (int col = 0; col < cols; col++) {
-            v.push_back(LevelCell(Location(row, col), cells[row][col]));
+            v.push_back(LevelCell(Location(row, col), cells[row][col].inLevel));
         }
         cellsSFML.push_back(v);
     }

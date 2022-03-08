@@ -9,7 +9,8 @@
 using namespace sf;
 
 /** Represents a maze. */
-class Maze {
+class Maze
+{
 
     public:
 
@@ -18,7 +19,7 @@ class Maze {
 
     /** Number of columns in the maze. */
     int cols;
-    
+
     /** The maze. */
     Level maze;
 
@@ -36,6 +37,17 @@ class Maze {
     /** Maps location in maze (level) to GraphNode in graph. */
     inline GraphNode quantize(const Location& location) {
         return graph.quantize(location);
+    }
+
+    /** Draws the graph on the window. */
+    inline void draw(RenderWindow* window) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                Location location = Location(row, col);
+                LevelCell cell(location, maze.cells[row][col].inLevel);
+                cell.draw(window);
+            }
+        }
     }
 };
 
