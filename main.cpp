@@ -44,7 +44,7 @@ void SmallGraphVisualizer() {
 	Clock clock;
 	while (sceneView.scene.isOpen()) {
 
-		// Delta time. Handle real-time time, not framing based time. Simply print dt to console and see it work.
+		// Delta time. 
 		float dt = clock.restart().asSeconds();
 
 		// Handle scene poll event.

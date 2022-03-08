@@ -174,8 +174,6 @@ vector<vector<LevelCell>> Level::toSFML() {
     return cellsSFML;
 }
 
-
-
 Graph levelToGraph(const Level& level) {
     
     unordered_map<int, GraphNode> nodes; 
