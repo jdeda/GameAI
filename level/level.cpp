@@ -33,7 +33,7 @@ void Level::startAt(Location location) {
     cells[location.x][location.y].inLevel = true;
 }
 
-int Level::getDirIdx(Location o, int x, int y) const{
+int Level::getDirIdx(Location o, int x, int y) const {
     int dx = x - o.x;
     int dy = y - o.y;
 
@@ -175,8 +175,8 @@ vector<vector<LevelCell>> Level::toSFML() {
 }
 
 Graph levelToGraph(const Level& level) {
-    
-    unordered_map<int, GraphNode> nodes; 
+
+    unordered_map<int, GraphNode> nodes;
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
 
@@ -190,10 +190,10 @@ Graph levelToGraph(const Level& level) {
 
             // Connection not in level has no edges.
             // What might happen here is vertex is passed, copied, and the IDs are actually now mismatched...
-            if (!connections.inLevel) { 
+            if (!connections.inLevel) {
                 // Does this graph node get a copy of the vertex...or does it construct one and increment id?
                 GraphNode node = GraphNode(location, vertex, edges);
-                nodes.insert({node.getVertex().getID(), node});
+                nodes.insert({ node.getVertex().getID(), node });
                 continue;
             }
 
@@ -205,13 +205,13 @@ Graph levelToGraph(const Level& level) {
                 int ny = j + level.NEIGHBORS[k][0]; // j + dy
 
                 // TODO: ID property may not work as expected.
-                if(!level.inBounds(nx, ny)) { continue; }
+                if (!level.inBounds(nx, ny)) { continue; }
                 graph::Vertex vertexNeighbor;
                 Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
                 edges.push_back(e);
             }
             GraphNode node = GraphNode(location, vertex, edges);
-            nodes.insert({node.getVertex().getID(), node});
+            nodes.insert({ node.getVertex().getID(), node });
 
         }
     }

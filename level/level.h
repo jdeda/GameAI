@@ -78,7 +78,7 @@ class Level
     Location makeConnections(Location location);
 
     /** Returns index repressenting direction of expansion from o to (x,y). */
-    int getDirIdx(Location o, int x, int y) const; 
+    int getDirIdx(Location o, int x, int y) const;
 
     /** Returns Level cells as LevelCells. */
     vector<vector<LevelCell>> toSFML();

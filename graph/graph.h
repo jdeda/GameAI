@@ -102,7 +102,7 @@ namespace graph {
         inline vector<Edge> getOutgoingEdges(const Vertex& of) {
             return nodes.at(of.getID()).getEdges();
         }
-    
+
         /** Maps vertex in graph to location in level. */
         inline Location localize(const graph::Vertex& vertex) {
             return nodes.at(vertex.getID()).getLocation();

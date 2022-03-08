@@ -25,9 +25,9 @@ namespace graph {
     float Edge::getCost() const {
         return cost;
     }
-    
+
     GraphNode::GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges) :
-    location(location.x, location.y) {
+        location(location.x, location.y) {
         GraphNode::location = location;
         GraphNode::vertex = vertex;
         GraphNode::edges = edges;
@@ -35,16 +35,16 @@ namespace graph {
 
     Vertex GraphNode::getVertex() const { return vertex; }
 
-    Location GraphNode::getLocation() const{ return location; }
+    Location GraphNode::getLocation() const { return location; }
 
-    vector<Edge> GraphNode::getEdges() const{ return edges; }
+    vector<Edge> GraphNode::getEdges() const { return edges; }
 
-    Graph::Graph(const unordered_map<int, GraphNode>& nodes) { 
+    Graph::Graph(const unordered_map<int, GraphNode>& nodes) {
         Graph::nodes = nodes;
         unordered_map<Location, GraphNode> localizer;
-        
+
         // TODO: Id here...may be bad.
-        for(const auto& kv : nodes) { localizer.insert({kv.second.getLocation(), kv.second}); }
+        for (const auto& kv : nodes) { localizer.insert({ kv.second.getLocation(), kv.second }); }
         Graph::localizer = localizer;
     }
 
