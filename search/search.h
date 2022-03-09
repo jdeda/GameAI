@@ -10,7 +10,8 @@ enum GraphNodeRecordState
     open,
     closed,
     unvisited,
-    visited
+    visited,
+    fail
 };
 
 /** Used for path finding algorithms. Stores a GraphNode and its relative state for pathfinding purposes. */
@@ -40,8 +41,8 @@ class GraphNodeRecord
     /** Setters. */
     void setState(GraphNodeRecordState newState);
     void setCostSoFar(float csf);
-    void setEstimatedTotalCost();
-    void setEdge(Edge edge); // TODO: set from and to records!
+    void setEstimatedTotalCost(float est);
+    void setEdge(Edge newEdge);
 
     /** Getters. */
     GraphNode getNode() const;
@@ -66,6 +67,9 @@ class Path
 
     /** Returns true if path is empty. */
     bool isEmpty() const;
+
+    /** Returns the path list. */
+    vector<GraphNodeRecord> getPathList();
 
     /** Returns GraphNodeRecord with smallest CSF.*/
     GraphNodeRecord getSmallestCSF() const;

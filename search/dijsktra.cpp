@@ -72,6 +72,7 @@ Path Dijkstra::search() {
     while(!(current.getLocation() == Search::getStart())) {
         pathList.push_back(current);
         current = closedList.find(current.getEdge().getFromVertex()); // Closed list is essentially the path...
+        // Can't store records in record class, not possible.
     }
 
     // Return reversed path lsit as a Path.
