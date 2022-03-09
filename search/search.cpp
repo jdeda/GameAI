@@ -9,6 +9,8 @@ GraphNodeRecordState GraphNodeRecord::getState() const { return state; }
 
 void GraphNodeRecord::setState(GraphNodeRecordState newState) {
     state = newState;
+    costSoFar = 0;
+    estimatedTotalCost = 0;
 }
 
 Search::Search(const Graph& _graph, const Location& _start, const Location& _end) :

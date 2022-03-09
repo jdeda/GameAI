@@ -24,32 +24,66 @@ class GraphNodeRecord
     /** GraphNode state. */
     GraphNodeRecordState state;
 
+    /** Accumulated cost of the node (CSF). */
+    float costSoFar;
+
+    /** Accumulated cost of the node plus heuristic of node (ETC = CSF + H). */
+    float estimatedTotalCost;
+
+    /** Connection between this record to another. */
+    Edge edge;
+
     public:
     /* Construct a GraphNodeRecord with all its fields. */
     GraphNodeRecord(const GraphNode& n, const GraphNodeRecordState& s);
 
-    /** Returns state of vertex.*/
-    GraphNodeRecordState getState() const;
-
-    /** Sets state of vertex. */
+    /** Setters. */
     void setState(GraphNodeRecordState newState);
+    void setCostSoFar(float csf);
+    void setEstimatedTotalCost();
+    void setEdge(Edge edge); // TODO: set from and to records!
+
+    /** Getters. */
+    GraphNode getNode() const;
+    GraphNodeRecordState getState() const;
+    float getCostSoFar() const;
+    float getEstimatedTotalCost() const;
+    Location getLocation() const;
+    Edge getEdge() const;
 };
 
 /** Represents the list of GraphRecords that complete a path. */
 class Path
 {
     private:
-
-
     /** The list of GraphNodeRecords in the path (order matters). */
     vector<GraphNodeRecord> path;
 
     public:
 
-    bool contains();
+    /** Returns size of path. */
+    int size() const;
 
-    void add(const GraphNodeRecords& record);
+    /** Returns true if path is empty. */
+    bool isEmpty() const;
 
+    /** Returns GraphNodeRecord with smallest CSF.*/
+    GraphNodeRecord getSmallestCSF() const;
+
+    /** Return true if node is in Path. */
+    bool contains(const GraphNode& node) const;
+
+    /** Return GraphNodeRecord in Path of corresponding GraphNode. */
+    GraphNodeRecord find(const GraphNode& node) const;
+
+    /** Return GraphNodeRecord in Path of corresponding Vertex. */
+    GraphNodeRecord find(const graph::Vertex& vertex) const;
+
+    /** Adds GraphNodeRecord to Path. */
+    void add(const GraphNodeRecord& record);
+    
+    /** Removes GraphNodeRecord to Path. */
+    void remove(const GraphNodeRecord& record);
 };
 
 /** Abstract class representing Search algorithms. */
@@ -93,9 +127,9 @@ class Search
     }
 
     /** Getters. */
-    Graph getGraph();
-    Location getStart();
-    Location getEnd();
+    Graph getGraph() const;
+    Location getStart() const;
+    Location getEnd() const;
 };
 
 #endif

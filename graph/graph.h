@@ -46,8 +46,10 @@ namespace graph {
         /** Constructs an Edge with all its fields. */
         Edge(float w, float c, Vertex f, Vertex t);
 
-        /** Returns non-negative cost of traversing edge. */
+        // Getters.
         float getCost() const;
+        Vertex getFromVertex() const;
+        Vertex getToVertex() const;
     };
 
     /** Represents node in graph (location, vertex, edges). */
@@ -103,10 +105,13 @@ namespace graph {
             return nodes.at(of.getID()).getEdges();
         }
 
+        inline GraphNode getNode(const graph::Vertex& vertex) const {
+            return nodes.at(vertex.getID());
+        }
+
         /** Maps vertex in graph to location in level. */
         inline Location localize(const graph::Vertex& vertex) const {
             return nodes.at(vertex.getID()).getLocation();
-
         }
 
         /** Maps location in level to GraphNode in graph. */
