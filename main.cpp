@@ -59,6 +59,8 @@ void SmallGraphVisualizer() {
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
+
+
 	SmallGraphVisualizer();
 	return EXIT_SUCCESS;
 }

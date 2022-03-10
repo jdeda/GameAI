@@ -1,3 +1,6 @@
+#ifndef DIJSKTRA_H
+#define DIJSKTRA_H
+
 #include "search.h"
 
 /** Represents Dijkstra's search algorithm. */
@@ -8,3 +11,5 @@ class Dijkstra: Search {
 
 
 };
+
+#endif

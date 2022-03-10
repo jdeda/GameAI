@@ -1,6 +1,3 @@
-#ifndef DIJSKTRA_H
-#define DIJSKTRA_H
-
 #include "dijsktra.h"
 #include "../graph/graph.h"
 #include "search.h"
@@ -80,5 +77,3 @@ Path Dijkstra::search() {
     for(int i = pathList.size(); i > 0; i++) { path.add(pathList[i]); }
     return path;
 }
-
-#endif

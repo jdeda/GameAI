@@ -25,6 +25,13 @@ namespace graph {
     float Edge::getCost() const {
         return cost;
     }
+    graph::Vertex Edge::getFromVertex() const {
+        return from;
+    }
+
+    graph::Vertex Edge::getToVertex() const {
+        return to;
+    }
 
     GraphNode::GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges) :
         location(location.x, location.y) {

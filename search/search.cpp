@@ -30,8 +30,15 @@ bool Path::isEmpty() const { return path.size() == 0; }
 vector<GraphNodeRecord> Path::getPathList() { return path; }
 
 GraphNodeRecord Path::getSmallestCSF() const {
-
+    GraphNodeRecord smallest = path[0];
+    for(const auto& record : path) {
+        if(record.getCostSoFar() < smallest.getCostSoFar()) { 
+            smallest = record;
+        }
+    }
+    return smallest;
 }
+
 bool Path::contains(const GraphNode& node) const {
     for(const auto& in : path) {
         if(in.getLocation() == node.getLocation()) { return true; }
@@ -55,15 +62,15 @@ GraphNodeRecord Path::find(const graph::Vertex& vertex) const {
 
 void Path::add(const GraphNodeRecord& record) {
     path.push_back(record);
-
 }
 
 void Path::remove(const GraphNodeRecord& record) {
-    // for (std::vector<int>::iterator i = std::begin(path); i != std::end(path); ++i) {
-        
-    // }
-    // path.erase(path.begin() + index);
-
+    for (auto it = begin (path); it != end (path); ++it) {
+        if (it->getLocation() == record.getLocation()) {
+            path.erase(it);
+            break;
+        }
+    }
 }
 
 Search::Search(const Graph& _graph, const Location& _start, const Location& _end) :
