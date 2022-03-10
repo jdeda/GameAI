@@ -49,6 +49,9 @@ class Maze
             }
         }
     }
+
+    /** Returns the graph of the maze. */
+    Graph getGraph();
 };
 
 #endif

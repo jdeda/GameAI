@@ -7,3 +7,7 @@ Maze::Maze(int rows, int cols) : maze(generateMaze(rows, cols)), graph(levelToGr
     Maze::rows = rows;
     Maze::cols = cols;
 }
+
+Graph Maze::getGraph() {
+    return graph;
+}

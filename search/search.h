@@ -11,7 +11,7 @@ enum GraphNodeRecordState
     closed,
     unvisited,
     visited,
-    fail
+    failed
 };
 
 /** Used for path finding algorithms. Stores a GraphNode and its relative state for pathfinding purposes. */
@@ -118,7 +118,7 @@ class Search
      * @param end the end location of the search
      * @return Path the path from the start to end location
      */
-    virtual Path search() const = 0;
+    Path search() const;
 
     /** Maps vertex in graph to location in level. */
     inline Location localize(const graph::Vertex& vertex) const {

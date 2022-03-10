@@ -50,14 +50,14 @@ GraphNodeRecord Path::find(const GraphNode& node) const {
     for(const auto& in : path) {
         if(in.getLocation() == node.getLocation()) { return in; }
     }
-    return GraphNodeRecord(node, GraphNodeRecordState::fail); // TODO: fail is a band-aid fix.
+    return GraphNodeRecord(node, GraphNodeRecordState::failed); // TODO: fail is a band-aid fix.
 }
 
 GraphNodeRecord Path::find(const graph::Vertex& vertex) const {
     for(const auto& in : path) {
         if(in.getNode().getVertex().getID() == vertex.getID()) { return in; }
     }
-    return GraphNodeRecord(path[0].getNode(), GraphNodeRecordState::fail); // TODO: total band-aid.
+    return GraphNodeRecord(path[0].getNode(), GraphNodeRecordState::failed); // TODO: total band-aid.
 }
 
 void Path::add(const GraphNodeRecord& record) {

@@ -3,6 +3,9 @@
 #include "search.h"
 #include "dijsktra.h"
 
+Dijkstra::Dijkstra(const Graph& graph, const Location& start, const Location& end) : Search(graph, start, end) {
+}
+
 Path Dijkstra::search() {
 
     // Setup open and closed list.

@@ -19,6 +19,8 @@
 #include "graph/graph.h"
 #include "level/level.h"
 #include "maze/maze.h"
+#include "search/search.h"
+#include "search/dijsktra.h"
 
 using namespace std;
 using namespace sf;
@@ -34,7 +36,15 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer(Algorithm algorithm) {
+
+	// Prepare search algorithm for the maze.
 	Maze maze = Maze(MAZE_X, MAZE_Y);
+	Location start = Location(1, 1);
+	Location end = Location(20, 1);
+	Dijkstra search = Dijkstra(maze.getGraph(), start, end);
+	Path path = search.search();
+
+	// Render maze with path found from start to end.
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	Clock clock;
 	while (sceneView.scene.isOpen()) {
@@ -56,34 +66,35 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 	}
 }
 
-void BigGraphVisualizer(Algorithm algorithm) {}
-void CharacterGraphVisualizer(Algorithm algorithm) {}
-
+// void BigGraphVisualizer(Algorithm algorithm) {}
+// void CharacterGraphVisualizer(Algorithm algorithm) {}
 
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
-	greeting();
-	Visualizer visualizer = getVisualizer();
-	Algorithm algorithm = getAlgorithm();
+	srand(1);
 
-	switch (visualizer) {
-		case Visualizer::small:
-			SmallGraphVisualizer(algorithm);
-			break;
-		case Visualizer::big:
-			BigGraphVisualizer(algorithm);
-			break;
-		case Visualizer::character:
-			CharacterGraphVisualizer(algorithm);
-			break;
-		case Visualizer::INVALID_VIS:
-			fail("invalid visualizer choice");
-			break;
+	// greeting();
+	// Visualizer visualizer = getVisualizer();
+	// Algorithm algorithm = getAlgorithm();
 
-	}
+	// switch (visualizer) {
+	// 	case Visualizer::small:
+	// 		SmallGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::big:
+	// 		BigGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::character:
+	// 		CharacterGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::INVALID_VIS:
+	// 		fail("invalid visualizer choice");
+	// 		break;
 
-	// SmallGraphVisualizer(Algorithm::DIJKSTRA);
+	// }
+
+	SmallGraphVisualizer(Algorithm::DIJKSTRA);
 
 	return EXIT_SUCCESS;
 }
