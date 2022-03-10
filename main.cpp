@@ -39,6 +39,16 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 
 	// Prepare search algorithm for the maze.
 	Maze maze = Maze(MAZE_X, MAZE_Y);
+	Level level = maze.getLevel();
+	Graph graph = maze.getGraph();
+	cout << maze.getRows() << endl;
+	cout << maze.getCols() << endl;
+	cout << "dammit"<< endl;
+	cout << graph.getRows() << endl;
+	cout << graph.getCols() << endl;
+	cout << "dammit"<< endl;
+	graph.print();
+	cout << "Yay!" << endl;
 	Location start = Location(1, 1);
 	Location end = Location(20, 1);
 	Dijkstra search = Dijkstra(maze.getGraph(), start, end);

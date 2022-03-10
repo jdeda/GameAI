@@ -118,6 +118,13 @@ namespace graph {
         inline GraphNode quantize(const Location& location) const{
             return localizer.at(location);
         }
+
+        /** Prints IDs of verticies in graph. */
+        void print();
+
+        /** Getters. */
+        int getRows();
+        int getCols();
     };
 };
 

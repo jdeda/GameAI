@@ -3,6 +3,9 @@
 #include "search.h"
 #include "dijsktra.h"
 
+#include <iostream>
+using namespace std;
+
 Dijkstra::Dijkstra(const Graph& graph, const Location& start, const Location& end) : Search(graph, start, end) {
 }
 
@@ -32,7 +35,8 @@ Path Dijkstra::search() {
         for(const auto& edge: edges) {
 
             // Get end node and it's cost so far (CSF).
-            GraphNode endNode = Search::getGraph().getNode(edge.getToVertex()); // TODO: could fail.
+            cout  << edge.getToVertex().getID() << endl;
+            GraphNode endNode = Search::getGraph().getNode(edge.getToVertex()); // TODO: could fail. <-- This is failing.
             float endNodeCSF = current.getCostSoFar() + edge.getCost();
 
             // Skip nodes on closed list.

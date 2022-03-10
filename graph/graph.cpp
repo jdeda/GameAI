@@ -1,6 +1,7 @@
 #include <vector>
 #include <unordered_map>
 #include <stack>
+#include <iostream>
 #include "../id/id.h"
 #include "../level/location.h"
 #include "graph.h"
@@ -53,5 +54,21 @@ namespace graph {
         // TODO: Id here...may be bad.
         for (const auto& kv : nodes) { localizer.insert({ kv.second.getLocation(), kv.second }); }
         Graph::localizer = localizer;
+    }
+
+    int Graph::getRows() { return rows; }
+    int Graph::getCols() { return cols; }
+    void Graph::print() {
+        int r = rows - 1;
+        int c = cols - 1;
+        cout << r << endl;
+        cout << c << endl;
+        for(int i = 2; i < r; i++) {
+            cout << "row " << i << endl;
+            for(int j = 2; j < c; j++) {
+                cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
+            }
+            cout << endl << endl;
+        }
     }
 };
