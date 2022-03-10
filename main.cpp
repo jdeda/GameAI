@@ -8,6 +8,7 @@
 #include <vector>
 #include "debug/debug.h"
 #include "debug/breadcrumbs.h"
+#include "userinput/userinput.h"
 #include "id/id.h"
 #include "scene/scene.h"
 #include "tables/tables.h"
@@ -32,7 +33,7 @@ const float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 /** Animates the velocity match steering behavior. */
-void SmallGraphVisualizer() {
+void SmallGraphVisualizer(Algorithm algorithm) {
 	Maze maze = Maze(MAZE_X, MAZE_Y);
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	Clock clock;
@@ -55,12 +56,34 @@ void SmallGraphVisualizer() {
 	}
 }
 
+void BigGraphVisualizer(Algorithm algorithm) {}
+void CharacterGraphVisualizer(Algorithm algorithm) {}
+
 
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
+	greeting();
+	Visualizer visualizer = getVisualizer();
+	Algorithm algorithm = getAlgorithm();
 
+	switch (visualizer) {
+		case Visualizer::small:
+			SmallGraphVisualizer(algorithm);
+			break;
+		case Visualizer::big:
+			BigGraphVisualizer(algorithm);
+			break;
+		case Visualizer::character:
+			CharacterGraphVisualizer(algorithm);
+			break;
+		case Visualizer::INVALID_VIS:
+			fail("invalid visualizer choice");
+			break;
 
-	SmallGraphVisualizer();
+	}
+
+	// SmallGraphVisualizer(Algorithm::DIJKSTRA);
+
 	return EXIT_SUCCESS;
 }
