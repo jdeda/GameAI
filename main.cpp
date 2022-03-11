@@ -37,33 +37,12 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer(Algorithm algorithm) {
 
+	// Find path through maze.
+	Maze maze(MAZE_X, MAZE_Y);
+	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(20, 1));
+	Path path = search.search();
 
-	// TODO: Level is fine... Graph is not!
-	// Prepare search algorithm for the maze.;
-	// Level l = generateMaze(MAZE_X, MAZE_Y);
-	// cout << l.getRows() << " " << l.getCols() << endl;
-	// Graph g = levelToGraph(l);
-	// cout << l.getRows() << " " << l.getCols() << endl;
-	// Maze maze = Maze(l, g);
-	// cout << maze.getRows() << " " << maze.getCols() << endl;;
-	Maze maze = Maze(MAZE_X, MAZE_Y);
-		cout << maze.getRows() << " " << maze.getCols() << endl;;
-	// Level level = maze.getLevel();
-	// Graph graph = maze.getGraph();
-	// cout << maze.getRows() << endl;
-	// cout << maze.getCols() << endl;
-	// cout << "dammit"<< endl;
-	// cout << graph.getRows() << endl;
-	// cout << graph.getCols() << endl;
-	// cout << "dammit"<< endl;
-	maze.getGraph().print();
-	// cout << "Yay!" << endl;
-	// Location start = Location(1, 1);
-	// Location end = Location(20, 1);
-	// Dijkstra search = Dijkstra(maze.getGraph(), start, end);
-	// Path path = search.search();
-
-	// Render maze with path found from start to end.
+	// Render the path in the maze.
 	// SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	// while (sceneView.scene.isOpen()) {
 

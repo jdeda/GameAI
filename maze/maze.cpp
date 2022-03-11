@@ -3,17 +3,7 @@
 #include "../graph/graph.h"
 #include "maze.h"
 
-// TODO: These constructors are garbage!
-// TODO: Add copy constructors!
-Maze::Maze(Level l, Graph g) : maze(l), graph(g) {
-    rows = l.rows;
-    cols = l.cols;
-}
-
 Maze::Maze(int rows, int cols) : maze(generateMaze(rows, cols)), graph(levelToGraph(maze)) {
-    // Level temp = generateMaze(rows, cols);
-    // Maze::maze = temp;
-    // Maze::graph = graph;
     Maze::rows = rows;
     Maze::cols = cols;
 }

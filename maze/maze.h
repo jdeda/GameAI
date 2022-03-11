@@ -29,9 +29,6 @@ class Maze
     /** Default constructor for the maze. */
     Maze(int rows, int cols);
 
-    /** Construct maze given level and graph. */
-    Maze(Level level, Graph graph);
-
     /** Maps vertex in graph to location in maze (level). */
     inline Location localize(const graph::Vertex& vertex) {
         return graph.localize(vertex);
