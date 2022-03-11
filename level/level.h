@@ -62,6 +62,9 @@ class Level
     /** Initializes level with all its fields. */
     Level(int w, int h);
 
+    /** Copy constructor. */
+    Level(const Level& level);
+
     /** Start level generation at given location. */
     void startAt(Location location);
 

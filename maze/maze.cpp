@@ -4,9 +4,7 @@
 #include "maze.h"
 
 // TODO: These constructors are garbage!
-Maze::Maze(const Level& level) {
-
-}
+// TODO: Add copy constructors!
 Maze::Maze(int rows, int cols) : maze(generateMaze(rows, cols)), graph(levelToGraph(maze)) {
     Level temp = generateMaze(rows, cols);
     Maze::maze = temp;

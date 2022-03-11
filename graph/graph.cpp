@@ -56,6 +56,14 @@ namespace graph {
         Graph::localizer = localizer;
     }
 
+    Graph::Graph(const Graph& graph) {
+        nodes = graph.nodes;
+        localizer = graph.localizer;
+        rows = graph.rows;
+        cols = graph.cols;
+    }
+
+
     int Graph::getRows() { return rows; }
     int Graph::getCols() { return cols; }
     void Graph::print() {

@@ -100,6 +100,9 @@ namespace graph {
         /** Constructs a new graph initializing all its fields given the map of edges.*/
         Graph(const unordered_map<int, GraphNode>& nodes);
 
+        /** Copy constructor. */
+        Graph(const Graph& graph);
+
         /** Returns the list of outgoing edges from the given vertex. */
         inline vector<Edge> getOutgoingEdges(const Vertex& of) const{
             return nodes.at(of.getID()).getEdges();

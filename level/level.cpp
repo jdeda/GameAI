@@ -17,6 +17,13 @@ LevelCell::LevelCell(const Location& location, bool inLevel) {
     setSize(LevelCell::dims);
 }
 
+
+Level::Level(const Level& level) {
+    rows = level.rows;
+    cols = level.cols;
+    cells = level.cells;
+}
+
 Level::Level(int w, int h) {
     cols = w;
     rows = h;
