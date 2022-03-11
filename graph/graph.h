@@ -98,7 +98,7 @@ namespace graph {
         public:
 
         /** Constructs a new graph initializing all its fields given the map of edges.*/
-        Graph(const unordered_map<int, GraphNode>& nodes);
+        Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes);
 
         /** Copy constructor. */
         Graph(const Graph& graph);

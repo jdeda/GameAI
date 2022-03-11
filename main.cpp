@@ -37,43 +37,51 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 /** Animates the velocity match steering behavior. */
 void SmallGraphVisualizer(Algorithm algorithm) {
 
-	// Prepare search algorithm for the maze.
+
+	// TODO: Level is fine... Graph is not!
+	// Prepare search algorithm for the maze.;
+	// Level l = generateMaze(MAZE_X, MAZE_Y);
+	// cout << l.getRows() << " " << l.getCols() << endl;
+	// Graph g = levelToGraph(l);
+	// cout << l.getRows() << " " << l.getCols() << endl;
+	// Maze maze = Maze(l, g);
+	// cout << maze.getRows() << " " << maze.getCols() << endl;;
 	Maze maze = Maze(MAZE_X, MAZE_Y);
-	Level level = maze.getLevel();
-	Graph graph = maze.getGraph();
-	cout << maze.getRows() << endl;
-	cout << maze.getCols() << endl;
-	cout << "dammit"<< endl;
-	cout << graph.getRows() << endl;
-	cout << graph.getCols() << endl;
-	cout << "dammit"<< endl;
-	graph.print();
-	cout << "Yay!" << endl;
-	Location start = Location(1, 1);
-	Location end = Location(20, 1);
-	Dijkstra search = Dijkstra(maze.getGraph(), start, end);
-	Path path = search.search();
+		cout << maze.getRows() << " " << maze.getCols() << endl;;
+	// Level level = maze.getLevel();
+	// Graph graph = maze.getGraph();
+	// cout << maze.getRows() << endl;
+	// cout << maze.getCols() << endl;
+	// cout << "dammit"<< endl;
+	// cout << graph.getRows() << endl;
+	// cout << graph.getCols() << endl;
+	// cout << "dammit"<< endl;
+	maze.getGraph().print();
+	// cout << "Yay!" << endl;
+	// Location start = Location(1, 1);
+	// Location end = Location(20, 1);
+	// Dijkstra search = Dijkstra(maze.getGraph(), start, end);
+	// Path path = search.search();
 
 	// Render maze with path found from start to end.
-	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-	Clock clock;
-	while (sceneView.scene.isOpen()) {
+	// SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+	// while (sceneView.scene.isOpen()) {
 
-		// Handle scene poll event.
-		Event event;
-		while (sceneView.scene.pollEvent(event)) {
-			switch (event.type) {
-				case Event::Closed:
-					sceneView.scene.close();
-					break;
-			}
-		}
+	// 	// Handle scene poll event.
+	// 	Event event;
+	// 	while (sceneView.scene.pollEvent(event)) {
+	// 		switch (event.type) {
+	// 			case Event::Closed:
+	// 				sceneView.scene.close();
+	// 				break;
+	// 		}
+	// 	}
 
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		maze.draw(&sceneView.scene);
-		sceneView.scene.display();
-	}
+	// 	// Re-render scene.
+	// 	sceneView.scene.clear(Color(255, 255, 255));
+	// 	maze.draw(&sceneView.scene);
+	// 	sceneView.scene.display();
+	// }
 }
 
 // void BigGraphVisualizer(Algorithm algorithm) {}

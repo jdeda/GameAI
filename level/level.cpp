@@ -17,7 +17,6 @@ LevelCell::LevelCell(const Location& location, bool inLevel) {
     setSize(LevelCell::dims);
 }
 
-
 Level::Level(const Level& level) {
     rows = level.rows;
     cols = level.cols;
@@ -137,6 +136,12 @@ Location Level::makeConnections(Location location) {
     }
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
+    
+    
+int Level::getRows() { return rows; }
+
+int Level::getCols() { return cols; }
+
 
 Level generateMaze(int w, int h) {
 
@@ -222,5 +227,5 @@ Graph levelToGraph(const Level& level) {
 
         }
     }
-    return Graph(nodes);
+    return Graph(level.rows, level.cols, nodes);
 }

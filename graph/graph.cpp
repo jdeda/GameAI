@@ -47,7 +47,9 @@ namespace graph {
 
     vector<Edge> GraphNode::getEdges() const { return edges; }
 
-    Graph::Graph(const unordered_map<int, GraphNode>& nodes) {
+    Graph::Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes) {
+        Graph::rows = rows;
+        Graph::cols = cols;
         Graph::nodes = nodes;
         unordered_map<Location, GraphNode> localizer;
 
@@ -67,13 +69,11 @@ namespace graph {
     int Graph::getRows() { return rows; }
     int Graph::getCols() { return cols; }
     void Graph::print() {
-        int r = rows - 1;
-        int c = cols - 1;
-        cout << r << endl;
-        cout << c << endl;
-        for(int i = 2; i < r; i++) {
+        cout << rows << endl;
+        cout << cols << endl;
+        for(int i = 0; i < rows; i++) {
             cout << "row " << i << endl;
-            for(int j = 2; j < c; j++) {
+            for(int j = 0; j < cols; j++) {
                 cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
             }
             cout << endl << endl;

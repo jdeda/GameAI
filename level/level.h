@@ -98,6 +98,11 @@ class Level
 
     /** Prints the level. */
     void print();
+
+
+    /** Getters. */
+    int getRows();
+    int getCols();
 };
 
 /** Generates a maze of given cols and rows. */
