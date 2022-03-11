@@ -137,11 +137,9 @@ Location Level::makeConnections(Location location) {
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
     
-    
 int Level::getRows() { return rows; }
 
 int Level::getCols() { return cols; }
-
 
 Level generateMaze(int w, int h) {
 
@@ -168,9 +166,9 @@ Level generateMaze(int w, int h) {
 void Level::print() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            cout << cells[r][c].inLevel << " ";
+            std::cout << cells[r][c].inLevel << " ";
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 }
 
@@ -187,7 +185,6 @@ vector<vector<LevelCell>> Level::toSFML() {
 }
 
 Graph levelToGraph(const Level& level) {
-
     unordered_map<int, GraphNode> nodes;
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {

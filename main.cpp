@@ -31,6 +31,7 @@ const float MAZE_Y = 20.f;
 /** Start unique IDs at 0. */
 int ID::count = 0;
 
+/** Size of each tile in the Maze. */
 const float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
