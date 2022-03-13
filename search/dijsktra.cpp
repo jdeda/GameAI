@@ -35,6 +35,9 @@ Path Dijkstra::search() {
         for(const auto& edge: edges) {
 
             // Get end node and it's cost so far (CSF).
+            cout << current.getNode().getVertex().getID() << endl;
+            // These to and from nodes are not in the graph... So...
+            // When creating graph, if ID doesn't exist, create new, else and linked, set ID?
             cout  << edge.getToVertex().getID() << endl;
             GraphNode endNode = Search::getGraph().getNode(edge.getToVertex()); // TODO: could fail. <-- This is failing.
             float endNodeCSF = current.getCostSoFar() + edge.getCost();

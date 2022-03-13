@@ -23,6 +23,9 @@ namespace graph {
 
         /** Returns the vertex's ID (as an int). */
         int getID() const;
+
+	    /** This is very dangerous, but hacking my way to make things work. */
+        void setID(int id);
     };
 
     /** Represents a directed weighted graph edge. */

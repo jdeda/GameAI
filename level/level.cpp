@@ -198,9 +198,7 @@ Graph levelToGraph(const Level& level) {
             Connections connections = level.cells[i][j];
 
             // Connection not in level has no edges.
-            // What might happen here is vertex is passed, copied, and the IDs are actually now mismatched...
             if (!connections.inLevel) {
-                // Does this graph node get a copy of the vertex...or does it construct one and increment id?
                 GraphNode node = GraphNode(location, vertex, edges);
                 nodes.insert({ node.getVertex().getID(), node });
                 continue;
@@ -208,16 +206,24 @@ Graph levelToGraph(const Level& level) {
 
             // Connection in level has edges (for those that are marked as true).
             bool directions[4] = { connections.directions };
-            for (int k = 0; k < 4; k++) {  // This is dangerous, assume 4 directions.
-                if (!directions[k]) { continue; } // Not marked true, continue.
+            for (int k = 0; k < 4; k++) {
+                if (!directions[k]) { continue; }
                 int nx = i + level.NEIGHBORS[k][0]; // i + dx
                 int ny = j + level.NEIGHBORS[k][0]; // j + dy
-
-                // TODO: ID property may not work as expected.
                 if (!level.inBounds(nx, ny)) { continue; }
-                graph::Vertex vertexNeighbor;
+
+                // Add neighbor to edge.
+                graph::Vertex vertexNeighbor; 
                 Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
                 edges.push_back(e);
+
+                // Add neighbor to graph.
+                // Recursion here would be nice...
+                // You could have a lookup table...
+                // key= the ID, value= asssociated fromVertex
+                // whenever u get a match, do your stuff then remove it from the table
+                GraphNode neighborNode = GraphNode(location, vertex, edges);
+
             }
             GraphNode node = GraphNode(location, vertex, edges);
             nodes.insert({ node.getVertex().getID(), node });

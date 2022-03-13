@@ -40,6 +40,7 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 
 	// Find path through maze.
 	Maze maze(MAZE_X, MAZE_Y);
+	maze.getGraph().print();
 	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(20, 1));
 	Path path = search.search();
 

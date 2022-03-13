@@ -16,6 +16,8 @@ namespace graph {
 
     int Vertex::getID() const { return id.getID(); }
 
+    void Vertex::setID(int id) { Vertex::id.setID(id); }
+
     Edge::Edge(float w, float c, Vertex f, Vertex t) {
         weight = w;
         cost = c;
