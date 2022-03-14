@@ -136,7 +136,7 @@ Location Level::makeConnections(Location location) {
     }
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
-    
+
 int Level::getRows() { return rows; }
 
 int Level::getCols() { return cols; }
@@ -184,50 +184,144 @@ vector<vector<LevelCell>> Level::toSFML() {
     return cellsSFML;
 }
 
+
+// Verticies that do not exist in level have neighbors?
+// All verticies are missing an extra neighbor.
 Graph levelToGraph(const Level& level) {
     unordered_map<int, GraphNode> nodes;
+    unordered_map<Location, GraphNode> nodesByLocation;
+    unordered_map<Location, GraphNode> lookupTable;
+        for (int i = 0; i < level.rows; i++) {
+            for (int j = 0; j < level.cols; j++) {
+                cout << level.cells[i][j].inLevel << " ";
+            }
+            cout << endl;
+        }
+        cout << endl << endl << endl << endl;
+        
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
 
-            // Make vertex and location for this point in the level.
-            graph::Vertex vertex;
-            Location location(i, j);
+            // Try lookupTable. If does not index out of bounds, GraphNode needs updating.
+            try {
+                GraphNode node = lookupTable.at(Location(i, j));
 
-            // Makes edges for this vertex for the graph (take directions marked as true).
-            vector<Edge> edges;
-            Connections connections = level.cells[i][j];
+                // Makes edges for this vertex for the graph (take directions marked as true).
+                vector<Edge> edges;
+                Connections connections = level.cells[i][j];
 
-            // Connection not in level has no edges.
-            if (!connections.inLevel) {
+                // Connection not in level has no edges.
+                if (!connections.inLevel) {
+                    auto iteratorLookupTable = lookupTable.find(node.getLocation());
+                    lookupTable.erase(iteratorLookupTable);
+                    continue;
+                }
+
+                // Connection in level has edges (for those that are marked as true).
+                bool directions[4] = { connections.directions };
+                for (int k = 0; k < 4; k++) {
+                    if (!directions[k]) { continue; }
+                    int nx = i + level.NEIGHBORS[k][0]; // i + dx
+                    int ny = j + level.NEIGHBORS[k][1]; // j + dy
+                    if (!level.inBounds(nx, ny)) { continue; }
+
+                    // Check if neighbor already exists.
+                    try {
+                        GraphNode neighborNode = nodesByLocation.at(Location(nx, ny));
+                        Edge e = Edge(1.0, 1.0, node.getVertex(), neighborNode.getVertex()); // weight=cost=1.0
+                        edges.push_back(e);
+                    }
+                    catch (const out_of_range& oor) {
+                        // Add neighbor to edge.
+                        graph::Vertex neighborVertex;
+                        Edge e = Edge(1.0, 1.0, node.getVertex(), neighborVertex); // weight=cost=1.0
+                        edges.push_back(e);
+
+                        // Add neighbor to graph.
+                        Location neighborLocation(nx, ny);
+                        vector<Edge> neighborEdges;
+                        neighborEdges.push_back(Edge(1.0, 1.0, neighborVertex, node.getVertex()));
+                        GraphNode neighborNode = GraphNode(neighborLocation, neighborVertex, neighborEdges);
+                        nodes.insert({ neighborNode.getVertex().getID(), neighborNode });
+                        nodesByLocation.insert({ neighborNode.getLocation(), neighborNode });
+                        lookupTable.insert({ neighborNode.getLocation(), neighborNode });
+                    }
+                }
+
+                // Update existing node.
+                node.appendEdges(edges);
+                auto iteratorNodes = nodes.find(node.getVertex().getID());
+                iteratorNodes->second = node;
+
+                // Remove it from lookupTable
+                auto iteratorLookupTable = lookupTable.find(node.getLocation());
+                lookupTable.erase(iteratorLookupTable);
+            }
+
+            // GraphNode was not found so create a new one.
+            catch (const out_of_range& oor) {
+                // Make vertex and location for this point in the level.
+                graph::Vertex vertex;
+                Location location(i, j);
+
+                // Makes edges for this vertex for the graph (take directions marked as true).
+                vector<Edge> edges;
+                Connections connections = level.cells[i][j];
+
+                // Connection not in level has no edges.
+                if (!connections.inLevel) {
+                    GraphNode node = GraphNode(location, vertex, edges);
+                    nodes.insert({ node.getVertex().getID(), node });
+                    continue;
+                }
+                if (i == 1 && j == 2) {
+                    cout << "inLevel: " << level.cells[i][j].inLevel << endl;
+
+                    cout << "location: ";
+                    cout << "(" << i << " " << j << ")" << endl;
+                    bool directions[4] = { connections.directions };
+                    for (int k = 0; k < 4; k++) {
+                        // Are these flipped?
+                        if (!directions[k]) { continue; }
+                        cout << k  << endl;
+                        int nx = i + level.NEIGHBORS[k][0]; // i + dx
+                        int ny = j + level.NEIGHBORS[k][1]; // j + dy
+                        cout << "(" << nx << " " << ny << ")" << endl;
+                    }
+                }
+
+                // Connection in level has edges (for those that are marked as true).
+                bool directions[4] = { connections.directions };
+                for (int k = 0; k < 4; k++) {
+                    if (!directions[k]) { continue; }
+                    int nx = i + level.NEIGHBORS[k][0]; // i + dx
+                    int ny = j + level.NEIGHBORS[k][1]; // j + dy
+                    if (!level.inBounds(nx, ny)) { continue; }
+
+                    // Check if neighbor already exists.
+                    try {
+                        GraphNode neighborNode = nodesByLocation.at(Location(nx, ny));
+                        Edge e = Edge(1.0, 1.0, vertex, neighborNode.getVertex());
+                        edges.push_back(e);
+                    }
+                    catch (const out_of_range& oor) {
+                        graph::Vertex neighborVertex;
+                        Edge e = Edge(1.0, 1.0, vertex, neighborVertex); // weight=cost=1.0
+                        edges.push_back(e);
+
+                        // Add neighbor to graph.
+                        Location neighborLocation(nx, ny);
+                        vector<Edge> neighborEdges;
+                        neighborEdges.push_back(Edge(1.0, 1.0, neighborVertex, vertex));
+                        GraphNode neighborNode = GraphNode(neighborLocation, neighborVertex, neighborEdges);
+                        nodes.insert({ neighborNode.getVertex().getID(), neighborNode });
+                        nodesByLocation.insert({ neighborNode.getLocation(), neighborNode });
+                        lookupTable.insert({ neighborNode.getLocation(), neighborNode });
+                    }
+                }
                 GraphNode node = GraphNode(location, vertex, edges);
                 nodes.insert({ node.getVertex().getID(), node });
-                continue;
             }
-
-            // Connection in level has edges (for those that are marked as true).
-            bool directions[4] = { connections.directions };
-            for (int k = 0; k < 4; k++) {
-                if (!directions[k]) { continue; }
-                int nx = i + level.NEIGHBORS[k][0]; // i + dx
-                int ny = j + level.NEIGHBORS[k][0]; // j + dy
-                if (!level.inBounds(nx, ny)) { continue; }
-
-                // Add neighbor to edge.
-                graph::Vertex vertexNeighbor; 
-                Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
-                edges.push_back(e);
-
-                // Add neighbor to graph.
-                // Recursion here would be nice...
-                // You could have a lookup table...
-                // key= the ID, value= asssociated fromVertex
-                // whenever u get a match, do your stuff then remove it from the table
-                GraphNode neighborNode = GraphNode(location, vertex, edges);
-
-            }
-            GraphNode node = GraphNode(location, vertex, edges);
-            nodes.insert({ node.getVertex().getID(), node });
-
         }
     }
     return Graph(level.rows, level.cols, nodes);

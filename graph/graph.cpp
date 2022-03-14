@@ -49,6 +49,15 @@ namespace graph {
 
     vector<Edge> GraphNode::getEdges() const { return edges; }
 
+    void GraphNode::setEdges(const vector<Edge>& edges) { GraphNode::edges = edges; }
+
+    void GraphNode::appendEdges(const vector<Edge>& edges) { 
+        for(const auto& edge: edges) {
+            GraphNode::edges.push_back(edge);
+        }
+    }
+
+
     Graph::Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes) {
         Graph::rows = rows;
         Graph::cols = cols;

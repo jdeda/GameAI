@@ -44,7 +44,7 @@ class Maze
     inline void draw(RenderWindow* window) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                Location location = Location(row, col);
+                Location location = Location(col, row);
                 LevelCell cell(location, maze.cells[row][col].inLevel);
                 cell.draw(window);
             }

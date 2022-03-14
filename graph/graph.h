@@ -79,6 +79,11 @@ namespace graph {
         Vertex getVertex() const;
         Location getLocation() const;
         vector<Edge> getEdges() const;
+
+        /** Setters. */
+        void setEdges(const vector<Edge>& edges); // TODO: This is dangerous but I am hacking...
+        void appendEdges(const vector<Edge>& edges); // TODO: This is dangerous but I am hacking...
+
     };
 
     /** Represents a tile directed weighted graph. */
@@ -125,12 +130,12 @@ namespace graph {
             return localizer.at(location);
         }
 
-        /** Prints IDs of verticies in graph. */
-        void print();
-
         /** Getters. */
         int getRows();
         int getCols();
+
+        /** Prints IDs of verticies in graph. */
+        void print();
     };
 };
 

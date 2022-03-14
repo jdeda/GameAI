@@ -18,7 +18,7 @@ class Connections
     /** True if connection is within the level. */
     bool inLevel = false;
 
-    /** Possible directions at a given time (left, up, down, right). */
+    /** Possible directions at a given time (right, up, down, left). */
     char directions[4] = { false, false, false, false };
 };
 
