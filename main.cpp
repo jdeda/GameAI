@@ -40,12 +40,12 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 
 	// Find path through maze.
 	Maze maze(MAZE_X, MAZE_Y);
+	Level level = maze.getLevel();
 	Graph graph = maze.getGraph();
 	for (int i = 0; i < graph.getRows(); i++) {
 		for (int j = 0; j < graph.getCols(); j++) {
-			if(i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) {
-				continue;
-			}
+			if(i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
+			if(!level.cells[i][j].inLevel) { continue; }
 			GraphNode current = graph.quantize(Location(i, j));
 			vector<Edge> edges = current.getEdges();
 			Location a = graph.quantize(current.getLocation()).getLocation();

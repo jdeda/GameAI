@@ -191,14 +191,14 @@ Graph levelToGraph(const Level& level) {
     unordered_map<int, GraphNode> nodes;
     unordered_map<Location, GraphNode> nodesByLocation;
     unordered_map<Location, GraphNode> lookupTable;
-        for (int i = 0; i < level.rows; i++) {
-            for (int j = 0; j < level.cols; j++) {
-                cout << level.cells[i][j].inLevel << " ";
-            }
-            cout << endl;
+    for (int i = 0; i < level.rows; i++) {
+        for (int j = 0; j < level.cols; j++) {
+            cout << level.cells[i][j].inLevel << " ";
         }
-        cout << endl << endl << endl << endl;
-        
+        cout << endl;
+    }
+    cout << endl << endl << endl << endl;
+
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
 
@@ -224,6 +224,7 @@ Graph levelToGraph(const Level& level) {
                     int nx = i + level.NEIGHBORS[k][0]; // i + dx
                     int ny = j + level.NEIGHBORS[k][1]; // j + dy
                     if (!level.inBounds(nx, ny)) { continue; }
+                    if (!level.cells[nx][ny].inLevel) { continue; }
 
                     // Check if neighbor already exists.
                     try {
@@ -274,21 +275,6 @@ Graph levelToGraph(const Level& level) {
                     nodes.insert({ node.getVertex().getID(), node });
                     continue;
                 }
-                if (i == 1 && j == 2) {
-                    cout << "inLevel: " << level.cells[i][j].inLevel << endl;
-
-                    cout << "location: ";
-                    cout << "(" << i << " " << j << ")" << endl;
-                    bool directions[4] = { connections.directions };
-                    for (int k = 0; k < 4; k++) {
-                        // Are these flipped?
-                        if (!directions[k]) { continue; }
-                        cout << k  << endl;
-                        int nx = i + level.NEIGHBORS[k][0]; // i + dx
-                        int ny = j + level.NEIGHBORS[k][1]; // j + dy
-                        cout << "(" << nx << " " << ny << ")" << endl;
-                    }
-                }
 
                 // Connection in level has edges (for those that are marked as true).
                 bool directions[4] = { connections.directions };
@@ -297,6 +283,7 @@ Graph levelToGraph(const Level& level) {
                     int nx = i + level.NEIGHBORS[k][0]; // i + dx
                     int ny = j + level.NEIGHBORS[k][1]; // j + dy
                     if (!level.inBounds(nx, ny)) { continue; }
+                    if (!level.cells[nx][ny].inLevel) { continue; }
 
                     // Check if neighbor already exists.
                     try {
