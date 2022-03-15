@@ -19,7 +19,7 @@ class Connections
     bool inLevel = false;
 
     /** Possible directions at a given time (right, up, down, left). */
-    char directions[4] = { false, false, false, false };
+    bool directions[4] = { false, false, false, false };
 };
 
 /** Represents cell in a Level. */
