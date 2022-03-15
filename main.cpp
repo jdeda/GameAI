@@ -81,16 +81,50 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 	// }
 
 
+	// for (int i = 0; i < graph.getRows(); i++) {
+	// 	for (int j = 0; j < graph.getCols(); j++) {
+	// 		if(i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
+	// 		if(!level.cells[i][j].inLevel) { continue; }
+	// 		cout <<  "cell: " << i << " " << j << endl;
+	// 		auto dirs = level.cells[i][j].directions;
+	// 		// i said right,up,down,left
+	// 		// originally it was: (left, up, down, right)
+	// 		for(int i = 0; i < 4; i++) {
+	// 				cout << dirs[i] << " ";
+	// 		}
+	// 		cout << endl << endl;
+	// 	}
+	// }
+
+    // graph: left right down up
+    // me: right up down left
 	for (int i = 0; i < graph.getRows(); i++) {
 		for (int j = 0; j < graph.getCols(); j++) {
-			if(i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
-			if(!level.cells[i][j].inLevel) { continue; }
-			cout <<  "cell: " << i << " " << j << endl;
+			if (i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
+			if (!level.cells[i][j].inLevel) { continue; }
+			cout << "cell: " << i << " " << j << endl;
 			auto dirs = level.cells[i][j].directions;
 			// i said right,up,down,left
 			// originally it was: (left, up, down, right)
-			for(int i = 0; i < 4; i++) {
-					cout << dirs[i] << " ";
+			for (int i = 0; i < 4; i++) {
+				bool dir = dirs[i];
+				if (dir) {
+					        // TRANSPOSE!: this is really: down, right, left, up
+
+					if (i == 0) {
+						cout << "down" << " ";
+					}
+					if (i == 1) {
+						cout << "right" << " ";
+					}
+					if (i == 2) {
+						cout << "left" << " ";
+					}
+					if (i == 3) {
+						cout << "up" << " ";
+					}
+					cout << endl;
+				}
 			}
 			cout << endl << endl;
 		}

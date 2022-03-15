@@ -1,5 +1,8 @@
 #!/bin/sh
 # Makes.
-make clean;
 clear;
-make
+printf "\n%s\n" "Making..."
+make;
+
+printf "\n\n%s\n\n" "Running!"
+./main

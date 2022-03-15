@@ -117,6 +117,10 @@ Location Level::makeConnections(Location location) {
     int y = location.y;
     for (auto neighbor : neighbors) {
 
+        // graph: left right down, up
+        // me: right up down left
+        // really: down
+        // TRANSPOSE!: this is really: down, right, left, up
         // Get neighbor.
         int dx = neighbor[0];
         int dy = neighbor[1];
@@ -125,8 +129,15 @@ Location Level::makeConnections(Location location) {
         int ny = y + dy;
         int fromDirIdx = 3 - dirIdx;
 
+        // graph: left right down up
+        // me: right up down left
         // Make sure it is not a cell that already is in the level.
         if (canPlaceCorridor(nx, ny) && canPlaceCorridorDeep(location, nx, ny, dirIdx)) {
+            cout << "placing corridor from: " << "(" << x << " " << y << ")" << endl;
+            cout << "to: " << "(" << nx << " " << ny << ")" << endl;
+            cout << "orig to new direction: " << dirIdx << endl;
+            cout << "new to orig direction: " << fromDirIdx << endl;
+            cout << "dx: " << dx << ", dy: " << dy << endl << endl;
             cells[x][y].directions[dirIdx] = true;
             cells[nx][ny].inLevel = true;
             cells[nx][ny].directions[fromDirIdx] = true;
