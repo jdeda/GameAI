@@ -42,93 +42,23 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 	Maze maze(MAZE_X, MAZE_Y);
 	Level level = maze.getLevel();
 	Graph graph = maze.getGraph();
-	// for (int i = 0; i < graph.getRows(); i++) {
-	// 	for (int j = 0; j < graph.getCols(); j++) {
-	// 		if (i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
-	// 		if (!level.cells[i][j].inLevel) { continue; }
-	// 		GraphNode current = graph.quantize(Location(i, j));
-	// 		vector<Edge> edges = current.getEdges();
-	// 		Location a = graph.quantize(current.getLocation()).getLocation();
-	// 		cout << "location: " << a.x << " " << a.y << endl;
-	// 		cout << "neighbors:" << endl;
-	// 		for (const auto& edge : edges) {
-	// 			Location b = graph.localize(edge.getToVertex());
-	// 			cout << b.x << " " << b.y << endl;
-	// 		}
-	// 		cout << "directions:" << endl;
-	// 		int count = 0;
-	// 		for (auto dir : level.cells[i][j].directions) {
-	// 			if (dir) {
-	// 				cout << count << " ";
-	// 				if (count == 0) {
-	// 					cout << "right" << " ";
-	// 				}
-	// 				if (count == 1) {
-	// 					cout << "up" << " ";
-	// 				}
-	// 				if (count == 2) {
-	// 					cout << "down" << " ";
-	// 				}
-	// 				if (count == 3) {
-	// 					cout << "left" << " ";
-	// 				}
-	// 				cout << endl;
-	// 			}
-	// 			count += 1;
-	// 		}
-	// 		cout << endl << endl;
-	// 	}
-	// }
-
-
-	// for (int i = 0; i < graph.getRows(); i++) {
-	// 	for (int j = 0; j < graph.getCols(); j++) {
-	// 		if(i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
-	// 		if(!level.cells[i][j].inLevel) { continue; }
-	// 		cout <<  "cell: " << i << " " << j << endl;
-	// 		auto dirs = level.cells[i][j].directions;
-	// 		// i said right,up,down,left
-	// 		// originally it was: (left, up, down, right)
-	// 		for(int i = 0; i < 4; i++) {
-	// 				cout << dirs[i] << " ";
-	// 		}
-	// 		cout << endl << endl;
-	// 	}
-	// }
-
-    // graph: left right down up
-    // me: right up down left
 	for (int i = 0; i < graph.getRows(); i++) {
 		for (int j = 0; j < graph.getCols(); j++) {
 			if (i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
 			if (!level.cells[i][j].inLevel) { continue; }
-			cout << "cell: " << i << " " << j << endl;
-			auto dirs = level.cells[i][j].directions;
-			// i said right,up,down,left
-			// originally it was: (left, up, down, right)
-			for (int i = 0; i < 4; i++) {
-				bool dir = dirs[i];
-				if (dir) {
-					        // TRANSPOSE!: this is really: down, right, left, up
-
-					if (i == 0) {
-						cout << "down" << " ";
-					}
-					if (i == 1) {
-						cout << "right" << " ";
-					}
-					if (i == 2) {
-						cout << "left" << " ";
-					}
-					if (i == 3) {
-						cout << "up" << " ";
-					}
-					cout << endl;
-				}
+			GraphNode current = graph.quantize(Location(i, j));
+			vector<Edge> edges = current.getEdges();
+			Location a = graph.quantize(current.getLocation()).getLocation();
+			cout << "location: " << a.x << " " << a.y << endl;
+			cout << "neighbors:" << endl;
+			for (const auto& edge : edges) {
+				Location b = graph.localize(edge.getToVertex());
+				cout << b.x << " " << b.y << endl;
 			}
 			cout << endl << endl;
 		}
 	}
+
 
 
 // Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(3, 9));

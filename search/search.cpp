@@ -1,7 +1,10 @@
 #include <vector>
+#include <iostream>
 #include "../graph/graph.h"
 #include "../level/level.h"
 #include "search.h"
+
+using namespace std;
 
 // TODO: Does this constructor cause index problems and what does it really do?
 // TODO: Edge constructor is a band-aid fix.
@@ -71,6 +74,14 @@ void Path::remove(const GraphNodeRecord& record) {
             break;
         }
     }
+}
+
+void Path::print() const {
+    for(const auto& record: path) {
+        Location l  = record.getLocation();
+        cout << l.x << " " << l.y << endl;
+    }
+
 }
 
 Search::Search(const Graph& _graph, const Location& _start, const Location& _end) :

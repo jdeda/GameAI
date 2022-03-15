@@ -88,6 +88,9 @@ class Path
     
     /** Removes GraphNodeRecord to Path. */
     void remove(const GraphNodeRecord& record);
+
+    /** Prints path. */
+    void print() const;
 };
 
 /** Abstract class representing Search algorithms. */

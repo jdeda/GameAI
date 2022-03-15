@@ -31,6 +31,7 @@ Path Dijkstra::search() {
         // Otherwise get its outgoing edges. // TODO: could fail.
         vector<Edge> edges = Search::getGraph().getOutgoingEdges(current.getNode().getVertex());
         
+        cout << "Dammit\n";
         // Find best edge to traverse.
         for (const auto& edge : edges) {
 
