@@ -69,7 +69,7 @@ class Path
     bool isEmpty() const;
 
     /** Returns the path list. */
-    vector<GraphNodeRecord> getPathList();
+    vector<GraphNodeRecord> getPathList() const;
 
     /** Returns GraphNodeRecord with smallest CSF.*/
     GraphNodeRecord getSmallestCSF() const;

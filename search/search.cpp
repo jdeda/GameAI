@@ -30,7 +30,7 @@ int Path::size() const { return path.size(); }
 
 bool Path::isEmpty() const { return path.size() == 0; }
 
-vector<GraphNodeRecord> Path::getPathList() { return path; }
+vector<GraphNodeRecord> Path::getPathList() const { return path; }
 
 GraphNodeRecord Path::getSmallestCSF() const {
     GraphNodeRecord smallest = path[0];

@@ -202,16 +202,6 @@ Graph levelToGraph(const Level& level) {
         }
     }
 
-    // for (int i = 0; i < level.rows; i++) {
-    //     for (int j = 0; j < level.cols; j++) {
-    //         auto dirs = level.cells[i][j].directions;
-    //         for(int i = 0 ; i < 4; i++) {
-    //             cout << dirs[i] << " ";
-    //         }
-    //         cout << endl;
-    //     }
-    // }
-    // cout << endl << endl;
     // Init nodes' edges.
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
@@ -221,7 +211,6 @@ Graph levelToGraph(const Level& level) {
             if (!connections.inLevel) { continue; }
 
             // Get self and list of edges to append.
-            cout << "\nat: " << i << " " << j << endl;
             GraphNode node = nodesByLocation.at(Location(i, j));
             vector<Edge> edges;
 
@@ -231,7 +220,6 @@ Graph levelToGraph(const Level& level) {
                 if (!directions[k]) { continue; }
                 int nx = i + level.NEIGHBORS[k][0];
                 int ny = j + level.NEIGHBORS[k][1];
-                cout << "to: " << nx << " " << ny << endl;
                 if (!level.inBounds(nx, ny)) { continue; }
                 if (!level.cells[nx][ny].inLevel) { continue; }
 
