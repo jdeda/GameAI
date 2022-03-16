@@ -23,6 +23,9 @@ namespace graph {
 
         /** Returns the vertex's ID (as an int). */
         int getID() const;
+
+        /** This is very dangerous, but hacking my way to make things work. */
+        void setID(int id);
     };
 
     /** Represents a directed weighted graph edge. */
@@ -46,8 +49,10 @@ namespace graph {
         /** Constructs an Edge with all its fields. */
         Edge(float w, float c, Vertex f, Vertex t);
 
-        /** Returns non-negative cost of traversing edge. */
+        // Getters.
         float getCost() const;
+        Vertex getFromVertex() const;
+        Vertex getToVertex() const;
     };
 
     /** Represents node in graph (location, vertex, edges). */
@@ -74,6 +79,11 @@ namespace graph {
         Vertex getVertex() const;
         Location getLocation() const;
         vector<Edge> getEdges() const;
+
+        /** Setters. */
+        void setEdges(const vector<Edge>& edges); // TODO: This is dangerous but I am hacking...
+        void appendEdges(const vector<Edge>& edges); // TODO: This is dangerous but I am hacking...
+
     };
 
     /** Represents a tile directed weighted graph. */
@@ -96,56 +106,37 @@ namespace graph {
         public:
 
         /** Constructs a new graph initializing all its fields given the map of edges.*/
-        Graph(const unordered_map<int, GraphNode>& nodes);
+        Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes);
+
+        /** Copy constructor. */
+        Graph(const Graph& graph);
 
         /** Returns the list of outgoing edges from the given vertex. */
-        inline vector<Edge> getOutgoingEdges(const Vertex& of) {
+        inline vector<Edge> getOutgoingEdges(const Vertex& of) const {
             return nodes.at(of.getID()).getEdges();
         }
 
-        /** Maps vertex in graph to location in level. */
-        inline Location localize(const graph::Vertex& vertex) {
-            return nodes.at(vertex.getID()).getLocation();
+        inline GraphNode getNode(const graph::Vertex& vertex) const {
+            return nodes.at(vertex.getID());
+        }
 
+        /** Maps vertex in graph to location in level. */
+        inline Location localize(const graph::Vertex& vertex) const {
+            return nodes.at(vertex.getID()).getLocation();
         }
 
         /** Maps location in level to GraphNode in graph. */
-        inline GraphNode quantize(const Location& location) {
+        inline GraphNode quantize(const Location& location) const {
             return localizer.at(location);
         }
+
+        /** Getters. */
+        int getRows();
+        int getCols();
+
+        /** Prints IDs of verticies in graph. */
+        void print();
     };
-
-    /** Any vertex in search is either open, closed, unvisited, or visited. */
-    enum VertexState
-    {
-        open,
-        closed,
-        unvisited,
-        visited
-    };
-
-    /** Used for path finding algorithms. Stores a vertex and its relative state for pathfinding purposes. */
-    class VertexRecord
-    {
-
-        private:
-        /** Vertex to record.*/
-        Vertex vertex;
-
-        /** Vertex state. */
-        VertexState state;
-
-        public:
-        /* Construct a Vertex Record with all its fields. */
-        VertexRecord(const Vertex& v, const VertexState& s);
-
-        /** Returns state of vertex.*/
-        VertexState getState() const;
-
-        /** Sets state of vertex. */
-        void setState(VertexState newState);
-    };
-
 };
 
 #endif

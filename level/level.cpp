@@ -13,8 +13,34 @@ using namespace graph;
 
 LevelCell::LevelCell(const Location& location, bool inLevel) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
-    setFillColor(inLevel ? sf::Color::Yellow : sf::Color::Black);
+    setFillColor(inLevel ? sf::Color::White : sf::Color::Black);
     setSize(LevelCell::dims);
+}
+
+LevelCell::LevelCell(const Location& location, int status) {
+    setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
+    // Start.
+    if (status == 1) {
+        setFillColor(sf::Color{ 255, 255, 0, 120 });
+    }
+
+    // Default.
+    if (status == 2) {
+        setFillColor(sf::Color{ 0, 0, 255, 120 });
+
+    }
+
+    // End.
+    if (status == 3) {
+        setFillColor(sf::Color{ 0, 255, 0, 120 });
+    }
+    setSize(LevelCell::dims);
+}
+
+Level::Level(const Level& level) {
+    rows = level.rows;
+    cols = level.cols;
+    cells = level.cells;
 }
 
 Level::Level(int w, int h) {
@@ -111,6 +137,8 @@ Location Level::makeConnections(Location location) {
     int y = location.y;
     for (auto neighbor : neighbors) {
 
+        // TRANSPOSE!: this is really: down, right, left, up
+
         // Get neighbor.
         int dx = neighbor[0];
         int dy = neighbor[1];
@@ -130,6 +158,10 @@ Location Level::makeConnections(Location location) {
     }
     return Location(-1, -1); // None of the neighbors were vlaid.
 }
+
+int Level::getRows() { return rows; }
+
+int Level::getCols() { return cols; }
 
 Level generateMaze(int w, int h) {
 
@@ -156,9 +188,9 @@ Level generateMaze(int w, int h) {
 void Level::print() {
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
-            cout << cells[r][c].inLevel << " ";
+            std::cout << cells[r][c].inLevel << " ";
         }
-        cout << "\n";
+        std::cout << "\n";
     }
 }
 
@@ -175,45 +207,54 @@ vector<vector<LevelCell>> Level::toSFML() {
 }
 
 Graph levelToGraph(const Level& level) {
-
     unordered_map<int, GraphNode> nodes;
+    unordered_map<Location, GraphNode> nodesByLocation;
+
+    // Init nodes (without edges).
+    for (int i = 0; i < level.rows; i++) {
+        for (int j = 0; j < level.cols; j++) {
+            Location location(i, j);
+            graph::Vertex vertex;
+            vector<Edge> edges;
+            GraphNode node = GraphNode(location, vertex, edges);
+            nodes.insert({ node.getVertex().getID(), node });
+            nodesByLocation.insert({ node.getLocation(), node });
+        }
+    }
+
+    // Init nodes' edges.
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
 
-            // Make vertex and location for this point in the level.
-            graph::Vertex vertex;
-            Location location(i, j);
-
-            // Makes edges for this vertex for the graph (take directions marked as true).
-            vector<Edge> edges;
-            Connections connections = level.cells[i][j];
-
             // Connection not in level has no edges.
-            // What might happen here is vertex is passed, copied, and the IDs are actually now mismatched...
-            if (!connections.inLevel) {
-                // Does this graph node get a copy of the vertex...or does it construct one and increment id?
-                GraphNode node = GraphNode(location, vertex, edges);
-                nodes.insert({ node.getVertex().getID(), node });
-                continue;
-            }
+            Connections connections = level.cells[i][j];
+            if (!connections.inLevel) { continue; }
+
+            // Get self and list of edges to append.
+            GraphNode node = nodesByLocation.at(Location(i, j));
+            vector<Edge> edges;
 
             // Connection in level has edges (for those that are marked as true).
-            bool directions[4] = { connections.directions };
-            for (int k = 0; k < 4; k++) {  // This is dangerous, assume 4 directions.
-                if (!directions[k]) { continue; } // Not marked true, continue.
-                int nx = i + level.NEIGHBORS[k][0]; // i + dx
-                int ny = j + level.NEIGHBORS[k][0]; // j + dy
-
-                // TODO: ID property may not work as expected.
+            auto directions = connections.directions;
+            for (int k = 0; k < 4; k++) {
+                if (!directions[k]) { continue; }
+                int nx = i + level.NEIGHBORS[k][0];
+                int ny = j + level.NEIGHBORS[k][1];
                 if (!level.inBounds(nx, ny)) { continue; }
-                graph::Vertex vertexNeighbor;
-                Edge e = Edge(1.0, 1.0, vertex, vertexNeighbor); // weight=cost=1.0
-                edges.push_back(e);
-            }
-            GraphNode node = GraphNode(location, vertex, edges);
-            nodes.insert({ node.getVertex().getID(), node });
+                if (!level.cells[nx][ny].inLevel) { continue; }
 
+                // Add edge to neighbor.
+                GraphNode neighborNode = nodesByLocation.at(Location(nx, ny));
+                edges.push_back(Edge(1.0, 1.0, node.getVertex(), neighborNode.getVertex()));
+            }
+
+            // Update node and its reference in the nodes.
+            node.appendEdges(edges);
+            auto iteratorNodes = nodes.find(node.getVertex().getID());
+            iteratorNodes->second = node;
         }
     }
-    return Graph(nodes);
+
+    // Return the graph.
+    return Graph(level.rows, level.cols, nodes);
 }

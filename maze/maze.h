@@ -39,16 +39,23 @@ class Maze
         return graph.quantize(location);
     }
 
+    // TODO: Render via graph loccalize/quantize.
     /** Draws the graph on the window. */
     inline void draw(RenderWindow* window) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
-                Location location = Location(row, col);
+                Location location = Location(col, row);
                 LevelCell cell(location, maze.cells[row][col].inLevel);
                 cell.draw(window);
             }
         }
     }
+
+    /** Getters. */
+    Graph getGraph();
+    Level getLevel();
+    int getRows();
+    int getCols();
 };
 
 #endif

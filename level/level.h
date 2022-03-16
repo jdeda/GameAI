@@ -18,8 +18,8 @@ class Connections
     /** True if connection is within the level. */
     bool inLevel = false;
 
-    /** Possible directions at a given time (left, up, down, right). */
-    char directions[4] = { false, false, false, false };
+    /** Possible directions at a given time (right, up, down, left). */
+    bool directions[4] = { false, false, false, false };
 };
 
 /** Represents cell in a Level. */
@@ -33,6 +33,9 @@ class LevelCell : RectangleShape
     /** Constructs a level cell via a given connections and location.*/
     LevelCell(const Location& location, bool inLevel);
 
+    /** Constructs a level cell via a given connections and status. */
+    LevelCell(const Location& location, int status);
+
     inline void draw(RenderWindow* window) {
         window->draw(*this);
     }
@@ -44,7 +47,40 @@ class Level
 {
     public:
 
-    /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
+    // graph: left right down up
+    // me: right up down left
+    /**
+     * @brief
+     * 3 - 3 = 0
+     * 3 - left = right
+     *
+     * 3 - 2 = 1
+     * 3 - down = up
+     *
+     * 3 - 1 = 2
+     * 3 - up = down
+     *
+     * 3 - 0 = 3
+     * 3 - right = left
+     *
+     */
+     // TRANSPOSE!: this is really: down, right, left, up
+     /**
+      * @brief
+      * 3 - 3 = 0
+      * 3 - up = down
+      *
+      * 3 - 2 = 1
+      * 3 - left = right
+      *
+      * 3 - 1 = 2
+      * 3 - right = left
+      *
+      * 3 - 0 = 3
+      * 3 - down = up
+      *
+      */
+      /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
 
     /** Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left). */
@@ -61,6 +97,9 @@ class Level
 
     /** Initializes level with all its fields. */
     Level(int w, int h);
+
+    /** Copy constructor. */
+    Level(const Level& level);
 
     /** Start level generation at given location. */
     void startAt(Location location);
@@ -95,6 +134,11 @@ class Level
 
     /** Prints the level. */
     void print();
+
+
+    /** Getters. */
+    int getRows();
+    int getCols();
 };
 
 /** Generates a maze of given cols and rows. */

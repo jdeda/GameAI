@@ -1,6 +1,7 @@
 #include <vector>
 #include <unordered_map>
 #include <stack>
+#include <iostream>
 #include "../id/id.h"
 #include "../level/location.h"
 #include "graph.h"
@@ -15,6 +16,8 @@ namespace graph {
 
     int Vertex::getID() const { return id.getID(); }
 
+    void Vertex::setID(int id) { Vertex::id.setID(id); }
+
     Edge::Edge(float w, float c, Vertex f, Vertex t) {
         weight = w;
         cost = c;
@@ -24,6 +27,13 @@ namespace graph {
 
     float Edge::getCost() const {
         return cost;
+    }
+    graph::Vertex Edge::getFromVertex() const {
+        return from;
+    }
+
+    graph::Vertex Edge::getToVertex() const {
+        return to;
     }
 
     GraphNode::GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges) :
@@ -39,7 +49,18 @@ namespace graph {
 
     vector<Edge> GraphNode::getEdges() const { return edges; }
 
-    Graph::Graph(const unordered_map<int, GraphNode>& nodes) {
+    void GraphNode::setEdges(const vector<Edge>& edges) { GraphNode::edges = edges; }
+
+    void GraphNode::appendEdges(const vector<Edge>& edges) {
+        for (const auto& edge : edges) {
+            GraphNode::edges.push_back(edge);
+        }
+    }
+
+
+    Graph::Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes) {
+        Graph::rows = rows;
+        Graph::cols = cols;
         Graph::nodes = nodes;
         unordered_map<Location, GraphNode> localizer;
 
@@ -48,14 +69,25 @@ namespace graph {
         Graph::localizer = localizer;
     }
 
-    VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {
-        vertex = v;
-        state = s;
+    Graph::Graph(const Graph& graph) {
+        nodes = graph.nodes;
+        localizer = graph.localizer;
+        rows = graph.rows;
+        cols = graph.cols;
     }
 
-    VertexState VertexRecord::getState() const { return state; }
 
-    void VertexRecord::setState(VertexState newState) {
-        state = newState;
+    int Graph::getRows() { return rows; }
+    int Graph::getCols() { return cols; }
+    void Graph::print() {
+        cout << rows << endl;
+        cout << cols << endl;
+        for (int i = 0; i < rows; i++) {
+            cout << "row " << i << endl;
+            for (int j = 0; j < cols; j++) {
+                cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
+            }
+            cout << endl << endl;
+        }
     }
 };
