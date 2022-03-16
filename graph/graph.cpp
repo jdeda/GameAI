@@ -1,47 +1,93 @@
-// #include <vector>
-// #include <unordered_map>
-// #include <stack>
-// #include "../id/id.h"
-// #include "graph.h"
+#include <vector>
+#include <unordered_map>
+#include <stack>
+#include <iostream>
+#include "../id/id.h"
+#include "../level/location.h"
+#include "graph.h"
 
-// using namespace std;
+using namespace std;
 
-// Vertex::Vertex() {
-//     id = ID();
-// }
+namespace graph {
 
-// int Vertex::getID() const { return id.getID(); }
+    Vertex::Vertex() {
+        id = ID();
+    }
 
-// Edge::Edge(float w, float c, Vertex f, Vertex t) {
-//     weight = w;
-//     cost = c;
-//     from = f;
-//     to = t;
-// }
+    int Vertex::getID() const { return id.getID(); }
 
-// float Edge::getCost() const {
-//     return cost;
-// }
+    void Vertex::setID(int id) { Vertex::id.setID(id); }
 
-// Graph::Graph(const unordered_map<int, vector<Edge>>& e) {
-//     edges = e;
-// }
+    Edge::Edge(float w, float c, Vertex f, Vertex t) {
+        weight = w;
+        cost = c;
+        from = f;
+        to = t;
+    }
 
-// VertexRecord::VertexRecord(const Vertex& v, const VertexState& s) {
-//     vertex = v;
-//     state = s;
-// }
+    float Edge::getCost() const {
+        return cost;
+    }
+    graph::Vertex Edge::getFromVertex() const {
+        return from;
+    }
 
-// VertexState VertexRecord::getState() const { return state; }
+    graph::Vertex Edge::getToVertex() const {
+        return to;
+    }
 
-// void VertexRecord::setState(VertexState newState) {
-//     state = newState;
-// }
+    GraphNode::GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges) :
+        location(location.x, location.y) {
+        GraphNode::location = location;
+        GraphNode::vertex = vertex;
+        GraphNode::edges = edges;
+    }
+
+    Vertex GraphNode::getVertex() const { return vertex; }
+
+    Location GraphNode::getLocation() const { return location; }
+
+    vector<Edge> GraphNode::getEdges() const { return edges; }
+
+    void GraphNode::setEdges(const vector<Edge>& edges) { GraphNode::edges = edges; }
+
+    void GraphNode::appendEdges(const vector<Edge>& edges) {
+        for (const auto& edge : edges) {
+            GraphNode::edges.push_back(edge);
+        }
+    }
 
 
-// /** Generates a hard-coded graph. */
-// unordered_map<int, vector<Edge>> GenerateG1() {
+    Graph::Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes) {
+        Graph::rows = rows;
+        Graph::cols = cols;
+        Graph::nodes = nodes;
+        unordered_map<Location, GraphNode> localizer;
 
-//     // Create adjanency lists representing graph.
+        // TODO: Id here...may be bad.
+        for (const auto& kv : nodes) { localizer.insert({ kv.second.getLocation(), kv.second }); }
+        Graph::localizer = localizer;
+    }
 
-// }
+    Graph::Graph(const Graph& graph) {
+        nodes = graph.nodes;
+        localizer = graph.localizer;
+        rows = graph.rows;
+        cols = graph.cols;
+    }
+
+
+    int Graph::getRows() { return rows; }
+    int Graph::getCols() { return cols; }
+    void Graph::print() {
+        cout << rows << endl;
+        cout << cols << endl;
+        for (int i = 0; i < rows; i++) {
+            cout << "row " << i << endl;
+            for (int j = 0; j < cols; j++) {
+                cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
+            }
+            cout << endl << endl;
+        }
+    }
+};
