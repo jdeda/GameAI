@@ -77,6 +77,7 @@ void Path::remove(const GraphNodeRecord& record) {
 }
 
 void Path::print() const {
+    cout << "Path:" << endl;
     for(const auto& record: path) {
         Location l  = record.getLocation();
         cout << l.x << " " << l.y << endl;

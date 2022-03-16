@@ -42,48 +42,29 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 	Maze maze(MAZE_X, MAZE_Y);
 	Level level = maze.getLevel();
 	Graph graph = maze.getGraph();
-	// for (int i = 0; i < graph.getRows(); i++) {
-	// 	for (int j = 0; j < graph.getCols(); j++) {
-	// 		if (i == 0 || i == MAZE_X - 1 || j == 0 | j == MAZE_Y - 1) { continue; }
-	// 		if (!level.cells[i][j].inLevel) { continue; }
-	// 		GraphNode current = graph.quantize(Location(i, j));
-	// 		vector<Edge> edges = current.getEdges();
-	// 		Location a = graph.quantize(current.getLocation()).getLocation();
-	// 		cout << "location: " << a.x << " " << a.y << endl;
-	// 		cout << "neighbors:" << endl;
-	// 		for (const auto& edge : edges) {
-	// 			Location b = graph.localize(edge.getToVertex());
-	// 			cout << b.x << " " << b.y << endl;
+	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(18, 10));
+	Path path = search.search();
+	path.print();
+
+	// // Render the path in the maze.
+	// SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+	// while (sceneView.scene.isOpen()) {
+
+	// 	// Handle scene poll event.
+	// 	Event event;
+	// 	while (sceneView.scene.pollEvent(event)) {
+	// 		switch (event.type) {
+	// 			case Event::Closed:
+	// 				sceneView.scene.close();
+	// 				break;
 	// 		}
-	// 		cout << endl << endl;
 	// 	}
+
+	// 	// Re-render scene.
+	// 	sceneView.scene.clear(Color(255, 255, 255));
+	// 	maze.draw(&sceneView.scene);
+	// 	sceneView.scene.display();
 	// }
-
-
-
-Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(19, 10));
-Path path = search.search();
-// path.print();
-
-// // Render the path in the maze.
-// SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-// while (sceneView.scene.isOpen()) {
-
-// 	// Handle scene poll event.
-// 	Event event;
-// 	while (sceneView.scene.pollEvent(event)) {
-// 		switch (event.type) {
-// 			case Event::Closed:
-// 				sceneView.scene.close();
-// 				break;
-// 		}
-// 	}
-
-// 	// Re-render scene.
-// 	sceneView.scene.clear(Color(255, 255, 255));
-// 	maze.draw(&sceneView.scene);
-// 	sceneView.scene.display();
-// }
 }
 
 // void BigGraphVisualizer(Algorithm algorithm) {}

@@ -13,6 +13,7 @@ Path Dijkstra::search() const {
 
     // Setup open and closed list.
     GraphNodeRecord start(Search::quantize(Search::getStart()), GraphNodeRecordState::visited);
+    GraphNodeRecord end(Search::quantize(Search::getEnd()), GraphNodeRecordState::unvisited);
     Path openList;
     openList.add(start);
     Path closedList;
@@ -24,21 +25,32 @@ Path Dijkstra::search() const {
         // Find smallest element in open list.
         GraphNodeRecord current = openList.getSmallestCSF();
 
-        // If current is stored at goal (location), terminate.
-        if (current.getLocation() == Search::getEnd()) { 
-            break;
+        // Found the end.
+        if (current.getLocation() == Search::getEnd()) {
+            vector<GraphNodeRecord> pathList;
+            while (!(current.getLocation() == Search::getStart())) {
+                pathList.push_back(current);
+                current = closedList.find(current.getEdge().getFromVertex()); // Closed list is essentially the path...
+            }
+            // cout << "PATHLIST SIZE: " << pathList.size() << endl;
+            // for (const auto& record : pathList) { cout << record.getLocation().x << " " << record.getLocation().y << endl; }
+
+            // Return reversed path list as a Path.
+            // TODO: Why do I have to add start and end records?
+            Path path;
+            path.add(start);
+            for (int i = pathList.size() - 1; i > 0; i--) { path.add(pathList[i]); }
+            path.add(end);
+            return path;
         }
 
         // Otherwise get its outgoing edges. // TODO: could fail.
         vector<Edge> edges = Search::getGraph().getOutgoingEdges(current.getNode().getVertex());
-        
+
         // Find best edge to traverse.
         for (const auto& edge : edges) {
 
             // Get end node and it's cost so far (CSF).
-            Location a = Search::getGraph().quantize(current.getLocation()).getLocation();
-            Location b = Search::getGraph().localize(edge.getToVertex());
-
             GraphNode endNode = Search::getGraph().getNode(edge.getToVertex());
             float endNodeCSF = current.getCostSoFar() + edge.getCost();
 
@@ -69,28 +81,6 @@ Path Dijkstra::search() const {
         // Finished viewing edges for current.
         openList.remove(current);
         closedList.add(current);
-        cout << closedList.size() << endl;
-        cout << openList.size() << endl;
-        cout << current.getLocation().x << " " << current.getLocation().y << endl << endl;
     }
-
-    cout << current.getLocation().x << " " << current.getLocation().y << endl;
-    cout << closedList.size() << endl;
-
-    // Goal not found.
-    if (current.getLocation() == Search::getEnd()) { return Path(); }
-
-    // Goal found.
-    vector<GraphNodeRecord> pathList;
-    while (!(current.getLocation() == Search::getStart())) {
-        pathList.push_back(current);
-        current = closedList.find(current.getEdge().getFromVertex()); // Closed list is essentially the path...
-    }
-    cout << "PATHLIST SIZE: " << pathList.size() << endl;
-    for(const auto& record: pathList) { cout << record.getLocation().x << record.getLocation().y << endl; }
-
-    // Return reversed path list as a Path.
-    Path path;
-    for (int i = pathList.size(); i > 0; i++) { path.add(pathList[i]); }
-    return path;
+    return Path();
 }
