@@ -19,6 +19,7 @@ Algorithm getAlgorithm();
 enum Visualizer {
     small,
     big,
+    huge,
     character,
     INVALID_VIS
 };

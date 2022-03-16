@@ -13,7 +13,27 @@ using namespace graph;
 
 LevelCell::LevelCell(const Location& location, bool inLevel) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
-    setFillColor(inLevel ? sf::Color::Yellow : sf::Color::Black);
+    setFillColor(inLevel ? sf::Color::White : sf::Color::Black);
+    setSize(LevelCell::dims);
+}
+
+LevelCell::LevelCell(const Location& location, int status) {
+    setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
+    // Start.
+    if(status == 1) {
+        setFillColor(sf::Color{ 255, 255, 0, 120 });
+    }
+
+    // Default.
+    if(status == 2) {
+        setFillColor(sf::Color{ 0, 0, 255, 120 });
+
+    }
+
+    // End.
+    if(status == 3) {
+                setFillColor(sf::Color{ 0, 255, 0, 120 });
+    }
     setSize(LevelCell::dims);
 }
 

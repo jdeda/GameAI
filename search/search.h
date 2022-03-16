@@ -91,6 +91,27 @@ class Path
 
     /** Prints path. */
     void print() const;
+
+    /** Draws the path on the window. */
+    inline void draw(RenderWindow* window) {
+
+        // Draw start.
+        Location startLocation = Location(path[0].getLocation().y, path[0].getLocation().x);
+        LevelCell startCell(startLocation, 1);
+        startCell.draw(window);
+
+        // Draw inbetween.
+        for(int i = 1; i < path.size() - 1; i++) {
+            Location location(path[i].getLocation().y, path[i].getLocation().x);
+            LevelCell cell(location, 2);
+            cell.draw(window);
+        }
+
+        // Draw end.
+        Location endLocation = Location(path[path.size() - 1].getLocation().y, path[path.size() - 1].getLocation().x);
+        LevelCell endCell(endLocation, 3);
+        endCell.draw(window);
+    }
 };
 
 /** Abstract class representing Search algorithms. */

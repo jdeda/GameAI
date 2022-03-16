@@ -33,6 +33,9 @@ class LevelCell : RectangleShape
     /** Constructs a level cell via a given connections and location.*/
     LevelCell(const Location& location, bool inLevel);
 
+    /** Constructs a level cell via a given connections and status. */
+    LevelCell(const Location& location, int status);
+
     inline void draw(RenderWindow* window) {
         window->draw(*this);
     }

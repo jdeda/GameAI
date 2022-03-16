@@ -22,6 +22,7 @@ vector<string> AlgorithmStrings {
 vector<string> VisualizerStrings {
     "Small Graph",
     "Big Graph",
+	"Huge Graph",
     "Character Steering Graph"
 };
 
@@ -37,6 +38,7 @@ Algorithm getAlgorithm() {
 	cout << "Enter an algorithm number: ";
 	cin >> caseNum; 
 	if (cin.bad()) { fail("invalid algorithm choice"); }
+	cout << endl;
 
 	// Map to enum.
 	caseNum--;
@@ -56,6 +58,7 @@ Visualizer getVisualizer() {
 	cout << "Enter a Visualizer choice: ";
 	cin >> caseNum; 
 	if (cin.bad()) { fail("invalid visualizer choice"); }
+	cout << endl;
 
 	// Map to enum.
 	caseNum--;
