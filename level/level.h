@@ -50,37 +50,37 @@ class Level
     // graph: left right down up
     // me: right up down left
     /**
-     * @brief 
-     * 3 - 3 = 0 
+     * @brief
+     * 3 - 3 = 0
      * 3 - left = right
-     * 
+     *
      * 3 - 2 = 1
      * 3 - down = up
-     * 
+     *
      * 3 - 1 = 2
      * 3 - up = down
-     * 
+     *
      * 3 - 0 = 3
      * 3 - right = left
-     * 
+     *
      */
-    // TRANSPOSE!: this is really: down, right, left, up
-    /**
-     * @brief 
-     * 3 - 3 = 0 
-     * 3 - up = down
-     * 
-     * 3 - 2 = 1
-     * 3 - left = right
-     * 
-     * 3 - 1 = 2
-     * 3 - right = left
-     * 
-     * 3 - 0 = 3
-     * 3 - down = up
-     * 
-     */
-    /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
+     // TRANSPOSE!: this is really: down, right, left, up
+     /**
+      * @brief
+      * 3 - 3 = 0
+      * 3 - up = down
+      *
+      * 3 - 2 = 1
+      * 3 - left = right
+      *
+      * 3 - 1 = 2
+      * 3 - right = left
+      *
+      * 3 - 0 = 3
+      * 3 - down = up
+      *
+      */
+      /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
 
     /** Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left). */

@@ -51,8 +51,8 @@ namespace graph {
 
     void GraphNode::setEdges(const vector<Edge>& edges) { GraphNode::edges = edges; }
 
-    void GraphNode::appendEdges(const vector<Edge>& edges) { 
-        for(const auto& edge: edges) {
+    void GraphNode::appendEdges(const vector<Edge>& edges) {
+        for (const auto& edge : edges) {
             GraphNode::edges.push_back(edge);
         }
     }
@@ -82,9 +82,9 @@ namespace graph {
     void Graph::print() {
         cout << rows << endl;
         cout << cols << endl;
-        for(int i = 0; i < rows; i++) {
+        for (int i = 0; i < rows; i++) {
             cout << "row " << i << endl;
-            for(int j = 0; j < cols; j++) {
+            for (int j = 0; j < cols; j++) {
                 cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
             }
             cout << endl << endl;

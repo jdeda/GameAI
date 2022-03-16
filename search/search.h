@@ -85,7 +85,7 @@ class Path
 
     /** Adds GraphNodeRecord to Path. */
     void add(const GraphNodeRecord& record);
-    
+
     /** Removes GraphNodeRecord to Path. */
     void remove(const GraphNodeRecord& record);
 
@@ -101,7 +101,7 @@ class Path
         startCell.draw(window);
 
         // Draw inbetween.
-        for(int i = 1; i < path.size() - 1; i++) {
+        for (int i = 1; i < path.size() - 1; i++) {
             Location location(path[i].getLocation().y, path[i].getLocation().x);
             LevelCell cell(location, 2);
             cell.draw(window);

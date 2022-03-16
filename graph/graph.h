@@ -24,7 +24,7 @@ namespace graph {
         /** Returns the vertex's ID (as an int). */
         int getID() const;
 
-	    /** This is very dangerous, but hacking my way to make things work. */
+        /** This is very dangerous, but hacking my way to make things work. */
         void setID(int id);
     };
 
@@ -112,7 +112,7 @@ namespace graph {
         Graph(const Graph& graph);
 
         /** Returns the list of outgoing edges from the given vertex. */
-        inline vector<Edge> getOutgoingEdges(const Vertex& of) const{
+        inline vector<Edge> getOutgoingEdges(const Vertex& of) const {
             return nodes.at(of.getID()).getEdges();
         }
 
@@ -126,7 +126,7 @@ namespace graph {
         }
 
         /** Maps location in level to GraphNode in graph. */
-        inline GraphNode quantize(const Location& location) const{
+        inline GraphNode quantize(const Location& location) const {
             return localizer.at(location);
         }
 

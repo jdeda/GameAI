@@ -10,8 +10,8 @@ using namespace std;
 // TODO: Edge constructor is a band-aid fix.
 GraphNodeRecord::GraphNodeRecord(const graph::GraphNode& n, const GraphNodeRecordState& s) :
     node(n), state(s), edge(1.0, 1.0, n.getVertex(), n.getVertex()) {
-        costSoFar = 0;
-        estimatedTotalCost = 0;
+    costSoFar = 0;
+    estimatedTotalCost = 0;
 }
 
 void GraphNodeRecord::setState(GraphNodeRecordState newState) { state = newState; }
@@ -34,8 +34,8 @@ vector<GraphNodeRecord> Path::getPathList() const { return path; }
 
 GraphNodeRecord Path::getSmallestCSF() const {
     GraphNodeRecord smallest = path[0];
-    for(const auto& record : path) {
-        if(record.getCostSoFar() < smallest.getCostSoFar()) { 
+    for (const auto& record : path) {
+        if (record.getCostSoFar() < smallest.getCostSoFar()) {
             smallest = record;
         }
     }
@@ -43,22 +43,22 @@ GraphNodeRecord Path::getSmallestCSF() const {
 }
 
 bool Path::contains(const GraphNode& node) const {
-    for(const auto& in : path) {
-        if(in.getLocation() == node.getLocation()) { return true; }
+    for (const auto& in : path) {
+        if (in.getLocation() == node.getLocation()) { return true; }
     }
     return false;
 }
 
 GraphNodeRecord Path::find(const GraphNode& node) const {
-    for(const auto& in : path) {
-        if(in.getLocation() == node.getLocation()) { return in; }
+    for (const auto& in : path) {
+        if (in.getLocation() == node.getLocation()) { return in; }
     }
     return GraphNodeRecord(node, GraphNodeRecordState::failed); // TODO: fail is a band-aid fix.
 }
 
 GraphNodeRecord Path::find(const graph::Vertex& vertex) const {
-    for(const auto& in : path) {
-        if(in.getNode().getVertex().getID() == vertex.getID()) { return in; }
+    for (const auto& in : path) {
+        if (in.getNode().getVertex().getID() == vertex.getID()) { return in; }
     }
     return GraphNodeRecord(path[0].getNode(), GraphNodeRecordState::failed); // TODO: total band-aid.
 }
@@ -68,7 +68,7 @@ void Path::add(const GraphNodeRecord& record) {
 }
 
 void Path::remove(const GraphNodeRecord& record) {
-    for (auto it = begin (path); it != end (path); ++it) {
+    for (auto it = begin(path); it != end(path); ++it) {
         if (it->getLocation() == record.getLocation()) {
             path.erase(it);
             break;
@@ -78,8 +78,8 @@ void Path::remove(const GraphNodeRecord& record) {
 
 void Path::print() const {
     cout << "Path:" << endl;
-    for(const auto& record: path) {
-        Location l  = record.getLocation();
+    for (const auto& record : path) {
+        Location l = record.getLocation();
         cout << l.x << " " << l.y << endl;
     }
 

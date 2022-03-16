@@ -20,19 +20,19 @@ LevelCell::LevelCell(const Location& location, bool inLevel) {
 LevelCell::LevelCell(const Location& location, int status) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
     // Start.
-    if(status == 1) {
+    if (status == 1) {
         setFillColor(sf::Color{ 255, 255, 0, 120 });
     }
 
     // Default.
-    if(status == 2) {
+    if (status == 2) {
         setFillColor(sf::Color{ 0, 0, 255, 120 });
 
     }
 
     // End.
-    if(status == 3) {
-                setFillColor(sf::Color{ 0, 255, 0, 120 });
+    if (status == 3) {
+        setFillColor(sf::Color{ 0, 255, 0, 120 });
     }
     setSize(LevelCell::dims);
 }
@@ -218,7 +218,7 @@ Graph levelToGraph(const Level& level) {
             vector<Edge> edges;
             GraphNode node = GraphNode(location, vertex, edges);
             nodes.insert({ node.getVertex().getID(), node });
-            nodesByLocation.insert({node.getLocation(), node });
+            nodesByLocation.insert({ node.getLocation(), node });
         }
     }
 

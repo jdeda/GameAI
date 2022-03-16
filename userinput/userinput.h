@@ -5,7 +5,8 @@
 
 using namespace std;
 
-enum Algorithm {
+enum Algorithm
+{
     DIJKSTRA,
     A_STAR_H1,
     A_STAR_H2,
@@ -16,7 +17,8 @@ extern vector<string> AlgorithmStrings;
 
 Algorithm getAlgorithm();
 
-enum Visualizer {
+enum Visualizer
+{
     small,
     big,
     huge,

@@ -14,5 +14,5 @@ Graph Maze::getGraph() {
 Level Maze::getLevel() {
     return maze;
 }
-int Maze::getRows() { return rows;}
+int Maze::getRows() { return rows; }
 int Maze::getCols() { return cols; }
