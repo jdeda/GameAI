@@ -12,7 +12,7 @@ using namespace sf;
 class Maze
 {
 
-    public:
+public:
 
     /** Number of rows in the maze. */
     int rows;

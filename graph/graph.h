@@ -13,11 +13,11 @@ namespace graph {
     /** Represents a general graph vertex. */
     class Vertex
     {
-        private:
+    private:
         /** Unique ID for vertex. */
         ID id;
 
-        public:
+    public:
         /** Default constructor for vertex. */
         Vertex();
 
@@ -32,7 +32,7 @@ namespace graph {
     class Edge
     {
 
-        private:
+    private:
         /** Non-negative weight of this edge. */
         float weight;
 
@@ -45,7 +45,7 @@ namespace graph {
         /** Vertex edge leads to (ends). */
         Vertex to;
 
-        public:
+    public:
         /** Constructs an Edge with all its fields. */
         Edge(float w, float c, Vertex f, Vertex t);
 
@@ -59,7 +59,7 @@ namespace graph {
     class GraphNode
     {
 
-        private:
+    private:
 
         /** Represents (x,y) coordinates in tile graph. */
         Location location;
@@ -70,7 +70,7 @@ namespace graph {
         /** Represents outgoing edges associated with vertex in graph. */
         vector<Edge> edges;
 
-        public:
+    public:
 
         /** Constructs a GraphNode with all of its fields. */
         GraphNode(const Location& location, const Vertex& vertex, const vector<Edge>& edges);
@@ -89,7 +89,7 @@ namespace graph {
     /** Represents a tile directed weighted graph. */
     class Graph
     {
-        private:
+    private:
 
         /** Index into map given a vertex's unique id and return associated GraphNode. */
         unordered_map<int, GraphNode> nodes; // Also called quantizer.
@@ -103,7 +103,7 @@ namespace graph {
         /** Number of columns to represent graph. */
         int cols;
 
-        public:
+    public:
 
         /** Constructs a new graph initializing all its fields given the map of edges.*/
         Graph(int rows, int cols, const unordered_map<int, GraphNode>& nodes);

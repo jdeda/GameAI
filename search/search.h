@@ -18,7 +18,7 @@ enum GraphNodeRecordState
 class GraphNodeRecord
 {
 
-    private:
+private:
     /** GraphNode to record.*/
     GraphNode node;
 
@@ -34,7 +34,7 @@ class GraphNodeRecord
     /** Connection between this record to another. */
     Edge edge;
 
-    public:
+public:
     /* Construct a GraphNodeRecord with all its fields. */
     GraphNodeRecord(const GraphNode& n, const GraphNodeRecordState& s);
 
@@ -56,11 +56,11 @@ class GraphNodeRecord
 /** Represents the list of GraphRecords that complete a path. */
 class Path
 {
-    private:
+private:
     /** The list of GraphNodeRecords in the path (order matters). */
     vector<GraphNodeRecord> path;
 
-    public:
+public:
 
     /** Returns size of path. */
     int size() const;
@@ -118,7 +118,7 @@ class Path
 class Search
 {
 
-    private:
+private:
 
     /** The graph to search. */
     const graph::Graph graph;
@@ -129,7 +129,7 @@ class Search
     /** The end location in the graph. */
     const Location end;
 
-    public:
+public:
 
     /** Default constructor for Search class. */
     Search(const Graph& graph, const Location& start, const Location& end);

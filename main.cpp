@@ -140,7 +140,7 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 		// Re-render scene.
 		sceneView.scene.clear(Color(255, 255, 255));
 		maze.draw(&sceneView.scene);
-		// path.draw(&sceneView.scene);
+		path.draw(&sceneView.scene);
 		sceneView.scene.display();
 	}
 }

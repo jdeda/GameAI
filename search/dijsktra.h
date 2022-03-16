@@ -7,14 +7,12 @@
 class Dijkstra : Search
 {
 
-    public:
+public:
     /** Default constructor. */
     Dijkstra(const Graph& graph, const Location& start, const Location& end);
 
     /** Returns path from start location to end location in graph. */
     Path search() const;
-
-
 };
 
 #endif

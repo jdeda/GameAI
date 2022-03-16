@@ -13,7 +13,7 @@ using namespace graph;
 /** Represents an edge in the level. */
 class Connections
 {
-    public:
+public:
 
     /** True if connection is within the level. */
     bool inLevel = false;
@@ -26,7 +26,7 @@ class Connections
 class LevelCell : RectangleShape
 {
 
-    public:
+public:
 
     static Vector2f dims;
 
@@ -45,7 +45,7 @@ class LevelCell : RectangleShape
 /** Basic tile grid level. Represents a maze when using the mazeGenerator algorithm. */
 class Level
 {
-    public:
+public:
 
     // graph: left right down up
     // me: right up down left
