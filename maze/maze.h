@@ -12,7 +12,7 @@ using namespace sf;
 class Maze
 {
 
-public:
+    public:
 
     /** Number of rows in the maze. */
     int rows;
@@ -39,9 +39,8 @@ public:
         return graph.quantize(location);
     }
 
-    // TODO: Render via graph loccalize/quantize.
     /** Draws the graph on the window. */
-    inline void draw(RenderWindow* window) {
+    inline void draw(RenderWindow* window) const {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Location location = Location(col, row);
@@ -52,10 +51,10 @@ public:
     }
 
     /** Getters. */
-    Graph getGraph();
-    Level getLevel();
-    int getRows();
-    int getCols();
+    Graph getGraph() const;
+    Level getLevel() const;
+    int getRows() const;
+    int getCols() const;
 };
 
 #endif

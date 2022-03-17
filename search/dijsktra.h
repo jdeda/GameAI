@@ -4,10 +4,10 @@
 #include "search.h"
 
 /** Represents Dijkstra's search algorithm. */
-class Dijkstra : Search
+class Dijkstra : public Search
 {
 
-public:
+    public:
     /** Default constructor. */
     Dijkstra(const Graph& graph, const Location& start, const Location& end);
 

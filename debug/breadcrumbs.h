@@ -10,10 +10,10 @@ const int NUM_CRUMBS = 20;
 class Crumb : sf::CircleShape
 {
 
-private:
+    private:
     int id;
 
-public:
+    public:
     Crumb(const int id, const Vector2f& pos);
     void drop(float x, float y);
     void drop(Vector2f position);

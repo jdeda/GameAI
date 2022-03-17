@@ -9,7 +9,7 @@ using namespace sf;
 /** Represents view where scene will take place. */
 class SceneView
 {
-private:
+	private:
 	/** Width of SceneView. */
 	int width;
 
@@ -19,7 +19,7 @@ private:
 	/** Frames per second of SceneView. */
 	int frames;
 
-public:
+	public:
 	/** Scene of SceneView. For now, it will be kept public. */
 	RenderWindow scene;
 

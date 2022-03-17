@@ -2,6 +2,7 @@
 #define USERINPUT_H
 
 #include <vector>
+#include <string>
 
 using namespace std;
 
