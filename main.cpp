@@ -21,6 +21,7 @@
 #include "maze/maze.h"
 #include "search/search.h"
 #include "search/dijsktra.h"
+#include "search/a*.h"
 
 using namespace std;
 using namespace sf;
@@ -34,6 +35,21 @@ float MAZE_Y = 0.f;
 float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
+/** Returns the search algorithm for the graph. */
+Search getSearch(Algorithm algorithm, const Graph& graph, const Location& start, const Location& end) {
+	switch (algorithm) {
+		case Algorithm::DIJKSTRA:
+			return Dijkstra(graph, start, end);
+		case Algorithm::A_STAR_H1:
+			return AStar(graph, start, end, ManhattanHeuristic(end));
+		case Algorithm::A_STAR_H2:
+			return AStar(graph, start, end, EuclideanHeuristic(end));
+		default:
+			fail("invalid algorithm choice");
+			break;
+	}
+}
+
 /** Renders path through a small maze. */
 void SmallGraphVisualizer(Algorithm algorithm) {
 
@@ -46,7 +62,7 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 	Maze maze(MAZE_X, MAZE_Y);
 
 	cout << "Searching maze..." << endl;
-	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(1, 18));
+	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(1, 18));
 	Path path = search.search();
 
 	cout << "Rendering solution..." << endl;
@@ -83,7 +99,7 @@ void BigGraphVisualizer(Algorithm algorithm) {
 	Maze maze(MAZE_X, MAZE_Y);
 
 	cout << "Searching maze..." << endl;
-	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(52, 50));
+	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(52, 50));
 	Path path = search.search();
 
 	cout << "Rendering solution..." << endl;
@@ -120,7 +136,7 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	Maze maze(MAZE_X, MAZE_Y);
 
 	cout << "Searching maze..." << endl;
-	Dijkstra search = Dijkstra(maze.getGraph(), Location(1, 1), Location(100, 100));
+	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(100, 100));
 	Path path = search.search();
 
 	cout << "Rendering solution..." << endl;
@@ -145,6 +161,7 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	}
 }
 
+/** Renders character moving through a level. */
 void CharacterGraphVisualizer(Algorithm algorithm) {}
 
 /** Runs the program.*/
@@ -172,7 +189,6 @@ int main(int argc, char* argv[]) {
 		case Visualizer::INVALID_VIS:
 			fail("invalid visualizer choice");
 			break;
-
 	}
 
 	return EXIT_SUCCESS;

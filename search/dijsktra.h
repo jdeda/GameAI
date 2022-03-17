@@ -4,7 +4,7 @@
 #include "search.h"
 
 /** Represents Dijkstra's search algorithm. */
-class Dijkstra : Search
+class Dijkstra : public Search
 {
 
 public:

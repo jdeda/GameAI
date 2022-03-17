@@ -1,12 +1,12 @@
 #include <vector>
 #include <iostream>
+#include <cmath>
 #include "../graph/graph.h"
 #include "../level/level.h"
 #include "search.h"
 
 using namespace std;
 
-// TODO: Does this constructor cause index problems and what does it really do?
 // TODO: Edge constructor is a band-aid fix.
 GraphNodeRecord::GraphNodeRecord(const graph::GraphNode& n, const GraphNodeRecordState& s) :
     node(n), state(s), edge(1.0, 1.0, n.getVertex(), n.getVertex()) {
@@ -36,6 +36,16 @@ GraphNodeRecord Path::getSmallestCSF() const {
     GraphNodeRecord smallest = path[0];
     for (const auto& record : path) {
         if (record.getCostSoFar() < smallest.getCostSoFar()) {
+            smallest = record;
+        }
+    }
+    return smallest;
+}
+
+GraphNodeRecord Path::getSmallestEST() const {
+    GraphNodeRecord smallest = path[0];
+    for (const auto& record : path) {
+        if (record.getEstimatedTotalCost() < smallest.getEstimatedTotalCost()) {
             smallest = record;
         }
     }
@@ -92,3 +102,17 @@ Search::Search(const Graph& _graph, const Location& _start, const Location& _end
 Graph Search::getGraph() const { return graph; }
 Location Search::getStart() const { return start; }
 Location Search::getEnd() const { return end; }
+
+Location Heuristic::getGoalLocation() const { return goalLocation; }
+
+ManhattanHeuristic::ManhattanHeuristic(const Location& goal) : Heuristic(goal) {}
+
+float ManhattanHeuristic::compute(const Location& location) const {
+    return abs(getGoalLocation().x - location.x) + abs(getGoalLocation().y - location.y);
+}
+
+EuclideanHeuristic::EuclideanHeuristic(const Location& goal) : Heuristic(goal) {}
+
+float EuclideanHeuristic::compute(const Location& location) const {
+    return sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
+}
