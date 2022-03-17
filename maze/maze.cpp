@@ -8,11 +8,11 @@ Maze::Maze(int rows, int cols) : maze(generateMaze(rows, cols)), graph(levelToGr
     Maze::cols = cols;
 }
 
-Graph Maze::getGraph() {
+Graph Maze::getGraph() const {
     return graph;
 }
-Level Maze::getLevel() {
+Level Maze::getLevel() const {
     return maze;
 }
-int Maze::getRows() { return rows; }
-int Maze::getCols() { return cols; }
+int Maze::getRows() const { return rows; }
+int Maze::getCols() const { return cols; }

@@ -74,6 +74,9 @@ class Path
     /** Returns GraphNodeRecord with smallest CSF.*/
     GraphNodeRecord getSmallestCSF() const;
 
+    /** Returns GraphNodeRecord with smallest EST.*/
+    GraphNodeRecord getSmallestEST() const;
+
     /** Return true if node is in Path. */
     bool contains(const GraphNode& node) const;
 
@@ -93,7 +96,7 @@ class Path
     void print() const;
 
     /** Draws the path on the window. */
-    inline void draw(RenderWindow* window) {
+    inline void draw(RenderWindow* window) const {
 
         // Draw start.
         Location startLocation = Location(path[0].getLocation().y, path[0].getLocation().x);
@@ -142,7 +145,7 @@ class Search
      * @param end the end location of the search
      * @return Path the path from the start to end location
      */
-    Path search() const;
+    virtual Path search() const = 0;
 
     /** Maps vertex in graph to location in level. */
     inline Location localize(const graph::Vertex& vertex) const {
@@ -158,6 +161,54 @@ class Search
     Graph getGraph() const;
     Location getStart() const;
     Location getEnd() const;
+};
+
+
+/**
+ * Heuristic is function that returns a value representing a cost
+ * from one location to a set goal location (all of which is in a graph).
+*/
+class Heuristic
+{
+
+    private:
+    Location goalLocation;
+
+    public:
+
+    /** Initializes class with the */
+    Heuristic(const Location& goal);
+
+    /** Returns heuristic value of location in the graph. */
+    virtual float compute(const Location& location) const = 0;
+
+    /** Getters. */
+    Location getGoalLocation() const;
+};
+
+/** Manhattan distance heuristic. */
+class ManhattanHeuristic : public Heuristic
+{
+
+    public:
+
+    /** Default constructor. */
+    ManhattanHeuristic(const Location& goal);
+
+    /** Returns heuristic value of location to goal location. */
+    float compute(const Location& location) const;
+};
+
+/** Euclidean distance heuristic. */
+class EuclideanHeuristic : public Heuristic
+{
+    public:
+
+    /** Default constructor. */
+    EuclideanHeuristic(const Location& goal);
+
+    /** Returns heuristic value of location to goal location. */
+    float compute(const Location& location) const;
 };
 
 #endif
