@@ -94,7 +94,6 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 	}
 }
 
-
 /** Renders path through a small maze. */
 void SmallGraphVisualizer(Algorithm algorithm) {
 

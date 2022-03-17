@@ -9,7 +9,7 @@ using namespace sf;
 class SteeringOutput
 {
 
-public:
+    public:
     /** Linear acceleration (d/t^2). */
     Vector2f linearAcceleration;
 

@@ -11,7 +11,7 @@ using namespace sf;
 class Kinematic
 {
 
-public:
+    public:
     /** Current point in space (x, y). */
     Vector2f position;
 

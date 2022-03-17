@@ -10,11 +10,11 @@ using namespace sf;
 
 class OrientationTable
 {
-private:
+	private:
 	/** Map of character's orientation indexing by the respective character's unique ID. */
 	unordered_map<int, float> table;
 
-public:
+	public:
 	/**
 	 * @brief Construct a new Orientation Table object
 	 *
@@ -40,11 +40,11 @@ public:
 
 class PositionTable
 {
-private:
+	private:
 	/** Map of character's position indexing by the respective character's unique ID. */
 	unordered_map<int, Vector2f> table;
 
-public:
+	public:
 	/**
 	 * @brief Construct a new PositionTable
 	 *
@@ -70,7 +70,7 @@ public:
 
 class CharacterTable
 {
-private:
+	private:
 	/** Map of characters indexing by their unique ID. */
 	unordered_map<int, Character*> table;
 
@@ -82,7 +82,7 @@ private:
 	 */
 	vector<Character*> characters;
 
-public:
+	public:
 	CharacterTable(const vector<Character*>& characters);
 
 	/**

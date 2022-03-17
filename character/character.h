@@ -15,14 +15,14 @@ using namespace sf;
 class Character
 {
 
-private:
+	private:
 	/** Character's kinematic data. */
 	Kinematic kinematic;
 
 	/** Character's unique ID. */
 	ID id;
 
-public:
+	public:
 	/** Constructs a Character with a unique ID. */
 	Character(vector<Crumb>* crumbs);
 

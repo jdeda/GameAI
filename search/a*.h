@@ -3,7 +3,8 @@
 
 #include "search.h"
 
-class AStar: public Search {
+class AStar : public Search
+{
 
     private:
     const Heuristic* heuristic;

@@ -206,7 +206,7 @@ class EuclideanHeuristic : public Heuristic
 
     /** Default constructor. */
     EuclideanHeuristic(const Location& goal);
-    
+
     /** Returns heuristic value of location to goal location. */
     float compute(const Location& location) const;
 };
