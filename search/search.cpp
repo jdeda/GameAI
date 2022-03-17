@@ -105,6 +105,8 @@ Location Search::getEnd() const { return end; }
 
 Location Heuristic::getGoalLocation() const { return goalLocation; }
 
+Heuristic::Heuristic(const Location& goal) : goalLocation(goal) {}
+
 ManhattanHeuristic::ManhattanHeuristic(const Location& goal) : Heuristic(goal) {}
 
 float ManhattanHeuristic::compute(const Location& location) const {

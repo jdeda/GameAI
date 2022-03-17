@@ -35,36 +35,8 @@ float MAZE_Y = 0.f;
 float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
-/** Returns the search algorithm for the graph. */
-Search getSearch(Algorithm algorithm, const Graph& graph, const Location& start, const Location& end) {
-	switch (algorithm) {
-		case Algorithm::DIJKSTRA:
-			return Dijkstra(graph, start, end);
-		case Algorithm::A_STAR_H1:
-			return AStar(graph, start, end, ManhattanHeuristic(end));
-		case Algorithm::A_STAR_H2:
-			return AStar(graph, start, end, EuclideanHeuristic(end));
-		default:
-			fail("invalid algorithm choice");
-			break;
-	}
-}
-
-/** Renders path through a small maze. */
-void SmallGraphVisualizer(Algorithm algorithm) {
-
-	MAZE_X = 20;
-	MAZE_Y = 20;
-	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
-	LevelCell::dims = Vector2f(SIZE, SIZE);
-
-	cout << "Generating maze..." << endl;
-	Maze maze(MAZE_X, MAZE_Y);
-
-	cout << "Searching maze..." << endl;
-	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(1, 18));
-	Path path = search.search();
-
+/** Renders the path through the maze.*/
+void Visualize(const Maze& maze, const Path& path) {
 	cout << "Rendering solution..." << endl;
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	while (sceneView.scene.isOpen()) {
@@ -85,6 +57,58 @@ void SmallGraphVisualizer(Algorithm algorithm) {
 		path.draw(&sceneView.scene);
 		sceneView.scene.display();
 	}
+}
+
+/** Switches over given algorithm for a maze path finding visualization. */
+void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& start, const Location& end) {
+	cout << "Searching maze..." << endl;
+	switch (algorithm) {
+		case DIJKSTRA:
+			{
+				Dijkstra search(maze.getGraph(), start, end);
+				Path path = search.search();
+				Visualize(maze, path);
+				break;
+			}
+		case A_STAR_H1:
+			{
+				AStar search(maze.getGraph(), start, end, ManhattanHeuristic(end));
+				Path path = search.search();
+				Visualize(maze, path);
+				break;
+			}
+		case A_STAR_H2:
+			{
+				AStar search(maze.getGraph(), start, end, EuclideanHeuristic(end));
+				Path path = search.search();
+				Visualize(maze, path);
+				break;
+			}
+		case INVALID_ALG:
+			{
+				Dijkstra search(maze.getGraph(), start, start);
+				Path path = search.search();
+				Visualize(maze, path);
+				break;
+			}
+	}
+}
+
+
+/** Renders path through a small maze. */
+void SmallGraphVisualizer(Algorithm algorithm) {
+
+	MAZE_X = 20;
+	MAZE_Y = 20;
+	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
+	LevelCell::dims = Vector2f(SIZE, SIZE);
+	Location start(1, 1);
+	Location end(1, 18);
+
+	cout << "Generating maze..." << endl;
+	Maze maze(MAZE_X, MAZE_Y);
+
+	VisualizeSwitch(algorithm, maze, start, end);
 }
 
 /** Renders path through a big maze. */
@@ -94,34 +118,13 @@ void BigGraphVisualizer(Algorithm algorithm) {
 	MAZE_Y = 100;
 	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 	LevelCell::dims = Vector2f(SIZE, SIZE);
+	Location start(1, 1);
+	Location end(52, 50);
 
 	cout << "Generating maze..." << endl;
 	Maze maze(MAZE_X, MAZE_Y);
 
-	cout << "Searching maze..." << endl;
-	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(52, 50));
-	Path path = search.search();
-
-	cout << "Rendering solution..." << endl;
-	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-	while (sceneView.scene.isOpen()) {
-
-		// Handle scene poll event.
-		Event event;
-		while (sceneView.scene.pollEvent(event)) {
-			switch (event.type) {
-				case Event::Closed:
-					sceneView.scene.close();
-					break;
-			}
-		}
-
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		maze.draw(&sceneView.scene);
-		path.draw(&sceneView.scene);
-		sceneView.scene.display();
-	}
+	VisualizeSwitch(algorithm, maze, start, end);
 }
 
 /** Renders path through a huge maze. */
@@ -131,34 +134,13 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	MAZE_Y = 200;
 	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 	LevelCell::dims = Vector2f(SIZE, SIZE);
+	Location start(1, 1);
+	Location end(100, 100);
 
 	cout << "Generating maze..." << endl;
 	Maze maze(MAZE_X, MAZE_Y);
 
-	cout << "Searching maze..." << endl;
-	Search search = getSearch(algorithm, maze.getGraph(), Location(1, 1), Location(100, 100));
-	Path path = search.search();
-
-	cout << "Rendering solution..." << endl;
-	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-	while (sceneView.scene.isOpen()) {
-
-		// Handle scene poll event.
-		Event event;
-		while (sceneView.scene.pollEvent(event)) {
-			switch (event.type) {
-				case Event::Closed:
-					sceneView.scene.close();
-					break;
-			}
-		}
-
-		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		maze.draw(&sceneView.scene);
-		path.draw(&sceneView.scene);
-		sceneView.scene.display();
-	}
+	VisualizeSwitch(algorithm, maze, start, end);
 }
 
 /** Renders character moving through a level. */

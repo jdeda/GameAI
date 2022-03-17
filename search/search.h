@@ -96,7 +96,7 @@ class Path
     void print() const;
 
     /** Draws the path on the window. */
-    inline void draw(RenderWindow* window) {
+    inline void draw(RenderWindow* window) const {
 
         // Draw start.
         Location startLocation = Location(path[0].getLocation().y, path[0].getLocation().x);
@@ -145,7 +145,7 @@ class Search
      * @param end the end location of the search
      * @return Path the path from the start to end location
      */
-    Path search() const;
+    virtual Path search() const = 0;
 
     /** Maps vertex in graph to location in level. */
     inline Location localize(const graph::Vertex& vertex) const {
@@ -180,7 +180,7 @@ class Heuristic
     Heuristic(const Location& goal);
 
     /** Returns heuristic value of location in the graph. */
-    float compute(const Location& location) const;
+    virtual float compute(const Location& location) const = 0;
 
     /** Getters. */
     Location getGoalLocation() const;

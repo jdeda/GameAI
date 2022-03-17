@@ -6,7 +6,7 @@
 class AStar: public Search {
 
     private:
-    Heuristic heuristic;
+    const Heuristic* heuristic;
 
     public:
     /** Default constructor. */

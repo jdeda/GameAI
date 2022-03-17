@@ -5,13 +5,13 @@
 #include <iostream>
 using namespace std;
 
-AStar::AStar(const Graph& graph, const Location& start, const Location& end, const Heuristic& heuristic) : Search(graph, start, end), heuristic(heuristic) {}
+AStar::AStar(const Graph& graph, const Location& start, const Location& end, const Heuristic& heuristic) : Search(graph, start, end), heuristic(&heuristic) {}
 
 Path AStar::search() const {
 
     // Setup open and closed list.
     GraphNodeRecord start(quantize(getStart()), GraphNodeRecordState::visited);
-    start.setEstimatedTotalCost(heuristic.compute(getStart()));
+    start.setEstimatedTotalCost(heuristic->compute(getStart()));
     GraphNodeRecord end(quantize(getEnd()), GraphNodeRecordState::unvisited);
     Path openList;
     openList.add(start);
@@ -48,7 +48,7 @@ Path AStar::search() const {
             // Get end node and it's cost so far (CSF).
             GraphNode endNode = getGraph().getNode(edge.getToVertex());
             float endNodeCSF = current.getCostSoFar() + edge.getCost(); // Get CSF or EST? i think CSF.
-            float endNodeHeuristic = heuristic.compute(endNode.getLocation()); // TODO: Bad?
+            float endNodeHeuristic = heuristic->compute(endNode.getLocation()); // TODO: Bad?
 
             // Skip nodes on closed list or remove it.
             if (closedList.contains(endNode)) {
