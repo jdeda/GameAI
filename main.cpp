@@ -6,6 +6,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <chrono>
+#include <iostream>
 #include "debug/debug.h"
 #include "debug/breadcrumbs.h"
 #include "userinput/userinput.h"
@@ -24,6 +26,7 @@
 #include "search/a*.h"
 
 using namespace std;
+using namespace chrono;
 using namespace sf;
 
 /** Start unique IDs at 0. */
@@ -66,29 +69,39 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 		case DIJKSTRA:
 			{
 				Dijkstra search(maze.getGraph(), start, end);
+				auto start = steady_clock::now();
 				Path path = search.search();
+				auto end = steady_clock::now();
+				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+				cout << "Time to compute search: " << elapsed << " seconds" << endl;
 				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H1:
 			{
 				AStar search(maze.getGraph(), start, end, ManhattanHeuristic(end));
+				auto start = steady_clock::now();
 				Path path = search.search();
+				auto end = steady_clock::now();
+				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+				cout << "Time to compute search: " << elapsed << " seconds" << endl;
 				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H2:
 			{
 				AStar search(maze.getGraph(), start, end, EuclideanHeuristic(end));
+				auto start = steady_clock::now();
 				Path path = search.search();
+				auto end = steady_clock::now();
+				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+				cout << "Time to compute search: " << elapsed << " seconds " << endl;
 				Visualize(maze, path);
 				break;
 			}
 		case INVALID_ALG:
 			{
-				Dijkstra search(maze.getGraph(), start, start);
-				Path path = search.search();
-				Visualize(maze, path);
+				fail("invalid algorithm choice");
 				break;
 			}
 	}
@@ -145,10 +158,87 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 /** Renders character moving through a level. */
 void CharacterGraphVisualizer(Algorithm algorithm) {}
 
+/** Prints runtimes of search algorithm to console. */
+void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Location& start, const Location& end) {
+	switch (algorithm) {
+		case DIJKSTRA:
+			{
+				cout << AlgorithmStrings[0] << " Runtime: " << endl;
+				float average = 0;
+				for (int i = 0; i < iterations; i++) {
+					Dijkstra search(graph, start, end);
+					auto start = steady_clock::now();
+					Path path = search.search();
+					auto end = steady_clock::now();
+					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					average += elapsed;
+				}
+				average /= iterations;
+				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				break;
+
+			}
+		case A_STAR_H1:
+			{
+				cout << AlgorithmStrings[1] << " Runtime: " << endl;
+				float average = 0;
+				for (int i = 0; i < iterations; i++) {
+					AStar search(graph, start, end, ManhattanHeuristic(end));
+					auto start = steady_clock::now();
+					Path path = search.search();
+					auto end = steady_clock::now();
+					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					average += elapsed;
+				}
+				average /= iterations;
+				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				break;
+			}
+		case A_STAR_H2:
+			{
+				cout << AlgorithmStrings[2] << " Runtimes: " << endl;
+				float average = 0;
+				for (int i = 0; i < iterations; i++) {
+					AStar search(graph, start, end, EuclideanHeuristic(end));
+					auto start = steady_clock::now();
+					Path path = search.search();
+					auto end = steady_clock::now();
+					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					average += elapsed;
+				}
+				average /= iterations;
+				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				break;
+			}
+		case INVALID_ALG:
+			{
+				fail("invalid algorithm choice");
+				break;
+			}
+	}
+}
+
+/** Prints runtimes of all search algorithms to console. */
+void Test(int iterations) {
+	MAZE_X = 100;
+	MAZE_Y = 100;
+	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
+	LevelCell::dims = Vector2f(SIZE, SIZE);
+	Location start(1, 1);
+	Location end(52, 50);
+	Maze maze(MAZE_X, MAZE_Y);
+	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2 };
+	for(auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
+}
+
 /** Runs the program.*/
 int main(int argc, char* argv[]) {
 
 	srand(1);
+	Test(10);
 
 	greeting();
 	Visualizer visualizer = getVisualizer();
@@ -171,6 +261,7 @@ int main(int argc, char* argv[]) {
 			fail("invalid visualizer choice");
 			break;
 	}
+
 
 	return EXIT_SUCCESS;
 }
