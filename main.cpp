@@ -225,8 +225,6 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 void Test(int iterations) {
 	MAZE_X = 100;
 	MAZE_Y = 100;
-	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
-	LevelCell::dims = Vector2f(SIZE, SIZE);
 	Location start(1, 1);
 	Location end(52, 50);
 	Maze maze(MAZE_X, MAZE_Y);
