@@ -37,6 +37,17 @@ LevelCell::LevelCell(const Location& location, int status) {
     setSize(LevelCell::dims);
 }
 
+ /** Constructs a level cell via a given connections and ConnectionCost. */
+LevelCell::LevelCell(const Location& location, ConnectionCost connectionCost, bool flag) {
+    setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
+    switch(connectionCost) {
+        case normal: setFillColor(sf::Color::White);
+        case pricey: setFillColor(sf::Color{ 100, 0, 0 });
+        case expensive: setFillColor(sf::Color{ 200, 0, 0 });
+        case wall: setFillColor(sf::Color::Black);
+    }
+    setSize(LevelCell::dims);
+}
 Level::Level(const Level& level) {
     rows = level.rows;
     cols = level.cols;
@@ -270,7 +281,7 @@ Level generateCharacterLevel() {
     //     }
     // }
 
-    // Initialize borders .
+    // Initialize borders.
     for (int i = 0; i < z; i++) {
         level.cells[0][i].inLevel = true; // Top row.
         level.cells[i][z / 2].inLevel = true; // Middle row.
@@ -278,11 +289,18 @@ Level generateCharacterLevel() {
         level.cells[i][0].inLevel = true; // First column.
         level.cells[z / 2][i].inLevel = true; // Middle column.
         level.cells[i][z - 1].inLevel = true; // Last row.
+
+        level.cells[0][i].cost = wall; // Top row.
+        level.cells[i][z / 2].cost = wall; // Middle row.
+        level.cells[z - 1][i].cost = wall; // Bottom row.
+        level.cells[i][0].cost = wall; // First column.
+        level.cells[z / 2][i].cost = wall; // Middle column.
+        level.cells[i][z - 1].cost = wall; // Last row.
     }
 
     for (int i = 0; i < z; i++) {
         for (int j = 0; j < z; j++) {
-            cout << level.cells[i][j].inLevel << " ";
+            cout << level.cells[i][j].cost << " ";
         }
         cout << endl;
     }
@@ -290,4 +308,14 @@ Level generateCharacterLevel() {
 
 
     return level;
+}
+
+float mapConnectionCost(ConnectionCost cost) {
+    switch(cost) {
+        case normal:    return 1.0;
+        case pricey:    return 2.0;
+        case expensive: return 4.0;
+        case wall:      return 100.0;
+        default: exit(1);
+    }
 }

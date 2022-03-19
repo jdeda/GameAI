@@ -225,10 +225,8 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		}
 
 		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		cout << "drawing level...";
-		level.draw(&sceneView.scene);
-		cout << "done!\n\n";
+		sceneView.scene.clear();
+		level.drawSpecial(&sceneView.scene); // Draw level once.
 		sceneView.scene.display();
 	}
 }

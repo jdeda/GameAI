@@ -2,6 +2,7 @@
 #define LEVEL_H
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <vector>
 #include "../graph/graph.h"
 #include "location.h"
@@ -10,10 +11,23 @@ using namespace std;
 using namespace sf;
 using namespace graph;
 
+
+enum ConnectionCost {
+    normal,
+    pricey,
+    expensive,
+    wall
+};
+
+float mapConnectionCost(ConnectionCost cost);
+
 /** Represents an edge in the level. */
 class Connections
 {
     public:
+
+    /** Cost of a given connection. */
+    ConnectionCost cost = normal;
 
     /** True if connection is within the level. */
     bool inLevel = false;
@@ -37,11 +51,13 @@ class LevelCell : RectangleShape
     /** Constructs a level cell via a given connections and status. */
     LevelCell(const Location& location, int status);
 
+    /** Constructs a level cell via a given connections and ConnectionCost. */
+    LevelCell(const Location& location, ConnectionCost connectionCost, bool flag);
+
     /** Draws cell onto the window. */
     inline void draw(RenderWindow* window) {
         window->draw(*this);
     }
-
 };
 
 /** Basic tile grid level. Represents a maze when using the mazeGenerator algorithm. */
@@ -99,6 +115,16 @@ class Level
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 LevelCell cell(Location(row, col), cells[row][col].inLevel);
+                cell.draw(window);
+            }
+        }
+    }
+
+        /** Level draws itself on the window. */
+    inline void drawSpecial(RenderWindow* window) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                LevelCell cell(Location(row, col), cells[row][col].cost, true);
                 cell.draw(window);
             }
         }
