@@ -40,6 +40,8 @@ LevelCell::LevelCell(const Location& location, int status) {
 /** Constructs a level cell via a given connections and ConnectionCost. */
 LevelCell::LevelCell(const Location& location, ConnectionCost connectionCost, bool flag) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
+    setOutlineColor(sf::Color{ 50, 50, 50 });
+    setOutlineThickness(1);
     switch (connectionCost) {
         case ConnectionCost::normal:
             setFillColor(sf::Color::White);

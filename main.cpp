@@ -144,33 +144,70 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 }
 
 
-Path getPath(Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
-Location start(start_.x, start_.y);
-Location end(end_.x, end_.y);
-cout << "Getting path..." << endl;
-	switch (algorithm) {
-		case DIJKSTRA:
-			{
-				Dijkstra search(graph, start, end);
-				return search.search();
+/** Returns mapping of position in SFML render window to location in graph. */
+Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
+	cout << "Mapping click..." << endl;
+	int x = vector.x;
+	int y = vector.y;
+	for (int i = 0; i < dimension; i++) {
+		for (int j = 0; j < dimension; j++) {
+			float min_x = i * mappingScale;
+			float max_x = min_x + mappingScale;
+			float min_y = j * mappingScale;
+			float max_y = min_y + mappingScale;
+			if ((x < max_x & x > min_x) && (y < max_y & y > min_y)) {
+				cout << "Mapped from: " << y << " " << y << endl;
+				cout << "Mapped to: " << j << " " << i << endl << endl;
+				return Location(j, i); // Inverse as graphic representation inversed.
 			}
-		case A_STAR_H1:
-			{
-				AStar search(graph, start, end, ManhattanHeuristic(end));
-				return search.search();
-			}
-		case A_STAR_H2:
-			{
-				AStar search(graph, start, end, EuclideanHeuristic(end));
-				return search.search();
-			}
-		default:
-			{
-				fail("invalid algorithm choice");
-				Dijkstra search(graph, start, start);
-				return search.search();
-			}
+		}
 	}
+	return Location(-1, -1);
+}
+
+/** Returns mapping of location in graph to position in SFML render window. */
+Vector2f mapToWindow(float mappingScale, const Location& location) {
+	cout << "Mapping location..." << endl;
+	Vector2f vector;
+	vector.x = location.x * mappingScale;
+	vector.y = location.y * mappingScale;
+	cout << "Mapped from: " << location.x << " " << location.y << endl;
+	cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
+	return vector;
+}
+
+/** Returns path from start to end in the graph. */
+Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
+	Location start = mapToLevel(level.rows, mappingScale, start_);
+	Location end = mapToLevel(level.rows, mappingScale, end_);
+	mapToWindow(mappingScale, start);
+	mapToWindow(mappingScale, end);
+	cout << "Getting path..." << endl;
+	cout << "Got path..." << endl << endl;
+	return Path();
+	// switch (algorithm) {
+	// 	case DIJKSTRA:
+	// 		{
+	// 			Dijkstra search(graph, start, end);
+	// 			return search.search();
+	// 		}
+	// 	case A_STAR_H1:
+	// 		{
+	// 			AStar search(graph, start, end, ManhattanHeuristic(end));
+	// 			return search.search();
+	// 		}
+	// 	case A_STAR_H2:
+	// 		{
+	// 			AStar search(graph, start, end, EuclideanHeuristic(end));
+	// 			return search.search();
+	// 		}
+	// 	default:
+	// 		{
+	// 			fail("invalid algorithm choice");
+	// 			Dijkstra search(graph, start, start);
+	// 			return search.search();
+	// 		}
+	// }
 }
 
 /** Renders character moving through a level. */
@@ -179,6 +216,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	MAZE_Y = 22;
 	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 	LevelCell::dims = Vector2f(SIZE, SIZE);
+	cout << SIZE << endl;
 
 	cout << "Generating level..." << endl;
 	Level level = generateCharacterLevel();
@@ -188,7 +226,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 
 	cout << "Generating scene assests..." << endl;
 	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
-    for(int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
+	for (int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
 	float scale = 0.05;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
@@ -197,7 +235,8 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
-	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Vector2f start = mapToWindow(SIZE, Location(1, 1));
+	character.sprite.setPosition(start.x, start.y);
 	Kinematic initialState;
 	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
 	character.setKinematic(initialState);
@@ -217,15 +256,15 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					sceneView.scene.close();
 					break;
 				case Event::MouseButtonPressed:
-					// path = getPath(algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition()));
+					path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
 					break;
-				break;
+					break;
 
 			}
 		}
 
 		// Re-render scene.
-		sceneView.scene.clear(sf::Color{255,255,255,255});
+		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
 		level.drawSpecial(&sceneView.scene); // Draw level once.
 		sceneView.scene.display();
 	}
@@ -302,7 +341,7 @@ void Test(int iterations) {
 	Location end(52, 50);
 	Maze maze(MAZE_X, MAZE_Y);
 	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2 };
-	for(auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
+	for (auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
 }
 
 /** Runs the program.*/
