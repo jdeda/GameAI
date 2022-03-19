@@ -225,7 +225,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		}
 
 		// Re-render scene.
-		sceneView.scene.clear();
+		sceneView.scene.clear(sf::Color{255,255,255,255});
 		level.drawSpecial(&sceneView.scene); // Draw level once.
 		sceneView.scene.display();
 	}
