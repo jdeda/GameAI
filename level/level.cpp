@@ -11,6 +11,27 @@ using namespace std;
 using namespace sf;
 using namespace graph;
 
+float mapConnectionCost(ConnectionCost cost) {
+    switch (cost) {
+        case normal:    return 1.0;
+        case pricey:    return 2.0;
+        case expensive: return 4.0;
+        case wall:      return 100.0;
+        default: exit(1);
+    }
+}
+void Connections::setFalse() {
+    for (int i = 0; i < 4; i++) {
+        directions[i] = false;
+    }
+}
+
+void Connections::setTrue() {
+    for (int i = 0; i < 4; i++) {
+        directions[i] = true;
+    }
+}
+
 LevelCell::LevelCell(const Location& location, bool inLevel) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
     setFillColor(inLevel ? sf::Color::White : sf::Color::Black);
@@ -37,7 +58,6 @@ LevelCell::LevelCell(const Location& location, int status) {
     setSize(LevelCell::dims);
 }
 
-/** Constructs a level cell via a given connections and ConnectionCost. */
 LevelCell::LevelCell(const Location& location, ConnectionCost connectionCost, bool flag) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
     setOutlineColor(sf::Color{ 50, 50, 50 });
@@ -320,7 +340,7 @@ Graph levelToGraph(const Level& level, bool flag) {
 
                 // Add edge to neighbor.
                 GraphNode neighborNode = nodesByLocation.at(Location(nx, ny));
-                int cost = level.cells[nx][ny].cost;
+                int cost = mapConnectionCost(level.cells[nx][ny].cost);
                 edges.push_back(Edge(1.0, cost, node.getVertex(), neighborNode.getVertex()));
             }
 
@@ -339,11 +359,12 @@ Level generateCharacterLevel() {
     int z = 22;
     Level level(z, z);
 
-    // Cells default to in level and normal cost.
+    // Cells default to in level, normal cost, and have full connections.
     for (int i = 0; i < z; i++) {
         for (int j = 0; j < z; j++) {
             level.cells[i][j].inLevel = true;
             level.cells[i][j].cost = normal;
+            level.cells[i][j].setTrue();
         }
     }
 
@@ -355,17 +376,32 @@ Level generateCharacterLevel() {
         level.cells[i][0].cost = wall; // First column.
         level.cells[z / 2][i].cost = wall; // Middle column.
         level.cells[i][z - 1].cost = wall; // Last row.
+
+        level.cells[0][i].setFalse(); // Top row.
+        level.cells[i][z / 2].setFalse(); // Middle row.
+        level.cells[z - 1][i].setFalse(); // Bottom row.
+        level.cells[i][0].setFalse(); // First column.
+        level.cells[z / 2][i].setFalse(); // Middle column.
+        level.cells[i][z - 1].setFalse(); // Last row.
     }
 
     // Open gaps in borders.
     level.cells[10][11].cost = normal;
+    level.cells[10][11].setTrue();
+
     level.cells[11][10].cost = normal;
+    level.cells[11][10].setTrue();
+
     level.cells[z - 2][11].cost = normal;
+    level.cells[z - 2][11].setTrue();
+
     level.cells[11][z - 2].cost = normal;
+    level.cells[11][z - 2].setTrue();
+
 
 
     // Add obstacle to top left room.
-    for(int i = 2; i < 6; i++) {
+    for (int i = 2; i < 6; i++) {
         level.cells[i][5].cost = wall;
         level.cells[5][i].cost = wall;
     }
@@ -384,8 +420,8 @@ Level generateCharacterLevel() {
         level.cells[i][7].cost = expensive;
         level.cells[i][8].cost = expensive;
     }
-    for(int i = 15; i < 20; i++) {
-        level.cells[i][10].cost = expensive;    
+    for (int i = 15; i < 20; i++) {
+        level.cells[i][10].cost = expensive;
     }
 
     // Add patches for bottom left room.
@@ -400,16 +436,8 @@ Level generateCharacterLevel() {
 
     // Add obstacles to bottom right room.
     level.cells[17][z - 2].cost = wall;
+    level.cells[17][z - 2].setFalse();
     level.cells[z - 2][17].cost = wall;
+    level.cells[z - 2][17].setFalse();
     return level;
-}
-
-float mapConnectionCost(ConnectionCost cost) {
-    switch (cost) {
-        case normal:    return 1.0;
-        case pricey:    return 2.0;
-        case expensive: return 4.0;
-        case wall:      return 100.0;
-        default: exit(1);
-    }
 }

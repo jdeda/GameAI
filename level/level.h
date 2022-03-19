@@ -34,6 +34,9 @@ class Connections
 
     /** Possible directions at a given time (right, up, down, left). */
     bool directions[4] = { false, false, false, false };
+
+    void setFalse();
+    void setTrue();
 };
 
 /** Represents cell in a Level. */
@@ -143,6 +146,9 @@ Level generateMaze(int r, int c);
 
 /** Converts the given level into a graph and returns it.*/
 Graph levelToGraph(const Level& level);
+
+/** Converts the given level into a graph and returns it.*/
+Graph levelToGraph(const Level& level, bool flag);
 
 /** Generates fixed size level. */
 Level generateCharacterLevel();

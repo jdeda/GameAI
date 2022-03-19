@@ -171,6 +171,8 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 	Vector2f vector;
 	vector.x = location.x * mappingScale;
 	vector.y = location.y * mappingScale;
+	vector.x += mappingScale;
+	vector.y += mappingScale;
 	cout << "Mapped from: " << location.x << " " << location.y << endl;
 	cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
 	return vector;
@@ -181,9 +183,7 @@ Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const 
 	cout << "===========================================================" << endl;
 	Location start = mapToLevel(level.rows, mappingScale, start_);
 	Location end = mapToLevel(level.rows, mappingScale, end_);
-	mapToWindow(mappingScale, start);
-	mapToWindow(mappingScale, end);
-	cout << "===========================================================" << endl << endl;;
+	cout << "===========================================================" << endl;
 	switch (algorithm) {
 		case DIJKSTRA:
 			{
@@ -215,13 +215,13 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	MAZE_Y = 22;
 	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 	LevelCell::dims = Vector2f(SIZE, SIZE);
-	cout << SIZE << endl;
 
 	cout << "Generating level..." << endl;
 	Level level = generateCharacterLevel();
 
 	cout << "Generating graph representation of level..." << endl;
-	Graph graph = levelToGraph(level);
+	Graph graph = levelToGraph(level, true);
+	graph.printy();
 
 	cout << "Generating scene assests..." << endl;
 	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
@@ -234,8 +234,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
-	Vector2f start = mapToWindow(SIZE, Location(2, 2));
-	character.sprite.setPosition(start.x, start.y);
+	Vector2f start = mapToWindow(SIZE, Location(1, 1));
 	Kinematic initialState;
 	initialState.position = start;
 	character.setKinematic(initialState);
@@ -255,10 +254,9 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					sceneView.scene.close();
 					break;
 				case Event::MouseButtonPressed:
-					cout << "Getting path..." << endl;
+					cout << "\n\nGetting path..." << endl;
 					path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
 					path.print();
-					cout << "Got path..." << endl << endl;
 					break;
 
 			}
@@ -373,7 +371,7 @@ int main(int argc, char* argv[]) {
 	// 		fail("invalid visualizer choice");
 	// 		break;
 	// }
-	CharacterGraphVisualizer(Algorithm::DIJKSTRA);
+	CharacterGraphVisualizer(Algorithm::A_STAR_H1);
 
 
 
