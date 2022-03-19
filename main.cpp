@@ -242,6 +242,18 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	Mouse mouse;
 	Clock clock;
 
+	cout << "Rendering static level pieces..." << endl;
+	RenderTexture levelTexture;
+	levelTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
+	auto levelSFML = level.toSFML();
+	for(int i = 0; i < level.rows; i++) {
+		for(int j = 0; j < level.cols; j++) {
+			levelTexture.draw(levelSFML[i][j]);
+		}
+	}
+	levelTexture.display();
+	Sprite staticLevel(levelTexture.getTexture());
+
 	cout << "Rendering level..." << endl;
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	Path path;
@@ -264,7 +276,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 
 		// Re-render scene.
 		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
-		level.drawSpecial(&sceneView.scene); // Draw level once.
+		sceneView.scene.draw(staticLevel);
 		path.draw(&sceneView.scene);
 		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();

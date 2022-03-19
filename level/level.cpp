@@ -241,7 +241,7 @@ vector<vector<LevelCell>> Level::toSFML() {
     for (int row = 0; row < rows; row++) {
         vector<LevelCell> v;
         for (int col = 0; col < cols; col++) {
-            v.push_back(LevelCell(Location(row, col), cells[row][col].inLevel));
+            v.push_back(LevelCell(Location(row, col), cells[row][col].cost, true));
         }
         cellsSFML.push_back(v);
     }

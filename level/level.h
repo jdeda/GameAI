@@ -40,7 +40,7 @@ class Connections
 };
 
 /** Represents cell in a Level. */
-class LevelCell : RectangleShape
+class LevelCell : public RectangleShape
 {
 
     public:
