@@ -361,6 +361,13 @@ Level generateCharacterLevel() {
     level.cells[z - 2][11].cost = normal;
     level.cells[11][z - 2].cost = normal;
 
+
+    // Add obstacle to top left room.
+    for(int i = 2; i < 6; i++) {
+        level.cells[i][5].cost = wall;
+        level.cells[5][i].cost = wall;
+    }
+
     // Add patches in top left room.
     for (int i = 2; i < 6; i++) {
         level.cells[i][8].cost = pricey;
@@ -390,8 +397,8 @@ Level generateCharacterLevel() {
     }
 
     // Add obstacles to bottom right room.
-    level.cells[17][21].cost = wall;
-    level.cells[21][17].cost = wall;
+    level.cells[17][z - 2].cost = wall;
+    level.cells[z - 2][17].cost = wall;
     return level;
 }
 
