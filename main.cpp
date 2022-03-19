@@ -69,33 +69,21 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 		case DIJKSTRA:
 			{
 				Dijkstra search(maze.getGraph(), start, end);
-				auto start = steady_clock::now();
 				Path path = search.search();
-				auto end = steady_clock::now();
-				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
-				cout << "Time to compute search: " << elapsed << " seconds" << endl;
 				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H1:
 			{
 				AStar search(maze.getGraph(), start, end, ManhattanHeuristic(end));
-				auto start = steady_clock::now();
 				Path path = search.search();
-				auto end = steady_clock::now();
-				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
-				cout << "Time to compute search: " << elapsed << " seconds" << endl;
 				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H2:
 			{
 				AStar search(maze.getGraph(), start, end, EuclideanHeuristic(end));
-				auto start = steady_clock::now();
 				Path path = search.search();
-				auto end = steady_clock::now();
-				auto elapsed = duration_cast<chrono::seconds>(end - start).count();
-				cout << "Time to compute search: " << elapsed << " seconds " << endl;
 				Visualize(maze, path);
 				break;
 			}
@@ -155,8 +143,95 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	VisualizeSwitch(algorithm, maze, start, end);
 }
 
+
+Path getPath(Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
+Location start(start_.x, start_.y);
+Location end(end_.x, end_.y);
+cout << "Getting path..." << endl;
+	switch (algorithm) {
+		case DIJKSTRA:
+			{
+				Dijkstra search(graph, start, end);
+				return search.search();
+			}
+		case A_STAR_H1:
+			{
+				AStar search(graph, start, end, ManhattanHeuristic(end));
+				return search.search();
+			}
+		case A_STAR_H2:
+			{
+				AStar search(graph, start, end, EuclideanHeuristic(end));
+				return search.search();
+			}
+		default:
+			{
+				fail("invalid algorithm choice");
+				Dijkstra search(graph, start, start);
+				return search.search();
+			}
+	}
+}
+
 /** Renders character moving through a level. */
-void CharacterGraphVisualizer(Algorithm algorithm) {}
+void CharacterGraphVisualizer(Algorithm algorithm) {
+	MAZE_X = 22;
+	MAZE_Y = 22;
+	SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
+	LevelCell::dims = Vector2f(SIZE, SIZE);
+
+	cout << "Generating level..." << endl;
+	Level level = generateCharacterLevel();
+
+	cout << "Generating graph representation of level..." << endl;
+	Graph graph = levelToGraph(level);
+
+	cout << "Generating scene assests..." << endl;
+	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
+    for(int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
+	float scale = 0.05;
+	Texture texture;
+	texture.loadFromFile("assets/boid.png");
+	Character character(&crumbs);
+	character.scale = scale;
+	character.texture = texture;
+	character.sprite = *(new Sprite(texture));
+	character.sprite.setScale(scale, scale);
+	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Kinematic initialState;
+	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	character.setKinematic(initialState);
+	character.update(SteeringOutput(), 0, true);
+	Mouse mouse;
+	Clock clock;
+
+	cout << "Rendering level..." << endl;
+	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
+	Path path;
+	while (sceneView.scene.isOpen()) {
+		float dt = clock.restart().asSeconds();
+		Event event;
+		while (sceneView.scene.pollEvent(event)) {
+			switch (event.type) {
+				case Event::Closed:
+					sceneView.scene.close();
+					break;
+				case Event::MouseButtonPressed:
+					// path = getPath(algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition()));
+					break;
+				break;
+
+			}
+		}
+
+		// Re-render scene.
+		sceneView.scene.clear(Color(255, 255, 255));
+		cout << "drawing level...";
+		level.draw(&sceneView.scene);
+		cout << "done!\n\n";
+		sceneView.scene.display();
+	}
+}
 
 /** Prints runtimes of search algorithm to console. */
 void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Location& start, const Location& end) {
@@ -236,29 +311,30 @@ void Test(int iterations) {
 int main(int argc, char* argv[]) {
 
 	srand(1);
-	Test(10);
 
-	greeting();
-	Visualizer visualizer = getVisualizer();
-	Algorithm algorithm = getAlgorithm();
+	// greeting();
+	// Visualizer visualizer = getVisualizer();
+	// Algorithm algorithm = getAlgorithm();
 
-	switch (visualizer) {
-		case Visualizer::small:
-			SmallGraphVisualizer(algorithm);
-			break;
-		case Visualizer::big:
-			BigGraphVisualizer(algorithm);
-			break;
-		case Visualizer::huge:
-			HugeGraphVisualizer(algorithm);
-			break;
-		case Visualizer::character:
-			CharacterGraphVisualizer(algorithm);
-			break;
-		case Visualizer::INVALID_VIS:
-			fail("invalid visualizer choice");
-			break;
-	}
+	// switch (visualizer) {
+	// 	case Visualizer::small:
+	// 		SmallGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::big:
+	// 		BigGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::huge:
+	// 		HugeGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::character:
+	// 		CharacterGraphVisualizer(algorithm);
+	// 		break;
+	// 	case Visualizer::INVALID_VIS:
+	// 		fail("invalid visualizer choice");
+	// 		break;
+	// }
+	CharacterGraphVisualizer(Algorithm::DIJKSTRA);
+
 
 
 	return EXIT_SUCCESS;

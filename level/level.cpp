@@ -258,3 +258,36 @@ Graph levelToGraph(const Level& level) {
     // Return the graph.
     return Graph(level.rows, level.cols, nodes);
 }
+
+Level generateCharacterLevel() {
+    int z = 22;
+    Level level(z, z);
+
+    // All cells will be in the level.
+    // for (int i = 0; i < z; i++) {
+    //     for (int j = 0; j < z; j++) {
+    //         level.cells[i][j].inLevel = true;
+    //     }
+    // }
+
+    // Initialize borders .
+    for (int i = 0; i < z; i++) {
+        level.cells[0][i].inLevel = true; // Top row.
+        level.cells[i][z / 2].inLevel = true; // Middle row.
+        level.cells[z - 1][i].inLevel = true; // Bottom row.
+        level.cells[i][0].inLevel = true; // First column.
+        level.cells[z / 2][i].inLevel = true; // Middle column.
+        level.cells[i][z - 1].inLevel = true; // Last row.
+    }
+
+    for (int i = 0; i < z; i++) {
+        for (int j = 0; j < z; j++) {
+            cout << level.cells[i][j].inLevel << " ";
+        }
+        cout << endl;
+    }
+
+
+
+    return level;
+}
