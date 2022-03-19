@@ -97,6 +97,7 @@ class Path
 
     /** Draws the path on the window. */
     inline void draw(RenderWindow* window) const {
+        if(path.size() == 0) { return; }
 
         // Draw start.
         Location startLocation = Location(path[0].getLocation().y, path[0].getLocation().x);

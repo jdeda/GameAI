@@ -143,7 +143,6 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	VisualizeSwitch(algorithm, maze, start, end);
 }
 
-
 /** Returns mapping of position in SFML render window to location in graph. */
 Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
 	cout << "Mapping click..." << endl;
@@ -180,38 +179,34 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 /** Returns path from start to end in the graph. */
 Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
 	cout << "===========================================================" << endl;
-	cout << start_.x << " " << start_.y << endl;
 	Location start = mapToLevel(level.rows, mappingScale, start_);
-	// Location end = mapToLevel(level.rows, mappingScale, end_);
+	Location end = mapToLevel(level.rows, mappingScale, end_);
 	mapToWindow(mappingScale, start);
-	// mapToWindow(mappingScale, end);
-	cout << "Getting path..." << endl;
-	cout << "Got path..." << endl << endl;
+	mapToWindow(mappingScale, end);
 	cout << "===========================================================" << endl << endl;;
-	return Path();
-	// switch (algorithm) {
-	// 	case DIJKSTRA:
-	// 		{
-	// 			Dijkstra search(graph, start, end);
-	// 			return search.search();
-	// 		}
-	// 	case A_STAR_H1:
-	// 		{
-	// 			AStar search(graph, start, end, ManhattanHeuristic(end));
-	// 			return search.search();
-	// 		}
-	// 	case A_STAR_H2:
-	// 		{
-	// 			AStar search(graph, start, end, EuclideanHeuristic(end));
-	// 			return search.search();
-	// 		}
-	// 	default:
-	// 		{
-	// 			fail("invalid algorithm choice");
-	// 			Dijkstra search(graph, start, start);
-	// 			return search.search();
-	// 		}
-	// }
+	switch (algorithm) {
+		case DIJKSTRA:
+			{
+				Dijkstra search(graph, start, end);
+				return search.search();
+			}
+		case A_STAR_H1:
+			{
+				AStar search(graph, start, end, ManhattanHeuristic(end));
+				return search.search();
+			}
+		case A_STAR_H2:
+			{
+				AStar search(graph, start, end, EuclideanHeuristic(end));
+				return search.search();
+			}
+		default:
+			{
+				fail("invalid algorithm choice");
+				Dijkstra search(graph, start, start);
+				return search.search();
+			}
+	}
 }
 
 /** Renders character moving through a level. */
@@ -231,7 +226,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	cout << "Generating scene assests..." << endl;
 	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
 	for (int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
-	float scale = 0.05;
+	float scale = 1.f / SIZE;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
 	Character character(&crumbs);
@@ -260,7 +255,10 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					sceneView.scene.close();
 					break;
 				case Event::MouseButtonPressed:
+					cout << "Getting path..." << endl;
 					path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
+					path.print();
+					cout << "Got path..." << endl << endl;
 					break;
 
 			}
@@ -269,6 +267,8 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		// Re-render scene.
 		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
 		level.drawSpecial(&sceneView.scene); // Draw level once.
+		path.draw(&sceneView.scene);
+		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
 	}
 }
