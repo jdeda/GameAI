@@ -162,6 +162,7 @@ Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
 			}
 		}
 	}
+	cout << "No mapping found." << endl << endl;
 	return Location(-1, -1);
 }
 
@@ -178,12 +179,15 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 
 /** Returns path from start to end in the graph. */
 Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
+	cout << "===========================================================" << endl;
+	cout << start_.x << " " << start_.y << endl;
 	Location start = mapToLevel(level.rows, mappingScale, start_);
-	Location end = mapToLevel(level.rows, mappingScale, end_);
+	// Location end = mapToLevel(level.rows, mappingScale, end_);
 	mapToWindow(mappingScale, start);
-	mapToWindow(mappingScale, end);
+	// mapToWindow(mappingScale, end);
 	cout << "Getting path..." << endl;
 	cout << "Got path..." << endl << endl;
+	cout << "===========================================================" << endl << endl;;
 	return Path();
 	// switch (algorithm) {
 	// 	case DIJKSTRA:
@@ -235,10 +239,10 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
-	Vector2f start = mapToWindow(SIZE, Location(1, 1));
+	Vector2f start = mapToWindow(SIZE, Location(2, 2));
 	character.sprite.setPosition(start.x, start.y);
 	Kinematic initialState;
-	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	initialState.position = start;
 	character.setKinematic(initialState);
 	character.update(SteeringOutput(), 0, true);
 	Mouse mouse;
@@ -257,7 +261,6 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					break;
 				case Event::MouseButtonPressed:
 					path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
-					break;
 					break;
 
 			}
