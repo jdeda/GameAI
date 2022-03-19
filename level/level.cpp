@@ -41,10 +41,18 @@ LevelCell::LevelCell(const Location& location, int status) {
 LevelCell::LevelCell(const Location& location, ConnectionCost connectionCost, bool flag) {
     setPosition((location.x * LevelCell::dims.x) / 1.f, (location.y * LevelCell::dims.y) / 1.f);
     switch(connectionCost) {
-        case normal: setFillColor(sf::Color::White);
-        case pricey: setFillColor(sf::Color{ 100, 0, 0 });
-        case expensive: setFillColor(sf::Color{ 200, 0, 0 });
-        case wall: setFillColor(sf::Color::Black);
+        case ConnectionCost::normal:
+            setFillColor(sf::Color::White);
+            break;
+        case ConnectionCost::pricey:
+            setFillColor(sf::Color{ 100, 0, 0 });
+            break;
+        case ConnectionCost::expensive:
+            setFillColor(sf::Color{ 200, 0, 0 });
+            break;
+        case ConnectionCost::wall:
+            setFillColor(sf::Color::Black);
+            break;
     }
     setSize(LevelCell::dims);
 }
