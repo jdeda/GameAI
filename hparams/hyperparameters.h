@@ -4,7 +4,7 @@
 const int ARGC = 2;
 
 const int SCENE_WINDOW_X = 640;
-const int SCENE_WINDOW_Y = 480;
+const int SCENE_WINDOW_Y = 640;
 const int SCENE_WINDOW_FR = 100;
 const int BOUND_BUFFER = 25;
 
