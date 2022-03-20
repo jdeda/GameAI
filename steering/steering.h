@@ -174,6 +174,11 @@ public:
 
         // Only use target position from target kinematic.
         Vector2f targetP = target.position;
+        cout << character.position.x << " " << character.position.y << endl;
+        cout << target.position.x << " " << target.position.y << endl;
+                // cout << currentPathIndex << endl;
+        // cout << newTargetPathIndex << endl << endl;.
+
 
         // Setup output.
         SteeringOutput output;
@@ -186,6 +191,7 @@ public:
 
         //  Set goal speed.
         if (distance < this->getRadiusOfArrival()) {
+            // cout << "YAY!"<< endl;
             goalLinearSpeed = 0;
         }
         else if (distance > this->getRadiusOfDeceleration()) {
@@ -271,17 +277,16 @@ public:
     FollowPath(const Path& p, float o, float idx, float pt, float t, float r1, float r2, float s);
 
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
-        cout << "FollowPath " << endl;
+        cout << "\nFollowPath " << endl;
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
+        // cout << currentPathIndex << endl;
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
         int newTargetPathIndex = currentPathIndex + pathOffset;
+        // cout << newTargetPathIndex << endl << endl;
         Kinematic newTarget;
-        newTarget.position = path.getPosition(newTargetPathIndex);
-        cout << "\tcurrentIndex: "  << currentPathIndex << endl;
-        cout << "\tfutureIndex: "  << newTargetPathIndex << endl;
-        cout << "\tcurrentPosition: " << futurePosition.x << " " << futurePosition.y << endl;
-        cout << "\tfuturePosition: " << newTarget.position.x << " " << newTarget.position.y << endl;
-        cout << endl;
+        newTarget.position = path.getPosition(newTargetPathIndex); // COULD OUT OF BOUNDS...
+        // cout << character.position.x << " " << character.position.y << endl;
+        // cout << newTarget.position.x << " " << newTarget.position.y << endl;
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };

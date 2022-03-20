@@ -237,6 +237,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 						path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
 						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 						cout << "Got path." << endl;
+						path.print();
 						followingPath = true;
 					}
 					break;
@@ -251,7 +252,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		}
 		if (followingPath) {
 			SteeringOutput acceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
-			cout << acceleration.angularAcceleration << endl;
+			cout << "accel: " << acceleration.linearAcceleration.x << " " << acceleration.linearAcceleration.y << endl << endl;
 			character.update(acceleration, dt, true);
 		}
 

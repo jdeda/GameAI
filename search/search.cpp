@@ -88,14 +88,15 @@ void Path::remove(const GraphNodeRecord& record) {
 
 int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) {
     Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
-    cout << "futurePosition mapped to: " << futureLocation.x << " " << futureLocation.y << endl;
     for (int i = 0; i < path.size(); i++) {
-        cout << "\t " << path[i].getLocation().x << " " << path[i].getLocation().y << endl;
         if (path[i].getLocation() == futureLocation) {
+            // cout <<"currrentPosition mapped to: " << path[currentIndexOnPath].getLocation().x << " " << path[currentIndexOnPath].getLocation().y << endl;
+            // cout <<"currrentPosition mapped to: " << path[i+1].getLocation().x << " " << path[i+1].getLocation().y << endl;
             return i;
         }
     }
-    cout << endl;
+    cout << "OH FUCK" << endl;
+    // exit(99);
     return -1;
 }
 
