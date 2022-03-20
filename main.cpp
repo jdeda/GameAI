@@ -210,6 +210,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	RenderTexture levelTexture;
 	levelTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
 	auto levelSFML = level.toSFML();
+	levelTexture.clear(sf::Color{ 255,255,255,0 });
 	for (int i = 0; i < level.rows; i++) {
 		for (int j = 0; j < level.cols; j++) {
 			levelTexture.draw(levelSFML[i][j]);
@@ -217,10 +218,14 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	}
 	levelTexture.display();
 	Sprite staticLevel(levelTexture.getTexture());
+	Path path;
+	Sprite staticPath;
+	RenderTexture pathTexture;
+	pathTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
+	auto pathSFML = path.toSFML();
 
 	cout << "Rendering level..." << endl;
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-	Path path;
 	FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 	bool followingPath = false;
 	while (sceneView.scene.isOpen()) {
@@ -239,6 +244,12 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 						cout << "Got path." << endl;
 						path.print();
 						followingPath = true;
+
+						pathSFML = path.toSFML();
+						pathTexture.clear(sf::Color{ 255,255,255,0 });
+						for (const auto& element : pathSFML) { pathTexture.draw(element); }
+						pathTexture.display();
+						staticPath = Sprite(pathTexture.getTexture());
 					}
 					break;
 			}
@@ -256,9 +267,10 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 			character.update(acceleration, dt, true);
 		}
 
+
 		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
 		sceneView.scene.draw(staticLevel);
-		path.draw(&sceneView.scene);
+		sceneView.scene.draw(staticPath);
 		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
 	}

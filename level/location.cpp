@@ -11,8 +11,8 @@ Location::Location(int a, int b) {
 
 Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
 	// cout << "Mapping click..." << endl;
-	int x = vector.x;
-	int y = vector.y;
+	int x = vector.x + 1;
+	int y = vector.y + 1;
 	for (int i = 0; i < dimension; i++) {
 		for (int j = 0; j < dimension; j++) {
 			float min_x = i * mappingScale;
@@ -35,9 +35,9 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 	Vector2f vector;
 	vector.x = location.x * mappingScale;
 	vector.y = location.y * mappingScale;
-	vector.x += mappingScale;
-	vector.y += mappingScale;
-	// cout << "Mapped from: " << location.x << " " << location.y << endl;
-	// cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
+	// vector.x += mappingScale;
+	// vector.y += mappingScale;
+	cout << "Mapped from: " << location.x << " " << location.y << endl;
+	cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
 	return vector;
 }
