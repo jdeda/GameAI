@@ -14,6 +14,8 @@
 #include "../kinematic/kinematic.h"
 #include "../hparams/hyperparameters.h"
 #include "../math/vmath.h"
+#include "../search/search.h"
+#include "../level/location.h"
 #include "steeringoutput.h"
 
 using namespace sf;
@@ -252,6 +254,26 @@ class Align : Orientation
         output.linearAcceleration = Vector2f(0.f, 0.f);
 
         return output;
+    }
+};
+
+
+class FollowPath : Arrive
+{
+    Path path;
+    float pathOffset;
+    int currentPathIndex;
+    float predictionTime;
+
+    FollowPath(vector<Vector2f> p, float o, float curr, const float t, const float r1, const float r2, float s);
+
+    inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
+        Kinematic newTarget = target;
+        Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
+        currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
+        int newTargetPathIndex = currentPathIndex + pathOffset;
+        newTarget.position = path.getPosition(newTargetPathIndex);
+        return Arrive::calculateAcceleration(character, newTarget);
     }
 };
 

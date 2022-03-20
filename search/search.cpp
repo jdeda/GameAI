@@ -86,6 +86,15 @@ void Path::remove(const GraphNodeRecord& record) {
     }
 }
 
+int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) {
+    Location futureLocation = mapToLevel(futurePosition);
+    
+}
+
+Vector2f Path::getPosition(int index) {
+
+}
+
 void Path::print() const {
     cout << "Path:" << endl;
     for (const auto& record : path) {

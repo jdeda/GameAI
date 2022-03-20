@@ -74,3 +74,14 @@ VelocityMatch::VelocityMatch(float f) : Velocity(f) {}
 Arrive::Arrive(const float t, const float r1, const float r2, float s) : Position(t, r1, r2, s) {}
 
 Align::Align(const float t, const float r1, const float r2, float m) : Orientation(t, r1, r2, m) {}
+
+FollowPath::FollowPath(vector<Vector2f> p, float o, float curr, const float t, const float r1, const float r2, float s) :
+    Arrive(t, r1, r2, s) {
+    path = p;
+    pathOffset = o;
+    currentPathPosition = curr;
+}
+
+SteeringPath::SteeringPath(vector<Vector2f> path_) {
+    path = path_;
+}

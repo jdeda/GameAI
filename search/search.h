@@ -92,6 +92,12 @@ class Path
     /** Removes GraphNodeRecord to Path. */
     void remove(const GraphNodeRecord& record);
 
+    /** Returns the index of the future position with respect to the current index on the path. */
+    int getIndex(const Vector2f& futurePosition, int currentIndexOnPath);
+
+     /** Returns the index of the future position with respect to the current index on the path. */
+    Vector2f getPosition(int index);
+
     /** Prints path. */
     void print() const;
 

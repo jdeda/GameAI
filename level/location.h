@@ -2,6 +2,7 @@
 #define LOCATION_H
 
 #include <functional>
+#include <SFML/Graphics.hpp>
 
 using namespace std;
 
@@ -40,5 +41,11 @@ namespace std {
         }
     };
 }
+
+/** Returns mapping of position in SFML render window to location in graph. */
+Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector);
+
+/** Returns mapping of location in graph to position in SFML render window. */
+Vector2f mapToWindow(float mappingScale, const Location& location);
 
 #endif
