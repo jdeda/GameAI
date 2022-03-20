@@ -263,7 +263,6 @@ public:
     }
 };
 
-
 class FollowPath : Arrive
 {
 private:
@@ -279,14 +278,11 @@ public:
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
         cout << "\nFollowPath " << endl;
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
-        // cout << currentPathIndex << endl;
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
         int newTargetPathIndex = currentPathIndex + pathOffset;
-        // cout << newTargetPathIndex << endl << endl;
         Kinematic newTarget;
-        newTarget.position = path.getPosition(newTargetPathIndex); // COULD OUT OF BOUNDS...
-        // cout << character.position.x << " " << character.position.y << endl;
-        // cout << newTarget.position.x << " " << newTarget.position.y << endl;
+        newTarget.position = path.getPosition(newTargetPathIndex);
+        if(newTargetPathIndex == path.size()) { return SteeringOutput(); }
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };

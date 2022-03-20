@@ -90,8 +90,6 @@ int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) {
     Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
     for (int i = 0; i < path.size(); i++) {
         if (path[i].getLocation() == futureLocation) {
-            // cout <<"currrentPosition mapped to: " << path[currentIndexOnPath].getLocation().x << " " << path[currentIndexOnPath].getLocation().y << endl;
-            // cout <<"currrentPosition mapped to: " << path[i+1].getLocation().x << " " << path[i+1].getLocation().y << endl;
             return i;
         }
     }
@@ -106,7 +104,7 @@ Vector2f Path::getPosition(int index) {
 }
 
 Location Path::getLast() {
-    return path[path.size() - 1].getLocation();
+    return path.back().getLocation();
 }
 
 void Path::print() const {
