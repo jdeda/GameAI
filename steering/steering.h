@@ -26,7 +26,7 @@ using namespace std;
 /** Interface representing steering behaviors. */
 class SteeringBehavior
 {
-    public:
+public:
     /**
      * Calculates accelerations for variable matching of relative variable (when implemented concretely).
      * @param character the character kinematic (immutable)
@@ -40,14 +40,14 @@ class SteeringBehavior
 class Position : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetSpeed;
     float radiusOfArrival;
     float radiusOfDeceleration;
     float maxSpeed;
 
-    public:
+public:
     /**
      * @brief Construct a new Position object with all its hyperparameters.
      *
@@ -68,14 +68,14 @@ class Position : SteeringBehavior
 class Orientation : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetRotation;
     float radiusOfArrival;
     float radiusOfDeceleration;
     float maxRotation;
 
-    public:
+public:
     /**
      * @brief Construct a new Orientation with all its hyperparameters
      *
@@ -106,11 +106,11 @@ class Orientation : SteeringBehavior
 class Velocity : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetVelocity;
 
-    public:
+public:
     /**
      * @brief Construct a new Velocity object with all its hyperparameters
      *
@@ -136,7 +136,7 @@ class Rotation : SteeringBehavior
 class VelocityMatch : Velocity
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Velocity Match object with all its hyperparameters
      *
@@ -158,7 +158,7 @@ class VelocityMatch : Velocity
 class Arrive : Position
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Arrive object with all its hyperparameters.
      *
@@ -213,7 +213,7 @@ class Arrive : Position
 class Align : Orientation
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Align with all its hyperparameters
      *
@@ -260,19 +260,28 @@ class Align : Orientation
 
 class FollowPath : Arrive
 {
+private:
     Path path;
     float pathOffset;
     int currentPathIndex;
     float predictionTime;
 
-    FollowPath(vector<Vector2f> p, float o, float curr, const float t, const float r1, const float r2, float s);
+public:
 
-    inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& target) {
-        Kinematic newTarget = target;
+    FollowPath(const Path& p, float o, float idx, float pt, float t, float r1, float r2, float s);
+
+    inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+        cout << "FollowPath " << endl;
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
         int newTargetPathIndex = currentPathIndex + pathOffset;
+        Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
+        cout << "\tcurrentIndex: "  << currentPathIndex << endl;
+        cout << "\tfutureIndex: "  << newTargetPathIndex << endl;
+        cout << "\tcurrentPosition: " << futurePosition.x << " " << futurePosition.y << endl;
+        cout << "\tfuturePosition: " << newTarget.position.x << " " << newTarget.position.y << endl;
+        cout << endl;
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };

@@ -98,6 +98,8 @@ class Path
      /** Returns the index of the future position with respect to the current index on the path. */
     Vector2f getPosition(int index);
 
+    Location getLast();
+
     /** Prints path. */
     void print() const;
 

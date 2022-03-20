@@ -75,13 +75,9 @@ Arrive::Arrive(const float t, const float r1, const float r2, float s) : Positio
 
 Align::Align(const float t, const float r1, const float r2, float m) : Orientation(t, r1, r2, m) {}
 
-FollowPath::FollowPath(vector<Vector2f> p, float o, float curr, const float t, const float r1, const float r2, float s) :
-    Arrive(t, r1, r2, s) {
-    path = p;
+FollowPath::FollowPath(const Path& p, float o, float idx, float pt, float t, float r1, float r2, float s) :
+    Arrive(t, r1, r2, s), path(p) {
     pathOffset = o;
-    currentPathPosition = curr;
-}
-
-SteeringPath::SteeringPath(vector<Vector2f> path_) {
-    path = path_;
+    currentPathIndex = idx;
+    predictionTime = pt;
 }

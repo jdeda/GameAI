@@ -1,5 +1,8 @@
-#include "location.h"
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include "location.h"
+
+using namespace sf;
 
 Location::Location(int a, int b) {
     x = a;
@@ -7,7 +10,7 @@ Location::Location(int a, int b) {
 }
 
 Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
-	cout << "Mapping click..." << endl;
+	// cout << "Mapping click..." << endl;
 	int x = vector.x;
 	int y = vector.y;
 	for (int i = 0; i < dimension; i++) {
@@ -17,24 +20,24 @@ Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
 			float min_y = j * mappingScale;
 			float max_y = min_y + mappingScale;
 			if ((x < max_x & x > min_x) && (y < max_y & y > min_y)) {
-				cout << "Mapped from: " << y << " " << y << endl;
-				cout << "Mapped to: " << j << " " << i << endl << endl;
+				// cout << "Mapped from: " << y << " " << y << endl;
+				// cout << "Mapped to: " << j << " " << i << endl << endl;
 				return Location(j, i); // Inverse as graphic representation inversed.
 			}
 		}
 	}
-	cout << "No mapping found." << endl << endl;
+	// cout << "No mapping found." << endl << endl;
 	return Location(-1, -1);
 }
 
 Vector2f mapToWindow(float mappingScale, const Location& location) {
-	cout << "Mapping location..." << endl;
+	// cout << "Mapping location..." << endl;
 	Vector2f vector;
 	vector.x = location.x * mappingScale;
 	vector.y = location.y * mappingScale;
 	vector.x += mappingScale;
 	vector.y += mappingScale;
-	cout << "Mapped from: " << location.x << " " << location.y << endl;
-	cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
+	// cout << "Mapped from: " << location.x << " " << location.y << endl;
+	// cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
 	return vector;
 }

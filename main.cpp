@@ -16,6 +16,7 @@
 #include "tables/tables.h"
 #include "character/character.h"
 #include "kinematic/kinematic.h"
+#include "hparams/hyperparameters.h"
 #include "steering/steering.h"
 #include "steering/steeringoutput.h"
 #include "graph/graph.h"
@@ -145,10 +146,8 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 
 /** Returns path from start to end in the graph. */
 Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
-	cout << "===========================================================" << endl;
 	Location start = mapToLevel(level.rows, mappingScale, start_);
 	Location end = mapToLevel(level.rows, mappingScale, end_);
-	cout << "===========================================================" << endl;
 	switch (algorithm) {
 		case DIJKSTRA:
 			{
@@ -189,7 +188,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	graph.printy();
 
 	cout << "Generating scene assests..." << endl;
-	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
+	vector<Crumb> crumbs = vector<Crumb>();
 	for (int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
 	float scale = 1.f / SIZE;
 	Texture texture;
@@ -211,8 +210,8 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	RenderTexture levelTexture;
 	levelTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
 	auto levelSFML = level.toSFML();
-	for(int i = 0; i < level.rows; i++) {
-		for(int j = 0; j < level.cols; j++) {
+	for (int i = 0; i < level.rows; i++) {
+		for (int j = 0; j < level.cols; j++) {
 			levelTexture.draw(levelSFML[i][j]);
 		}
 	}
@@ -222,6 +221,8 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	cout << "Rendering level..." << endl;
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
 	Path path;
+	FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	bool followingPath = false;
 	while (sceneView.scene.isOpen()) {
 		float dt = clock.restart().asSeconds();
 		Event event;
@@ -231,15 +232,29 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					sceneView.scene.close();
 					break;
 				case Event::MouseButtonPressed:
-					cout << "\n\nGetting path..." << endl;
-					path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
-					path.print();
+					if (!followingPath) {
+						cout << "\n\nGetting path..." << endl;
+						path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
+						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+						cout << "Got path." << endl;
+						followingPath = true;
+					}
 					break;
-
 			}
 		}
 
 		// Re-render scene.
+		if (!path.isEmpty()) {
+			if (mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
+				followingPath = false;
+			}
+		}
+		if (followingPath) {
+			SteeringOutput acceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
+			cout << acceleration.angularAcceleration << endl;
+			character.update(acceleration, dt, true);
+		}
+
 		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
 		sceneView.scene.draw(staticLevel);
 		path.draw(&sceneView.scene);

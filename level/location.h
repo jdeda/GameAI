@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 using namespace std;
+using namespace sf;
 
 /** X and Y coordinates in a level. */
 class Location

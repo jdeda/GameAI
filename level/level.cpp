@@ -399,7 +399,6 @@ Level generateCharacterLevel() {
     level.cells[11][z - 2].setTrue();
 
 
-
     // Add obstacle to top left room.
     for (int i = 2; i < 6; i++) {
         level.cells[i][5].cost = wall;

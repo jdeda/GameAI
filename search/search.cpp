@@ -87,12 +87,25 @@ void Path::remove(const GraphNodeRecord& record) {
 }
 
 int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) {
-    Location futureLocation = mapToLevel(futurePosition);
-    
+    Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
+    cout << "futurePosition mapped to: " << futureLocation.x << " " << futureLocation.y << endl;
+    for (int i = 0; i < path.size(); i++) {
+        cout << "\t " << path[i].getLocation().x << " " << path[i].getLocation().y << endl;
+        if (path[i].getLocation() == futureLocation) {
+            return i;
+        }
+    }
+    cout << endl;
+    return -1;
 }
 
 Vector2f Path::getPosition(int index) {
+    auto temp = mapToWindow(29.0909, path[index].getLocation());
+    return Vector2f(temp.y, temp.x);
+}
 
+Location Path::getLast() {
+    return path[path.size() - 1].getLocation();
 }
 
 void Path::print() const {
