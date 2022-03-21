@@ -86,6 +86,28 @@ void Path::remove(const GraphNodeRecord& record) {
     }
 }
 
+int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const {
+    Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
+    cout << futureLocation.x << " " << futureLocation.y << endl;
+    for (int i = 0; i < path.size(); i++) {
+        if (path[i].getLocation() == futureLocation) {
+            return i;
+        }
+    }
+    cout << "OH FUCK" << endl;
+    // You could just return the next index to be safe?
+    return currentIndexOnPath + 1; // Cause segfault?
+}
+
+Vector2f Path::getPosition(int index) const {
+    auto temp = mapToWindow(29.0909, path[index].getLocation());
+    return Vector2f(temp.y, temp.x);
+}
+
+Location Path::getLast() const {
+    return path.back().getLocation();
+}
+
 void Path::print() const {
     cout << "Path:" << endl;
     for (const auto& record : path) {

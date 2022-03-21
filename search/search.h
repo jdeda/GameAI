@@ -92,11 +92,36 @@ class Path
     /** Removes GraphNodeRecord to Path. */
     void remove(const GraphNodeRecord& record);
 
+    /** Returns the index of the future position with respect to the current index on the path. */
+    int getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const;
+
+    /** Returns the index of the future position with respect to the current index on the path. */
+    Vector2f getPosition(int index) const;
+
+    Location getLast() const;
+
+    inline vector<LevelCell> toSFML() const {
+        vector<LevelCell> sfml;
+        if(path.size() == 0) { return sfml; }
+        int end = path.size() - 1;
+
+        Location start(path[0].getLocation().y, path[0].getLocation().x);
+        sfml.push_back(LevelCell(start, 1));
+        for (int i = 1; i < end; i++) {
+            sfml.push_back(LevelCell(Location(path[i].getLocation().y,path[i].getLocation().x), 2));
+        }
+        Location endd(path[end].getLocation().y, path[end].getLocation().x);
+        sfml.push_back(LevelCell(endd, 3));
+        return sfml;
+    }
+
+
     /** Prints path. */
     void print() const;
 
     /** Draws the path on the window. */
     inline void draw(RenderWindow* window) const {
+        if (path.size() == 0) { return; }
 
         // Draw start.
         Location startLocation = Location(path[0].getLocation().y, path[0].getLocation().x);

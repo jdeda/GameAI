@@ -16,6 +16,7 @@
 #include "tables/tables.h"
 #include "character/character.h"
 #include "kinematic/kinematic.h"
+#include "hparams/hyperparameters.h"
 #include "steering/steering.h"
 #include "steering/steeringoutput.h"
 #include "graph/graph.h"
@@ -143,11 +144,11 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 	VisualizeSwitch(algorithm, maze, start, end);
 }
 
-
-Path getPath(Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
-Location start(start_.x, start_.y);
-Location end(end_.x, end_.y);
-cout << "Getting path..." << endl;
+/** Returns path from start to end in the graph. */
+Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
+	Location start = mapToLevel(level.rows, mappingScale, start_);
+	cout << "START: "<< start.x << " " << start.y << endl;
+	Location end = mapToLevel(level.rows, mappingScale, end_);
 	switch (algorithm) {
 		case DIJKSTRA:
 			{
@@ -184,12 +185,13 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	Level level = generateCharacterLevel();
 
 	cout << "Generating graph representation of level..." << endl;
-	Graph graph = levelToGraph(level);
+	Graph graph = levelToGraph(level, true);
+	graph.printy();
 
 	cout << "Generating scene assests..." << endl;
-	vector<Crumb> crumbs = vector<Crumb>(); // TODO: positions...
-    for(int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
-	float scale = 0.05;
+	vector<Crumb> crumbs = vector<Crumb>();
+	for (int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
+	float scale = 0.90 / SIZE;
 	Texture texture;
 	texture.loadFromFile("assets/boid.png");
 	Character character(&crumbs);
@@ -197,17 +199,37 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	character.texture = texture;
 	character.sprite = *(new Sprite(texture));
 	character.sprite.setScale(scale, scale);
-	character.sprite.setPosition(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	Vector2f start = mapToWindow(SIZE, Location(1, 1));
 	Kinematic initialState;
-	initialState.position = Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2);
+	initialState.position = start;
 	character.setKinematic(initialState);
 	character.update(SteeringOutput(), 0, true);
 	Mouse mouse;
 	Clock clock;
 
+	cout << "Rendering static level pieces..." << endl;
+	RenderTexture levelTexture;
+	levelTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
+	auto levelSFML = level.toSFML();
+	levelTexture.clear(sf::Color{ 255,255,255,0 });
+	for (int i = 0; i < level.rows; i++) {
+		for (int j = 0; j < level.cols; j++) {
+			levelTexture.draw(levelSFML[i][j]);
+		}
+	}
+	levelTexture.display();
+	Sprite staticLevel(levelTexture.getTexture());
+	Path path;
+	Sprite staticPath;
+	RenderTexture pathTexture;
+	pathTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
+	auto pathSFML = path.toSFML();
+
 	cout << "Rendering level..." << endl;
 	SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
-	Path path;
+	FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	bool followingPath = false;
+	bool newPathExists = false;
 	while (sceneView.scene.isOpen()) {
 		float dt = clock.restart().asSeconds();
 		Event event;
@@ -217,18 +239,47 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					sceneView.scene.close();
 					break;
 				case Event::MouseButtonPressed:
-					// path = getPath(algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition()));
-					break;
-				break;
+					if (!followingPath) {
+						cout << "\n\nGetting path..." << endl;
+						path = Path();
+						auto pp =character.getPosition();
+						cout << "OK:" << pp.x << " " << pp.y << endl;
+						path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
+						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+						cout << "Got path." << endl;
+						path.print();
+						followingPath = true;
+						newPathExists = true;
 
+						pathSFML = path.toSFML();
+						pathTexture.clear(sf::Color{ 255,255,255,0 });
+						for (const auto& element : pathSFML) { pathTexture.draw(element); }
+						pathTexture.display();
+						staticPath = Sprite(pathTexture.getTexture());
+					}
+					break;
 			}
 		}
 
 		// Re-render scene.
-		sceneView.scene.clear(Color(255, 255, 255));
-		cout << "drawing level...";
-		level.draw(&sceneView.scene);
-		cout << "done!\n\n";
+		if (!path.isEmpty()) {
+			if (mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
+				auto p = mapToLevel(MAZE_X, SIZE, character.getPosition());
+				cout << p.x << " " << p.y << endl;
+				followingPath = false;
+			}
+		}
+		if (newPathExists) {
+			SteeringOutput acceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
+			cout << "accel: " << acceleration.linearAcceleration.x << " " << acceleration.linearAcceleration.y << endl << endl;
+			character.update(acceleration, dt, true);
+		}
+
+
+		sceneView.scene.clear(sf::Color{ 255,255,255,255 });
+		sceneView.scene.draw(staticLevel);
+		sceneView.scene.draw(staticPath);
+		sceneView.scene.draw(character.sprite);
 		sceneView.scene.display();
 	}
 }
@@ -304,7 +355,7 @@ void Test(int iterations) {
 	Location end(52, 50);
 	Maze maze(MAZE_X, MAZE_Y);
 	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2 };
-	for(auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
+	for (auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
 }
 
 /** Runs the program.*/
@@ -333,7 +384,7 @@ int main(int argc, char* argv[]) {
 	// 		fail("invalid visualizer choice");
 	// 		break;
 	// }
-	CharacterGraphVisualizer(Algorithm::DIJKSTRA);
+	CharacterGraphVisualizer(Algorithm::A_STAR_H1);
 
 
 

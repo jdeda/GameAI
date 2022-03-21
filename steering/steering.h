@@ -14,6 +14,8 @@
 #include "../kinematic/kinematic.h"
 #include "../hparams/hyperparameters.h"
 #include "../math/vmath.h"
+#include "../search/search.h"
+#include "../level/location.h"
 #include "steeringoutput.h"
 
 using namespace sf;
@@ -24,7 +26,7 @@ using namespace std;
 /** Interface representing steering behaviors. */
 class SteeringBehavior
 {
-    public:
+public:
     /**
      * Calculates accelerations for variable matching of relative variable (when implemented concretely).
      * @param character the character kinematic (immutable)
@@ -38,14 +40,14 @@ class SteeringBehavior
 class Position : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetSpeed;
     float radiusOfArrival;
     float radiusOfDeceleration;
     float maxSpeed;
 
-    public:
+public:
     /**
      * @brief Construct a new Position object with all its hyperparameters.
      *
@@ -66,14 +68,14 @@ class Position : SteeringBehavior
 class Orientation : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetRotation;
     float radiusOfArrival;
     float radiusOfDeceleration;
     float maxRotation;
 
-    public:
+public:
     /**
      * @brief Construct a new Orientation with all its hyperparameters
      *
@@ -104,11 +106,11 @@ class Orientation : SteeringBehavior
 class Velocity : SteeringBehavior
 {
 
-    private:
+private:
     /** Algorithm Hyperparameters. */
     float timeToReachTargetVelocity;
 
-    public:
+public:
     /**
      * @brief Construct a new Velocity object with all its hyperparameters
      *
@@ -134,7 +136,7 @@ class Rotation : SteeringBehavior
 class VelocityMatch : Velocity
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Velocity Match object with all its hyperparameters
      *
@@ -156,7 +158,7 @@ class VelocityMatch : Velocity
 class Arrive : Position
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Arrive object with all its hyperparameters.
      *
@@ -172,6 +174,11 @@ class Arrive : Position
 
         // Only use target position from target kinematic.
         Vector2f targetP = target.position;
+        cout << character.position.x << " " << character.position.y << endl;
+        cout << target.position.x << " " << target.position.y << endl;
+                // cout << currentPathIndex << endl;
+        // cout << newTargetPathIndex << endl << endl;.
+
 
         // Setup output.
         SteeringOutput output;
@@ -184,6 +191,7 @@ class Arrive : Position
 
         //  Set goal speed.
         if (distance < this->getRadiusOfArrival()) {
+            // cout << "YAY!"<< endl;
             goalLinearSpeed = 0;
         }
         else if (distance > this->getRadiusOfDeceleration()) {
@@ -211,7 +219,7 @@ class Arrive : Position
 class Align : Orientation
 {
 
-    public:
+public:
     /**
      * @brief Construct a new Align with all its hyperparameters
      *
@@ -252,6 +260,30 @@ class Align : Orientation
         output.linearAcceleration = Vector2f(0.f, 0.f);
 
         return output;
+    }
+};
+
+class FollowPath : Arrive
+{
+private:
+    Path path;
+    float pathOffset;
+    int currentPathIndex;
+    float predictionTime;
+
+public:
+
+    FollowPath(const Path& p, float o, float idx, float pt, float t, float r1, float r2, float s);
+
+    inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+        cout << "\nFollowPath " << endl;
+        Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
+        currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
+        int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
+        Kinematic newTarget;
+        newTarget.position = path.getPosition(newTargetPathIndex);
+        if(newTargetPathIndex == path.size()) { return SteeringOutput(); }
+        return Arrive::calculateAcceleration(character, newTarget);
     }
 };
 
