@@ -147,7 +147,6 @@ void HugeGraphVisualizer(Algorithm algorithm) {
 /** Returns path from start to end in the graph. */
 Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const Graph& graph, const Vector2f& start_, const Vector2f& end_) {
 	Location start = mapToLevel(level.rows, mappingScale, start_);
-	cout << "START: "<< start.x << " " << start.y << endl;
 	Location end = mapToLevel(level.rows, mappingScale, end_);
 	switch (algorithm) {
 		case DIJKSTRA:
@@ -242,14 +241,16 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					if (!followingPath) {
 						cout << "\n\nGetting path..." << endl;
 						path = Path();
-						auto pp =character.getPosition();
-						cout << "OK:" << pp.x << " " << pp.y << endl;
+						// auto pp =character.getPosition();
+						// cout << "OK:" << pp.x << " " << pp.y << endl;
 						path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
-						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+						newPathExists = true;
 						cout << "Got path." << endl;
 						path.print();
+
+						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 						followingPath = true;
-						newPathExists = true;
+
 
 						pathSFML = path.toSFML();
 						pathTexture.clear(sf::Color{ 255,255,255,0 });
@@ -264,14 +265,14 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		// Re-render scene.
 		if (!path.isEmpty()) {
 			if (mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
-				auto p = mapToLevel(MAZE_X, SIZE, character.getPosition());
-				cout << p.x << " " << p.y << endl;
+				// auto p = mapToLevel(MAZE_X, SIZE, character.getPosition());
+				// cout << p.x << " " << p.y << endl;
 				followingPath = false;
 			}
 		}
 		if (newPathExists) {
 			SteeringOutput acceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
-			cout << "accel: " << acceleration.linearAcceleration.x << " " << acceleration.linearAcceleration.y << endl << endl;
+			// cout << "accel: " << acceleration.linearAcceleration.x << " " << acceleration.linearAcceleration.y << endl << endl;
 			character.update(acceleration, dt, true);
 		}
 
