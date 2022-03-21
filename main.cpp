@@ -348,7 +348,7 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 	}
 }
 
-/** Prints runtimes of all search algorithms to console. */
+/** Prints runtimes of all search algorithms on big graph to console. */
 void Test(int iterations) {
 	MAZE_X = 100;
 	MAZE_Y = 100;
@@ -364,28 +364,27 @@ int main(int argc, char* argv[]) {
 
 	srand(1);
 
-	// greeting();
-	// Visualizer visualizer = getVisualizer();
-	// Algorithm algorithm = getAlgorithm();
+	greeting();
+	Visualizer visualizer = getVisualizer();
+	Algorithm algorithm = getAlgorithm();
 
-	// switch (visualizer) {
-	// 	case Visualizer::small:
-	// 		SmallGraphVisualizer(algorithm);
-	// 		break;
-	// 	case Visualizer::big:
-	// 		BigGraphVisualizer(algorithm);
-	// 		break;
-	// 	case Visualizer::huge:
-	// 		HugeGraphVisualizer(algorithm);
-	// 		break;
-	// 	case Visualizer::character:
-	// 		CharacterGraphVisualizer(algorithm);
-	// 		break;
-	// 	case Visualizer::INVALID_VIS:
-	// 		fail("invalid visualizer choice");
-	// 		break;
-	// }
-	CharacterGraphVisualizer(Algorithm::A_STAR_H1);
+	switch (visualizer) {
+		case Visualizer::small:
+			SmallGraphVisualizer(algorithm);
+			break;
+		case Visualizer::big:
+			BigGraphVisualizer(algorithm);
+			break;
+		case Visualizer::huge:
+			HugeGraphVisualizer(algorithm);
+			break;
+		case Visualizer::character:
+			CharacterGraphVisualizer(algorithm);
+			break;
+		case Visualizer::INVALID_VIS:
+			fail("invalid visualizer choice");
+			break;
+	}
 
 
 
