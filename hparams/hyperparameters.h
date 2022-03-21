@@ -30,10 +30,10 @@ const float TIME_TO_REACH_TARGET_ROTATION = 0.25;
 const float TIME_TO_REACH_TARGET_VELOCITY = 0.25;
 
 const float RADIUS_OF_ARRIVAL = 10.f;
-const float RADIUS_OF_DECELERATION = 200.f;
+const float RADIUS_OF_DECELERATION = 25.f;
 
 
 const float PATH_OFFSET = 1;
-const float PREDICTION_TIME = 0.5;
+const float PREDICTION_TIME = 0.15;
 
 #endif
