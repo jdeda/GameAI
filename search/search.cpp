@@ -95,8 +95,8 @@ int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const
         }
     }
     cout << "OH FUCK" << endl;
-    // exit(99);
-    return -1;
+    // You could just return the next index to be safe?
+    return currentIndexOnPath + 1; // Cause segfault?
 }
 
 Vector2f Path::getPosition(int index) const {

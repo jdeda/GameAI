@@ -35,9 +35,7 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 	Vector2f vector;
 	vector.x = location.x * mappingScale;
 	vector.y = location.y * mappingScale;
-	// vector.x += mappingScale;
-	// vector.y += mappingScale;
-	cout << "Mapped from: " << location.x << " " << location.y << endl;
-	cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
+	// cout << "Mapped from: " << location.x << " " << location.y << endl;
+	// cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
 	return vector;
 }

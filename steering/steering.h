@@ -279,10 +279,10 @@ public:
         cout << "\nFollowPath " << endl;
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
-        int newTargetPathIndex = currentPathIndex + pathOffset;
+        int newTargetPathIndex = currentPathIndex >= path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
         Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
-        if(newTargetPathIndex == path.size()) { return SteeringOutput(); }
+        if(newTargetPathIndex >= path.size()) { return SteeringOutput(); }
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };
