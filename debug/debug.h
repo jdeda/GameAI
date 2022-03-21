@@ -11,7 +11,7 @@ using namespace sf;
 void debug(Vector2f v);
 
 /* Debug output (prints the sprites coordinates). */
-void debug(const Character &character);
+void debug(const Character& character);
 
 /** Exits program and displays message to console*/
 void fail(string message);

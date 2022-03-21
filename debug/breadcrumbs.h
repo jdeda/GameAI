@@ -2,8 +2,6 @@
 #define BCRUMBS_H
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
-#include <vector>
 
 using namespace sf;
 
@@ -12,14 +10,14 @@ const int NUM_CRUMBS = 20;
 class Crumb : sf::CircleShape
 {
 
-private:
+    private:
     int id;
 
-public:
-    Crumb(const int id, const Vector2f &pos);
+    public:
+    Crumb(const int id, const Vector2f& pos);
     void drop(float x, float y);
     void drop(Vector2f position);
-    void draw(RenderWindow *window);
+    void draw(RenderWindow* window);
     Vector2f pos();
 };
 

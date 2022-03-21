@@ -9,13 +9,14 @@ using namespace sf;
 class SteeringOutput
 {
 
-public:
+    public:
     /** Linear acceleration (d/t^2). */
     Vector2f linearAcceleration;
 
     /** Angular acceleration (theta/t^2). */
     float angularAcceleration;
 
+    /** Default constructor for SteeringOutput. */
     SteeringOutput();
 };
 
