@@ -247,6 +247,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 						newPathExists = true;
 						cout << "Got path." << endl;
 						path.print();
+						cout << "Explored nodes: " << path.exploredNodes << endl;
 
 						pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 						followingPath = true;
@@ -292,6 +293,7 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 			{
 				cout << AlgorithmStrings[0] << " Runtime: " << endl;
 				float average = 0;
+				float avgExplored = 0;
 				for (int i = 0; i < iterations; i++) {
 					Dijkstra search(graph, start, end);
 					auto start = steady_clock::now();
@@ -299,17 +301,21 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 					auto end = steady_clock::now();
 					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
 					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					cout << "\t             " << path.exploredNodes << " nodes explored" << endl << endl;
 					average += elapsed;
+					avgExplored += path.exploredNodes;
 				}
 				average /= iterations;
-				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				avgExplored /= avgExplored;
+				cout << "Average runtime over " << iterations << " iterations: " << average << " seconds" << endl;
+				cout << "Average memory over " << iterations << " iterations: " << (int)avgExplored << " nodes explored" << endl << endl;
 				break;
-
 			}
 		case A_STAR_H1:
 			{
 				cout << AlgorithmStrings[1] << " Runtime: " << endl;
 				float average = 0;
+				float avgExplored = 0;
 				for (int i = 0; i < iterations; i++) {
 					AStar search(graph, start, end, ManhattanHeuristic(end));
 					auto start = steady_clock::now();
@@ -317,16 +323,22 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 					auto end = steady_clock::now();
 					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
 					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					cout << "\t             " << path.exploredNodes << " nodes explored" << endl << endl;
 					average += elapsed;
+					avgExplored += path.exploredNodes;
 				}
 				average /= iterations;
-				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				avgExplored /= avgExplored;
+				cout << "Average runtime over " << iterations << " iterations: " << average << " seconds" << endl;
+				cout << "Average memory over " << iterations << " iterations: " << (int)avgExplored << " nodes explored" << endl << endl;
+
 				break;
 			}
 		case A_STAR_H2:
 			{
-				cout << AlgorithmStrings[2] << " Runtimes: " << endl;
+				cout << AlgorithmStrings[2] << " Runtime: " << endl;
 				float average = 0;
+				float avgExplored = 0;
 				for (int i = 0; i < iterations; i++) {
 					AStar search(graph, start, end, EuclideanHeuristic(end));
 					auto start = steady_clock::now();
@@ -334,10 +346,14 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 					auto end = steady_clock::now();
 					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
 					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					cout << "\t             " << path.exploredNodes << " nodes explored" << endl << endl;
 					average += elapsed;
+					avgExplored += path.exploredNodes;
 				}
 				average /= iterations;
-				cout << "Average runtime over " << iterations << " iterations: " << average << endl << endl;
+				avgExplored /= avgExplored;
+				cout << "Average runtime over " << iterations << " iterations: " << average << " seconds" << endl;
+				cout << "Average memory over " << iterations << " iterations: " << (int)avgExplored << " nodes explored" << endl << endl;
 				break;
 			}
 		case INVALID_ALG:
@@ -354,6 +370,11 @@ void Test(int iterations) {
 	MAZE_Y = 100;
 	Location start(1, 1);
 	Location end(52, 50);
+	// MAZE_X = 20;
+	// MAZE_Y = 20;
+	// Location start(1, 1);
+	// Location end(1, 18);
+
 	Maze maze(MAZE_X, MAZE_Y);
 	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2 };
 	for (auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
@@ -366,6 +387,10 @@ int main(int argc, char* argv[]) {
 
 	greeting();
 	Visualizer visualizer = getVisualizer();
+	if (visualizer == Visualizer::test) {
+		Test(10);
+		exit(0);
+	}
 	Algorithm algorithm = getAlgorithm();
 
 	switch (visualizer) {
@@ -381,7 +406,7 @@ int main(int argc, char* argv[]) {
 		case Visualizer::character:
 			CharacterGraphVisualizer(algorithm);
 			break;
-		case Visualizer::INVALID_VIS:
+		default:
 			fail("invalid visualizer choice");
 			break;
 	}

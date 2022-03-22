@@ -57,10 +57,13 @@ class GraphNodeRecord
 class Path
 {
     private:
+
     /** The list of GraphNodeRecords in the path (order matters). */
     vector<GraphNodeRecord> path;
 
     public:
+
+    int exploredNodes = 0; // TODO: Make private
 
     /** Returns size of path. */
     int size() const;
@@ -187,7 +190,6 @@ class Search
     Location getStart() const;
     Location getEnd() const;
 };
-
 
 /**
  * Heuristic is function that returns a value representing a cost

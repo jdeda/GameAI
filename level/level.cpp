@@ -297,6 +297,35 @@ Graph levelToGraph(const Level& level) {
         }
     }
 
+    // // Print out the number of verticies.
+    // int inLevelCount = 0;
+    // int directionsCount = 0;
+    // for (int i = 0; i < level.rows; i++) {
+    //     for (int j = 0; j < level.cols; j++) {
+    //         if (level.cells[i][j].inLevel) {
+    //             inLevelCount += 1;
+    //             for (int k = 0; k < 4; k++) {
+    //                 if (level.cells[i][j].directions[k]) {
+    //                     directionsCount += 1;
+    //                 }
+    //             }
+    //         }
+    //         Location(i, j);
+    //     }
+    // }
+    // cout << "allLevelCount = " << level.rows * level.cols << endl;
+    // cout << "inLevelCount = " << inLevelCount << endl;
+    // cout << "directionsCount = " << directionsCount << endl;
+
+    // int edgesCount = 0;
+    // for (auto const& node : nodes) {
+    //     edgesCount += node.second.getEdges().size();
+    // }
+    // cout << "edgesCount = " << edgesCount << endl;
+
+
+    // Print out the number of edges.
+
     // Return the graph.
     return Graph(level.rows, level.cols, nodes);
 }

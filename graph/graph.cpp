@@ -76,9 +76,10 @@ namespace graph {
         cols = graph.cols;
     }
 
-
     int Graph::getRows() { return rows; }
+    
     int Graph::getCols() { return cols; }
+   
     void Graph::print() {
         cout << rows << endl;
         cout << cols << endl;

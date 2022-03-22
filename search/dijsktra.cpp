@@ -40,6 +40,7 @@ Path Dijkstra::search() const {
             path.add(start);
             for (int i = pathList.size() - 1; i > 0; i--) { path.add(pathList[i]); }
             path.add(end);
+            path.exploredNodes = closedList.size();
             return path;
         }
 

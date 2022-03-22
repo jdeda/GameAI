@@ -24,6 +24,7 @@ enum Visualizer
     big,
     huge,
     character,
+    test,
     INVALID_VIS
 };
 

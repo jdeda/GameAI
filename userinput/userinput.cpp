@@ -23,7 +23,8 @@ vector<string> VisualizerStrings{
 	"Small Graph",
 	"Big Graph",
 	"Huge Graph",
-	"Character Steering Graph"
+	"Character Steering Graph",
+	"Testing"
 };
 
 /** Returns an Algorithm if input is valid, otherwise fail program. */
