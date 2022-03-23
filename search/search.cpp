@@ -139,3 +139,9 @@ EuclideanHeuristic::EuclideanHeuristic(const Location& goal) : Heuristic(goal) {
 float EuclideanHeuristic::compute(const Location& location) const {
     return sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
 }
+
+CustomHeuristic::CustomHeuristic(const Location& goal) : Heuristic(goal) {}
+
+float CustomHeuristic::compute(const Location& location) const {
+        return 10.f * sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
+}

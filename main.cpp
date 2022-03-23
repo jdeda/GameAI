@@ -39,6 +39,8 @@ float MAZE_Y = 0.f;
 float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
+const bool BREAD_CRUMBS = true;
+
 /** Renders the path through the maze.*/
 void Visualize(const Maze& maze, const Path& path) {
 	cout << "Rendering solution..." << endl;
@@ -71,7 +73,7 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 			{
 				Dijkstra search(maze.getGraph(), start, end);
 				Path path = search.search();
-				Visualize(maze, path);
+				Visualize(maze, path );
 				break;
 			}
 		case A_STAR_H1:
@@ -84,6 +86,13 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 		case A_STAR_H2:
 			{
 				AStar search(maze.getGraph(), start, end, EuclideanHeuristic(end));
+				Path path = search.search();
+				Visualize(maze, path);
+				break;
+			}
+		case A_STAR_CUSTOM:
+			{
+				AStar search(maze.getGraph(), start, end, CustomHeuristic(end));
 				Path path = search.search();
 				Visualize(maze, path);
 				break;
@@ -164,6 +173,12 @@ Path getPath(float mappingScale, Algorithm algorithm, const Level& level, const 
 				AStar search(graph, start, end, EuclideanHeuristic(end));
 				return search.search();
 			}
+		case A_STAR_CUSTOM:
+			{
+				AStar search(graph, start, end, CustomHeuristic(end));
+				return search.search();
+			}
+
 		default:
 			{
 				fail("invalid algorithm choice");
@@ -190,9 +205,9 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 	cout << "Generating scene assests..." << endl;
 	vector<Crumb> crumbs = vector<Crumb>();
 	for (int i = 0; i < NUM_CRUMBS; i++) { crumbs.push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2))); }
-	float scale = 0.90 / SIZE;
+	float scale = 1.5 / SIZE;
 	Texture texture;
-	texture.loadFromFile("assets/boid.png");
+	texture.loadFromFile("assets/circle.png");
 	Character character(&crumbs);
 	character.scale = scale;
 	character.texture = texture;
@@ -241,8 +256,6 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 					if (!followingPath) {
 						cout << "\n\nGetting path..." << endl;
 						path = Path();
-						// auto pp =character.getPosition();
-						// cout << "OK:" << pp.x << " " << pp.y << endl;
 						path = getPath(SIZE, algorithm, level, graph, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
 						newPathExists = true;
 						cout << "Got path." << endl;
@@ -266,14 +279,11 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		// Re-render scene.
 		if (!path.isEmpty()) {
 			if (mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
-				// auto p = mapToLevel(MAZE_X, SIZE, character.getPosition());
-				// cout << p.x << " " << p.y << endl;
 				followingPath = false;
 			}
 		}
 		if (newPathExists) {
 			SteeringOutput acceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
-			// cout << "accel: " << acceleration.linearAcceleration.x << " " << acceleration.linearAcceleration.y << endl << endl;
 			character.update(acceleration, dt, true);
 		}
 
@@ -282,6 +292,7 @@ void CharacterGraphVisualizer(Algorithm algorithm) {
 		sceneView.scene.draw(staticLevel);
 		sceneView.scene.draw(staticPath);
 		sceneView.scene.draw(character.sprite);
+		if (BREAD_CRUMBS) { for (int i = 0; i < crumbs.size(); i++) { crumbs[i].draw(&sceneView.scene); } }
 		sceneView.scene.display();
 	}
 }
@@ -356,6 +367,29 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 				cout << "Average memory over " << iterations << " iterations: " << (int)avgExplored << " nodes explored" << endl << endl;
 				break;
 			}
+
+		case A_STAR_CUSTOM:
+			{
+				cout << AlgorithmStrings[3] << " Runtime: " << endl;
+				float average = 0;
+				float avgExplored = 0;
+				for (int i = 0; i < iterations; i++) {
+					AStar search(graph, start, end, CustomHeuristic(end));
+					auto start = steady_clock::now();
+					Path path = search.search();
+					auto end = steady_clock::now();
+					auto elapsed = duration_cast<chrono::seconds>(end - start).count();
+					cout << "\tIteration " << i << ": " << elapsed << " seconds" << endl;
+					cout << "\t             " << path.exploredNodes << " nodes explored" << endl << endl;
+					average += elapsed;
+					avgExplored += path.exploredNodes;
+				}
+				average /= iterations;
+				avgExplored /= avgExplored;
+				cout << "Average runtime over " << iterations << " iterations: " << average << " seconds" << endl;
+				cout << "Average memory over " << iterations << " iterations: " << (int)avgExplored << " nodes explored" << endl << endl;
+				break;
+			}
 		case INVALID_ALG:
 			{
 				fail("invalid algorithm choice");
@@ -368,16 +402,33 @@ void Tester(int iterations, Algorithm algorithm, const Graph& graph, const Locat
 void Test(int iterations) {
 	MAZE_X = 100;
 	MAZE_Y = 100;
-	Location start(1, 1);
-	Location end(52, 50);
-	// MAZE_X = 20;
-	// MAZE_Y = 20;
-	// Location start(1, 1);
-	// Location end(1, 18);
-
 	Maze maze(MAZE_X, MAZE_Y);
-	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2 };
-	for (auto algorithm : algorithms) { Tester(iterations, algorithm, maze.getGraph(), start, end); }
+	auto l = maze.getLevel();
+
+	vector<Location> starts;
+	starts.push_back(Location(1, 1));
+	starts.push_back(Location(52, 50));
+	starts.push_back(Location(81, 11));
+	starts.push_back(Location(10, 90));
+	starts.push_back(Location(98, 98));
+	vector<Location> ends;
+	ends.push_back(Location(52, 50));
+	ends.push_back(Location(1, 1));
+	ends.push_back(Location(10, 90));
+	ends.push_back(Location(81, 11));
+	ends.push_back(Location(1, 1));
+
+	auto algorithms = { Algorithm::DIJKSTRA, Algorithm::A_STAR_H1, Algorithm::A_STAR_H2, Algorithm::A_STAR_CUSTOM };
+	for (int i = 0; i < starts.size(); i++) {
+		cout << "======================================================" << endl;
+		cout << "Locations " << i << endl;
+		cout << "Start: (" << starts[i].x << ", " << starts[i].y << ")" << endl;
+		cout << "End: (" << ends[i].x << ", " << ends[i].y << ")" << endl;
+		for (auto algorithm : algorithms) {
+			Tester(iterations, algorithm, maze.getGraph(), starts[i], ends[i]);
+		}
+		cout << "======================================================" << endl << endl;
+	}
 }
 
 /** Runs the program.*/

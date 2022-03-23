@@ -16,7 +16,8 @@ void greeting() {
 vector<string> AlgorithmStrings{
 	"Dijkstra's",
 	"A* (manhattan heuristic)",
-	"A* (euclidean heuristic)"
+	"A* (euclidean heuristic)",
+	"A* (custom heuristic)"
 };
 
 vector<string> VisualizerStrings{

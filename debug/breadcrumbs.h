@@ -5,7 +5,7 @@
 
 using namespace sf;
 
-const int NUM_CRUMBS = 20;
+const int NUM_CRUMBS = 10;
 
 class Crumb : sf::CircleShape
 {

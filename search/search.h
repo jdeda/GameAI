@@ -238,4 +238,16 @@ class EuclideanHeuristic : public Heuristic
     float compute(const Location& location) const;
 };
 
+
+/** Weighted distance heuristic. */
+class CustomHeuristic : public Heuristic
+{
+    public:
+
+    /** Default constructor. */
+    CustomHeuristic(const Location& goal);
+
+    /** Returns heuristic value of location to goal location. */
+    float compute(const Location& location) const;
+};
 #endif

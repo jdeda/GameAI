@@ -11,6 +11,7 @@ enum Algorithm
     DIJKSTRA,
     A_STAR_H1,
     A_STAR_H2,
+    A_STAR_CUSTOM,
     INVALID_ALG
 };
 
