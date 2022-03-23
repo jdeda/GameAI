@@ -10,7 +10,7 @@ using namespace sf;
 /** X and Y coordinates in a level. */
 class Location
 {
-    public:
+public:
 
     /** Constructs a location with all its fields. */
     Location(int a, int b);

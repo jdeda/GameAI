@@ -18,7 +18,7 @@ enum GraphNodeRecordState
 class GraphNodeRecord
 {
 
-    private:
+private:
     /** GraphNode to record.*/
     GraphNode node;
 
@@ -34,7 +34,7 @@ class GraphNodeRecord
     /** Connection between this record to another. */
     Edge edge;
 
-    public:
+public:
     /* Construct a GraphNodeRecord with all its fields. */
     GraphNodeRecord(const GraphNode& n, const GraphNodeRecordState& s);
 
@@ -56,12 +56,12 @@ class GraphNodeRecord
 /** Represents the list of GraphRecords that complete a path. */
 class Path
 {
-    private:
+private:
 
     /** The list of GraphNodeRecords in the path (order matters). */
     vector<GraphNodeRecord> path;
 
-    public:
+public:
 
     int exploredNodes = 0; // TODO: Make private
 
@@ -105,13 +105,13 @@ class Path
 
     inline vector<LevelCell> toSFML() const {
         vector<LevelCell> sfml;
-        if(path.size() == 0) { return sfml; }
+        if (path.size() == 0) { return sfml; }
         int end = path.size() - 1;
 
         Location start(path[0].getLocation().y, path[0].getLocation().x);
         sfml.push_back(LevelCell(start, 1));
         for (int i = 1; i < end; i++) {
-            sfml.push_back(LevelCell(Location(path[i].getLocation().y,path[i].getLocation().x), 2));
+            sfml.push_back(LevelCell(Location(path[i].getLocation().y, path[i].getLocation().x), 2));
         }
         Location endd(path[end].getLocation().y, path[end].getLocation().x);
         sfml.push_back(LevelCell(endd, 3));
@@ -149,7 +149,7 @@ class Path
 class Search
 {
 
-    private:
+private:
 
     /** The graph to search. */
     const graph::Graph graph;
@@ -160,7 +160,7 @@ class Search
     /** The end location in the graph. */
     const Location end;
 
-    public:
+public:
 
     /** Default constructor for Search class. */
     Search(const Graph& graph, const Location& start, const Location& end);
@@ -198,10 +198,10 @@ class Search
 class Heuristic
 {
 
-    private:
+private:
     Location goalLocation;
 
-    public:
+public:
 
     /** Initializes class with the */
     Heuristic(const Location& goal);
@@ -217,7 +217,7 @@ class Heuristic
 class ManhattanHeuristic : public Heuristic
 {
 
-    public:
+public:
 
     /** Default constructor. */
     ManhattanHeuristic(const Location& goal);
@@ -229,7 +229,7 @@ class ManhattanHeuristic : public Heuristic
 /** Euclidean distance heuristic. */
 class EuclideanHeuristic : public Heuristic
 {
-    public:
+public:
 
     /** Default constructor. */
     EuclideanHeuristic(const Location& goal);
@@ -242,7 +242,7 @@ class EuclideanHeuristic : public Heuristic
 /** Weighted distance heuristic. */
 class CustomHeuristic : public Heuristic
 {
-    public:
+public:
 
     /** Default constructor. */
     CustomHeuristic(const Location& goal);

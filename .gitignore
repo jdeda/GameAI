@@ -1,0 +1,8 @@
+# Git Ignore File
+
+# Ignore object files.
+*.o
+
+# Ignore VS-Code Workspace.
+*.code-workspace
+*.vscode/

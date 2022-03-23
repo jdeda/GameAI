@@ -6,10 +6,10 @@
 class AStar : public Search
 {
 
-    private:
+private:
     const Heuristic* heuristic;
 
-    public:
+public:
     /** Default constructor. */
     AStar(const Graph& graph, const Location& start, const Location& end, const Heuristic& heuristic);
 

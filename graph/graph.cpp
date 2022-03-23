@@ -77,9 +77,9 @@ namespace graph {
     }
 
     int Graph::getRows() { return rows; }
-    
+
     int Graph::getCols() { return cols; }
-   
+
     void Graph::print() {
         cout << rows << endl;
         cout << cols << endl;
@@ -98,7 +98,7 @@ namespace graph {
                 // cout << "===========================================" << endl;
                 // cout << "from " << "(" << i << ", " << j << ")" << endl << endl;
                 GraphNode node = quantize(Location(i, j));
-                for(const auto& edge: node.getEdges()) {
+                for (const auto& edge : node.getEdges()) {
                     Location from = localize(edge.getFromVertex());
                     Location to = localize(edge.getToVertex());
                     // cout << "\tto " << "(" << to.x << ", " << to.y << ")";

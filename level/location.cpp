@@ -5,8 +5,8 @@
 using namespace sf;
 
 Location::Location(int a, int b) {
-    x = a;
-    y = b;
+	x = a;
+	y = b;
 }
 
 Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
