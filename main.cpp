@@ -23,8 +23,10 @@
 #include "level/level.h"
 #include "maze/maze.h"
 #include "search/search.h"
-#include "search/dijsktra.h"
 #include "search/a*.h"
+#include "decision/decisiontree.h"
+#include "decision/behaviortree.h"
+#include "decision/decisiontreelearning.h"
 
 using namespace std;
 using namespace chrono;
@@ -42,9 +44,16 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 const bool BREAD_CRUMBS = true;
 
 int main(int argc, char* argv[]) {
-
 	srand(1);
-
-
+	auto visualizer = getVisualizer();
+	if (visualizer == NULL) { fail("invalid visualizer choice"); }
+	switch (*visualizer) {
+		case Visualizer::DecisionTree:
+			break;
+		case Visualizer::BehaviorTree:
+			break;
+		case Visualizer::DecisionTreeLearning:
+			break;
+	};
 	return EXIT_SUCCESS;
 }
