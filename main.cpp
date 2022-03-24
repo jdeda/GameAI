@@ -39,7 +39,7 @@ float MAZE_Y = 0.f;
 float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
-const bool BREAD_CRUMBS = true;
+const bool BREAD_CRUMBS = false;
 
 /** Renders the path through the maze.*/
 void Visualize(const Maze& maze, const Path& path) {

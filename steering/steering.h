@@ -272,9 +272,11 @@ public:
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
-        int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
+        int newTargetPathIndex = currentPathIndex +  1 == path.size() ? currentPathIndex : currentPathIndex + pathOffset;
         Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
+        cout << futurePosition.x << " " << futurePosition.y << endl;
+        cout << newTargetPathIndex << endl << endl;
         if(newTargetPathIndex == path.size()) { return SteeringOutput(); }
         return Arrive::calculateAcceleration(character, newTarget);
     }
