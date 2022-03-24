@@ -40,14 +40,19 @@ Path Dijkstra::search() const {
             path.add(start);
             for (int i = pathList.size() - 1; i > 0; i--) { path.add(pathList[i]); }
             path.add(end);
+            path.exploredNodes = closedList.size();
             return path;
         }
 
         // Otherwise get its outgoing edges. // TODO: could fail.
         vector<Edge> edges = Search::getGraph().getOutgoingEdges(current.getNode().getVertex());
 
+        // cout << "\n\n" << current.getLocation().x << " " <<  current.getLocation().y << endl;
         // Find best edge to traverse.
         for (const auto& edge : edges) {
+
+            auto l = Search::localize(edge.getToVertex());
+            // cout << l.x << " " << l.y << endl;
 
             // Get end node and it's cost so far (CSF).
             GraphNode endNode = Search::getGraph().getNode(edge.getToVertex());

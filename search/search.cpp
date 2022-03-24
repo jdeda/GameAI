@@ -86,6 +86,27 @@ void Path::remove(const GraphNodeRecord& record) {
     }
 }
 
+int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const {
+    Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
+    for (int i = 0; i < path.size(); i++) {
+        if (path[i].getLocation() == futureLocation) {
+            return i;
+        }
+    }
+    // cout << "OH NO" << endl;
+    // You could just return the next index to be safe?
+    return currentIndexOnPath + 1; // Cause segfault?
+}
+
+Vector2f Path::getPosition(int index) const {
+    auto temp = mapToWindow(29.0909, path[index].getLocation());
+    return Vector2f(temp.y, temp.x);
+}
+
+Location Path::getLast() const {
+    return path.back().getLocation();
+}
+
 void Path::print() const {
     cout << "Path:" << endl;
     for (const auto& record : path) {
@@ -117,4 +138,10 @@ EuclideanHeuristic::EuclideanHeuristic(const Location& goal) : Heuristic(goal) {
 
 float EuclideanHeuristic::compute(const Location& location) const {
     return sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
+}
+
+CustomHeuristic::CustomHeuristic(const Location& goal) : Heuristic(goal) {}
+
+float CustomHeuristic::compute(const Location& location) const {
+        return 10.f * sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
 }

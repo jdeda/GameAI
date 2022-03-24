@@ -76,9 +76,10 @@ namespace graph {
         cols = graph.cols;
     }
 
-
     int Graph::getRows() { return rows; }
+    
     int Graph::getCols() { return cols; }
+   
     void Graph::print() {
         cout << rows << endl;
         cout << cols << endl;
@@ -88,6 +89,24 @@ namespace graph {
                 cout << "(" << i << ", " << j << "): " << quantize(Location(i, j)).getVertex().getID() << endl;
             }
             cout << endl << endl;
+        }
+    }
+
+    void Graph::printy() {
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                // cout << "===========================================" << endl;
+                // cout << "from " << "(" << i << ", " << j << ")" << endl << endl;
+                GraphNode node = quantize(Location(i, j));
+                for(const auto& edge: node.getEdges()) {
+                    Location from = localize(edge.getFromVertex());
+                    Location to = localize(edge.getToVertex());
+                    // cout << "\tto " << "(" << to.x << ", " << to.y << ")";
+                    // cout << "\tcost = " << edge.getCost() << endl << endl;
+                }
+                // cout << "===========================================" << endl << endl;
+            }
+            // cout << endl << endl;
         }
     }
 };

@@ -2,6 +2,7 @@
 #define LEVEL_H
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <vector>
 #include "../graph/graph.h"
 #include "location.h"
@@ -10,24 +11,41 @@ using namespace std;
 using namespace sf;
 using namespace graph;
 
+
+enum ConnectionCost {
+    normal,
+    pricey,
+    expensive,
+    wall
+};
+
+float mapConnectionCost(ConnectionCost cost);
+
 /** Represents an edge in the level. */
 class Connections
 {
     public:
+
+    /** Cost of a given connection. */
+    ConnectionCost cost = normal;
 
     /** True if connection is within the level. */
     bool inLevel = false;
 
     /** Possible directions at a given time (right, up, down, left). */
     bool directions[4] = { false, false, false, false };
+
+    void setFalse();
+    void setTrue();
 };
 
 /** Represents cell in a Level. */
-class LevelCell : RectangleShape
+class LevelCell : public RectangleShape
 {
 
     public:
 
+    /** Dimensions of the cell. */
     static Vector2f dims;
 
     /** Constructs a level cell via a given connections and location.*/
@@ -36,51 +54,24 @@ class LevelCell : RectangleShape
     /** Constructs a level cell via a given connections and status. */
     LevelCell(const Location& location, int status);
 
+    /** Constructs a level cell via a given connections and ConnectionCost. */
+    LevelCell(const Location& location, ConnectionCost connectionCost, bool flag);
+
+    /** Draws cell onto the window. */
     inline void draw(RenderWindow* window) {
         window->draw(*this);
     }
-
 };
 
 /** Basic tile grid level. Represents a maze when using the mazeGenerator algorithm. */
 class Level
 {
     public:
-
-    // graph: left right down up
-    // me: right up down left
-    /**
-     * @brief
-     * 3 - 3 = 0
-     * 3 - left = right
-     *
-     * 3 - 2 = 1
-     * 3 - down = up
-     *
-     * 3 - 1 = 2
-     * 3 - up = down
-     *
-     * 3 - 0 = 3
-     * 3 - right = left
-     *
-     */
-     // TRANSPOSE!: this is really: down, right, left, up
-     /**
-      * @brief
-      * 3 - 3 = 0
-      * 3 - up = down
-      *
-      * 3 - 2 = 1
-      * 3 - left = right
-      *
-      * 3 - 1 = 2
-      * 3 - right = left
-      *
-      * 3 - 0 = 3
-      * 3 - down = up
-      *
-      */
-      /** Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell. */
+    
+      /** 
+       * Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell.
+       * TRANSPOSE!: this is really: down, right, left, up
+       * */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
 
     /** Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left). */
@@ -132,9 +123,18 @@ class Level
         }
     }
 
+        /** Level draws itself on the window. */
+    inline void drawSpecial(RenderWindow* window) {
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                LevelCell cell(Location(row, col), cells[row][col].cost, true);
+                cell.draw(window);
+            }
+        }
+    }
+
     /** Prints the level. */
     void print();
-
 
     /** Getters. */
     int getRows();
@@ -146,5 +146,11 @@ Level generateMaze(int r, int c);
 
 /** Converts the given level into a graph and returns it.*/
 Graph levelToGraph(const Level& level);
+
+/** Converts the given level into a graph and returns it.*/
+Graph levelToGraph(const Level& level, bool flag);
+
+/** Generates fixed size level. */
+Level generateCharacterLevel();
 
 #endif

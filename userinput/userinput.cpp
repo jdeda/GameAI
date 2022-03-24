@@ -16,20 +16,22 @@ void greeting() {
 vector<string> AlgorithmStrings{
 	"Dijkstra's",
 	"A* (manhattan heuristic)",
-	"A* (euclidean heuristic)"
+	"A* (euclidean heuristic)",
+	"A* (custom heuristic)"
 };
 
 vector<string> VisualizerStrings{
 	"Small Graph",
 	"Big Graph",
 	"Huge Graph",
-	"Character Steering Graph"
+	"Character Steering Graph",
+	"Testing"
 };
 
 /** Returns an Algorithm if input is valid, otherwise fail program. */
 Algorithm getAlgorithm() {
 	cout << "Choose an algorithm for pathfinding:" << endl;
-	for (int i = 0; i < AlgorithmStrings.size() - 1; i++) {
+	for (int i = 0; i < AlgorithmStrings.size(); i++) {
 		cout << i + 1 << ". " << AlgorithmStrings[i] << endl;
 	}
 
@@ -49,7 +51,7 @@ Algorithm getAlgorithm() {
 /** Returns a Visualizer if input is valid, otherwise fail program. */
 Visualizer getVisualizer() {
 	cout << "Choose a graph to visualize" << endl;
-	for (int i = 0; i < VisualizerStrings.size() - 1; i++) {
+	for (int i = 0; i < VisualizerStrings.size(); i++) {
 		cout << i + 1 << ". " << VisualizerStrings[i] << endl;
 	}
 

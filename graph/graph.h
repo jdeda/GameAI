@@ -136,6 +136,8 @@ namespace graph {
 
         /** Prints IDs of verticies in graph. */
         void print();
+
+        void printy();
     };
 };
 

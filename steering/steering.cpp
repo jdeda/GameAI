@@ -74,3 +74,10 @@ VelocityMatch::VelocityMatch(float f) : Velocity(f) {}
 Arrive::Arrive(const float t, const float r1, const float r2, float s) : Position(t, r1, r2, s) {}
 
 Align::Align(const float t, const float r1, const float r2, float m) : Orientation(t, r1, r2, m) {}
+
+FollowPath::FollowPath(const Path& p, float o, float idx, float pt, float t, float r1, float r2, float s) :
+    Arrive(t, r1, r2, s), path(p) {
+    pathOffset = o;
+    currentPathIndex = idx;
+    predictionTime = pt;
+}
