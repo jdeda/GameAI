@@ -21,4 +21,4 @@ Here is some important information you need to know before running them:
 5. Testing -- takes about an hour to run
 Thus, Huge Graph is terribly slow (search algorithm takes almost the entire time) and Testing is slow (testing 4 algorithms 10 times which each take around two and a half minutes).
 
-Additionally you will be prompted for some algorithms in some cases. The algorithm choice does not matter.
+Additionally you will be prompted for some algorithms in some cases. Choose to your liking.

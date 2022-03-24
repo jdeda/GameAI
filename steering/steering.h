@@ -274,6 +274,7 @@ public:
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
         int newTargetPathIndex = ((currentPathIndex +  pathOffset) >= path.size()) ? path.size() - 1 : currentPathIndex + pathOffset;
         Kinematic newTarget;
+        cout << newTargetPathIndex << endl;
         newTarget.position = path.getPosition(newTargetPathIndex);
         if(newTargetPathIndex >= path.size()) { 
             newTargetPathIndex = path.size() - 1;

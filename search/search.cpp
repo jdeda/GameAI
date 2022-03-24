@@ -88,6 +88,7 @@ void Path::remove(const GraphNodeRecord& record) {
 
 int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const {
     Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
+    if(futureLocation.x == -1) { return currentIndexOnPath; }
     for (int i = 0; i < path.size(); i++) {
         if (path[i].getLocation() == futureLocation) {
             return i;
