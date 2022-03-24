@@ -105,13 +105,13 @@ class Path
 
     inline vector<LevelCell> toSFML() const {
         vector<LevelCell> sfml;
-        if(path.size() == 0) { return sfml; }
+        if (path.size() == 0) { return sfml; }
         int end = path.size() - 1;
 
         Location start(path[0].getLocation().y, path[0].getLocation().x);
         sfml.push_back(LevelCell(start, 1));
         for (int i = 1; i < end; i++) {
-            sfml.push_back(LevelCell(Location(path[i].getLocation().y,path[i].getLocation().x), 2));
+            sfml.push_back(LevelCell(Location(path[i].getLocation().y, path[i].getLocation().x), 2));
         }
         Location endd(path[end].getLocation().y, path[end].getLocation().x);
         sfml.push_back(LevelCell(endd, 3));

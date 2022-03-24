@@ -39,7 +39,7 @@ float MAZE_Y = 0.f;
 float SIZE = sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
 Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
-const bool BREAD_CRUMBS = false;
+const bool BREAD_CRUMBS = true;
 
 /** Renders the path through the maze.*/
 void Visualize(const Maze& maze, const Path& path) {
@@ -73,7 +73,7 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 			{
 				Dijkstra search(maze.getGraph(), start, end);
 				Path path = search.search();
-				Visualize(maze, path );
+				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H1:

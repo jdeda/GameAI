@@ -5,12 +5,12 @@
 using namespace sf;
 
 Location::Location(int a, int b) {
-    x = a;
-    y = b;
+	x = a;
+	y = b;
 }
 
 Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
-	// cout << "Mapping click..." << endl;
+	cout << "Mapping click..." << endl;
 	int x = vector.x + 1;
 	int y = vector.y + 1;
 	for (int i = 0; i < dimension; i++) {
