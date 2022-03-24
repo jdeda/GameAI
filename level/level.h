@@ -12,7 +12,8 @@ using namespace sf;
 using namespace graph;
 
 
-enum ConnectionCost {
+enum ConnectionCost
+{
     normal,
     pricey,
     expensive,
@@ -67,11 +68,11 @@ class LevelCell : public RectangleShape
 class Level
 {
     public:
-    
-      /** 
-       * Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell.
-       * TRANSPOSE!: this is really: down, right, left, up
-       * */
+
+    /**
+     * Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell.
+     * TRANSPOSE!: this is really: down, right, left, up
+     * */
     vector<vector<int>> NEIGHBORS = { {1, 0, 0}, {0, 1, 1}, {0, -1, 2}, {-1, 0, 3} };
 
     /** Each list pair represents possible corner neighbors dx and dy. (in order of right, up, down, left). */
@@ -123,7 +124,7 @@ class Level
         }
     }
 
-        /** Level draws itself on the window. */
+    /** Level draws itself on the window. */
     inline void drawSpecial(RenderWindow* window) {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {

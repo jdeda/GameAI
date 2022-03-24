@@ -88,7 +88,7 @@ void Path::remove(const GraphNodeRecord& record) {
 
 int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const {
     Location futureLocation = mapToLevel(22, 29.0909, futurePosition); // TODO: Hack
-    if(futureLocation.x == -1) { return currentIndexOnPath; }
+    if (futureLocation.x == -1) { return currentIndexOnPath; }
     for (int i = 0; i < path.size(); i++) {
         if (path[i].getLocation() == futureLocation) {
             return i;
@@ -144,5 +144,5 @@ float EuclideanHeuristic::compute(const Location& location) const {
 CustomHeuristic::CustomHeuristic(const Location& goal) : Heuristic(goal) {}
 
 float CustomHeuristic::compute(const Location& location) const {
-        return 10.f * sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
+    return 10.f * sqrt(pow(getGoalLocation().x - location.x, 2) + pow(getGoalLocation().y - location.y, 2));
 }

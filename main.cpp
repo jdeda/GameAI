@@ -73,7 +73,7 @@ void VisualizeSwitch(Algorithm algorithm, const Maze& maze, const Location& star
 			{
 				Dijkstra search(maze.getGraph(), start, end);
 				Path path = search.search();
-				Visualize(maze, path );
+				Visualize(maze, path);
 				break;
 			}
 		case A_STAR_H1:
