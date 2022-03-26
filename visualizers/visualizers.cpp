@@ -11,6 +11,7 @@
 #include "../steering/steeringoutput.h"
 #include "../graph/graph.h"
 #include "../level/level.h"
+#include "../environment/environment.h"
 #include "../search/search.h"
 #include "../search/a*.h"
 #include "../decision/decisiontree.h"
@@ -18,12 +19,15 @@
 #include "../decision/decisiontreelearning.h"
 #include "visualizers.h"
 
-void DecisionTreeVisualizer() {
+
+void DecisionTreeVisualizer(const Environment& environment) {
 
 }
+
 void BehaviorTreeVisualizer() {
 
 }
+
 void DecisionTreeLearningVisualizer() {
 
 }

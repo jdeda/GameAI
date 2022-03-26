@@ -18,6 +18,8 @@ Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 const bool BREAD_CRUMBS = false;
 
 int main() {
+
+	// Run visualizer.
 	srand(1);
 	auto visualizer = getVisualizer();
 	if (visualizer == NULL) { fail("invalid visualizer choice"); }
@@ -29,5 +31,8 @@ int main() {
 		case Visualizer::DecisionTreeLearning:
 			DecisionTreeLearningVisualizer();
 	};
+
+	// Free memory and exit.
+	delete visualizer;
 	return EXIT_SUCCESS;
 }
