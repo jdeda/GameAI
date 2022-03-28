@@ -26,7 +26,7 @@ Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector) {
 			}
 		}
 	}
-	// cout << "No mapping found." << endl << endl;
+	cout << "No mapping found." << endl << endl;
 	return Location(-1, -1);
 }
 

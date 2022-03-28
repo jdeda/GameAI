@@ -4,8 +4,8 @@
 #include "environment.h"
 
 Environment::Environment() : level(generateCharacterLevel()), graph(levelToGraph(level)) {
-    Environment::level.rows = rows;
-    Environment::level.cols = cols;
+    Environment::rows = level.rows;
+    Environment::cols = level.cols;
 }
 
 Graph Environment::getGraph() const {

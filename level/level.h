@@ -112,7 +112,7 @@ public:
     int getDirIdx(Location o, int x, int y) const;
 
     /** Returns Level cells as LevelCells. */
-    vector<vector<LevelCell>> toSFML();
+    vector<vector<LevelCell>> toSFML() const;
 
     /** Level draws itself on the window. */
     inline void draw(RenderWindow* window) {

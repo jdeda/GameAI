@@ -236,7 +236,7 @@ void Level::print() {
     }
 }
 
-vector<vector<LevelCell>> Level::toSFML() {
+vector<vector<LevelCell>> Level::toSFML() const {
     vector<vector<LevelCell>> cellsSFML;
     for (int row = 0; row < rows; row++) {
         vector<LevelCell> v;

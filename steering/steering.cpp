@@ -2,6 +2,7 @@
 #include <bits/stdc++.h>
 #include <iostream>
 #include <random>
+#include "../debug/debug.h"
 #include "../kinematic/kinematic.h"
 #include "../hparams/hyperparameters.h"
 #include "../math/vmath.h"

@@ -99,6 +99,7 @@ int Path::getIndex(const Vector2f& futurePosition, int currentIndexOnPath) const
 }
 
 Vector2f Path::getPosition(int index) const {
+    cout << index << endl;
     auto temp = mapToWindow(29.0909, path[index].getLocation());
     return Vector2f(temp.y, temp.x);
 }
@@ -113,7 +114,6 @@ void Path::print() const {
         Location l = record.getLocation();
         cout << l.x << " " << l.y << endl;
     }
-
 }
 
 Search::Search(const Graph& _graph, const Location& _start, const Location& _end) :
