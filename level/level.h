@@ -25,7 +25,7 @@ float mapConnectionCost(ConnectionCost cost);
 /** Represents an edge in the level. */
 class Connections
 {
-public:
+    public:
 
     /** Cost of a given connection. */
     ConnectionCost cost = normal;
@@ -44,7 +44,7 @@ public:
 class LevelCell : public RectangleShape
 {
 
-public:
+    public:
 
     /** Dimensions of the cell. */
     static Vector2f dims;
@@ -67,7 +67,7 @@ public:
 /** Basic tile grid level. Represents a maze when using the mazeGenerator algorithm. */
 class Level
 {
-public:
+    public:
 
     /**
      * Each list represents (dx, dy, direction index) for cells (in order right, up, down, left) of the cell.

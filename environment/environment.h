@@ -11,7 +11,7 @@ class Environment
 {
 
 
-public:
+    public:
 
     int rows;
 

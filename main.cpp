@@ -4,7 +4,12 @@
 #include "hparams/hyperparameters.h"
 #include "id/id.h"
 #include "level/level.h"
-#include "visualizers/visualizers.h"
+#include "visualizers/dtvisualizer.h"
+#include "visualizers/btvisualizer.h"
+#include "visualizers/dtlvisualizer.h"
+
+int ID::count = 0;
+Vector2f LevelCell::dims = Vector2f(SIZE, SIZE);
 
 int main() {
 

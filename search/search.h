@@ -18,7 +18,7 @@ enum GraphNodeRecordState
 class GraphNodeRecord
 {
 
-private:
+    private:
     /** GraphNode to record.*/
     GraphNode node;
 
@@ -34,7 +34,7 @@ private:
     /** Connection between this record to another. */
     Edge edge;
 
-public:
+    public:
     /* Construct a GraphNodeRecord with all its fields. */
     GraphNodeRecord(const GraphNode& n, const GraphNodeRecordState& s);
 
@@ -56,12 +56,12 @@ public:
 /** Represents the list of GraphRecords that complete a path. */
 class Path
 {
-private:
+    private:
 
     /** The list of GraphNodeRecords in the path (order matters). */
     vector<GraphNodeRecord> path;
 
-public:
+    public:
 
     int exploredNodes = 0; // TODO: Make private
 
@@ -149,7 +149,7 @@ public:
 class Search
 {
 
-private:
+    private:
 
     /** The graph to search. */
     const graph::Graph graph;
@@ -160,7 +160,7 @@ private:
     /** The end location in the graph. */
     const Location end;
 
-public:
+    public:
 
     /** Default constructor for Search class. */
     Search(const Graph& graph, const Location& start, const Location& end);
@@ -198,10 +198,10 @@ public:
 class Heuristic
 {
 
-private:
+    private:
     Location goalLocation;
 
-public:
+    public:
 
     /** Initializes class with the */
     Heuristic(const Location& goal);
@@ -217,7 +217,7 @@ public:
 class ManhattanHeuristic : public Heuristic
 {
 
-public:
+    public:
 
     /** Default constructor. */
     ManhattanHeuristic(const Location& goal);
@@ -229,7 +229,7 @@ public:
 /** Euclidean distance heuristic. */
 class EuclideanHeuristic : public Heuristic
 {
-public:
+    public:
 
     /** Default constructor. */
     EuclideanHeuristic(const Location& goal);
@@ -242,7 +242,7 @@ public:
 /** Weighted distance heuristic. */
 class CustomHeuristic : public Heuristic
 {
-public:
+    public:
 
     /** Default constructor. */
     CustomHeuristic(const Location& goal);

@@ -2,6 +2,7 @@
 #define HYPER_PARAMS_H
 
 #include <cmath>
+#include "../id/id.h"
 
 const int ARGC = 2;
 
@@ -35,5 +36,12 @@ const float RADIUS_OF_DECELERATION = 25.f;
 
 const float PATH_OFFSET = 1;
 const float PREDICTION_TIME = 0.15;
+
+
+// Other.
+const float MAZE_X = 22.f;
+const float MAZE_Y = 22.f;
+const float SIZE = std::sqrt((SCENE_WINDOW_X * SCENE_WINDOW_Y) / (MAZE_X * MAZE_Y));
+const bool BREAD_CRUMBS = false;
 
 #endif

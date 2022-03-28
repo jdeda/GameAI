@@ -1,3 +1,15 @@
+#include <SFML/Graphics.hpp>
+#include "../hparams/hyperparameters.h"
+#include "../environment/environment.h"
+#include "../steering/steering.h"
+#include "../search/a*.h"
+#include "../search/search.h"
+#include "../scene/scene.h"
+#include "../decision/decisiontree.h"
+#include "visualizers.h"
+
+using namespace sf;
+using namespace std;
 
 void DecisionTreeVisualizer() {
 
@@ -45,7 +57,7 @@ void DecisionTreeVisualizer() {
                 case Event::MouseButtonPressed:
                     if (!followingPath) {
                         //  Get path and path following.
-                        path = getPath(environment.getLevel(), environment.getGraph(), character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
+                        path = getPath(environment, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
                         pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
                         newPathExists = true;
                         followingPath = true;
