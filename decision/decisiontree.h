@@ -25,7 +25,7 @@ private:
     DecisionTreeNode& falseNode;
 
 public:
-    T testValue(T value) const;;
+    T& testValue(T value) const;;
     DecisionTreeNode& makeDecision() const;
     DecisionTreeNode& getBranch(T value) const;;
     DecisionTreeNode& getTrueNode() const;
