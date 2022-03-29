@@ -16,7 +16,7 @@ vector<Crumb>* initializeCharacterCrumbs();
 
 Texture* initializeCharacterTexture();
 
-Character initializeCharacter(vector<Crumb>* crumbs, Texture* texture);
+Character* initializeCharacter(vector<Crumb>* crumbs, Texture* texture);
 
 RenderTexture* generateLevelTexture(const Level& level);
 

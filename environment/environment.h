@@ -9,8 +9,6 @@ using namespace sf;
 
 class Environment
 {
-
-
     public:
 
     int rows;

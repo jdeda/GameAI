@@ -13,7 +13,7 @@ using namespace std;
 
 void DecisionTreeVisualizer() {
 
-    // Create visualization assests.
+    // Create all assests.
     cout << "Creating scene assets..." << endl;
     Environment environment;
 
@@ -35,17 +35,32 @@ void DecisionTreeVisualizer() {
 
     // Path following.
     FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-    bool followingPath = false;
-    bool newPathExists = false;
+    bool* followingPath;
+    *followingPath = false;
+    bool* newPathExists;
+    *newPathExists = false;
+    bool* monsterClose;
+    *monsterClose = false;
 
     // SceneView assets.
     SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
     Clock clock;
     Mouse mouse;
 
+    // DecisionTree state.
+    Location* mouseLocation;
+    *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition()));
+    float *dt;
+    *dt = 0;
+
+    // DecisionTree.
+    CharacterDecisionTree tree(environment.getGraph(), mouseLocation, dt, monsterClose, followingPath);
+
+
+    // Animate.
     cout << "Rendering level..." << endl;
     while (sceneView.scene.isOpen()) {
-        float dt = clock.restart().asSeconds();
+        *dt = clock.restart().asSeconds();
 
         // Handle scene poll event.
         Event event;
@@ -57,37 +72,35 @@ void DecisionTreeVisualizer() {
                 case Event::MouseButtonPressed:
                     if (!followingPath) {
                         //  Get path and path following.
-                        path = getPath(environment, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
-                        pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-                        newPathExists = true;
-                        followingPath = true;
-
-                        // Recreate path sprite.
-                        pathSFML = path.toSFML();
-                        pathTexture.clear(sf::Color{ 255,255,255,0 });
-                        for (const auto& element : pathSFML) { pathTexture.draw(element); }
-                        pathTexture.display();
-                        pathSprite = Sprite(pathTexture.getTexture());
+                        *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition()));
+                        *newPathExists = true;
+                        *followingPath = true;
                     }
                     break;
             }
         }
         // Mark followingPath.
-        if (!path.isEmpty() && mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
-            followingPath = false;
+        if (!path.isEmpty() && mapToLevel(MAZE_X, SIZE, character->getPosition()) == path.getLast()) {
+            *followingPath = false;
         }
 
-        // Update if and only if newPathExists.
-        if (newPathExists) {
-            SteeringOutput pathAcceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
-            character.update(pathAcceleration, dt, true);
+        // DecisionTree makes decision.
+        tree.makeDecision();
+
+        // Update path if tree makes one.
+        if(!tree.getPath().isEmpty()) {
+            pathSFML = tree.getPath().toSFML();
+            pathTexture.clear(sf::Color{ 255,255,255,0 });
+            for (const auto& element : pathSFML) { pathTexture.draw(element); }
+            pathTexture.display();
+            pathSprite = Sprite(pathTexture.getTexture());
         }
 
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);
         sceneView.scene.draw(pathSprite);
-        sceneView.scene.draw(character.sprite);
+        sceneView.scene.draw(character->sprite);
         sceneView.scene.display();
     }
 
@@ -95,5 +108,5 @@ void DecisionTreeVisualizer() {
     delete levelTexture;
     delete characterCrumbs;
     delete characterTexture;
-    // delete character;
+    delete character;
 }
