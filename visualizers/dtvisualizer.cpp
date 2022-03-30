@@ -65,10 +65,6 @@ void DecisionTreeVisualizer() {
                     break;
                 case Event::MouseButtonPressed:
                     if (*followingPath == false) {
-                        cout << "hi!" << endl;
-                        //  Get path and path following.
-                        // TODO: do these do anything? pointer dumb.
-
                         // TODO: Inverse the mouse location or the visualizer?
                         *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition(sceneView.scene)));
                         *newPathExists = true;
@@ -87,6 +83,9 @@ void DecisionTreeVisualizer() {
                 if(closeEnough(character->getPosition(), mapToWindow(SIZE, tree.getPath().getLast()))) {
                     *followingPath = false;
                 }
+                // if (mapToLevel(MAZE_X, SIZE, character->getPosition()) == tree.getPath().getLast()) {
+                //     *followingPath = false;
+                // }
             }
         }
 
