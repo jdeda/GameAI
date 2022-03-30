@@ -119,19 +119,27 @@ class CharacterDecisionNode
             if(action == followClick && followingIteration == 0) {
                 search = new AStar(graph, character->getLocation(), *mouseLocation, ManhattanHeuristic(*mouseLocation));
                 path = search->search();
+                path.print();
                 pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
             }
 
             // If followingClick has complete, reset count.
             if(*followingPath == false) {
                 followingIteration = 0;
+                cout << character->getLocation().x << " " << character->getLocation().y << endl;
             }
 
             switch (action) {
                 case CharacterAction::followClick:
                     {
-                        // Apply path following to click.                  
+                        // TODO: path finding broken...
+                        // TODO: Sometimes gets stuck...
+                        // Need to fix start position error...
+                        // Apply path following to click.
+                        // TODO: indexes can be infinitely large 
+                        // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kiindad hacky
                         SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
+                        cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";                        
                         character->update(pathAccelerations, *dt, true);
                         followingIteration += 1;
                         break;

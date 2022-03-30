@@ -49,7 +49,6 @@ void DecisionTreeVisualizer() {
 
     // DecisionTree.
     CharacterDecisionTree tree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
-    cout << "ok" << endl;
 
     // Animate.
     cout << "Rendering level..." << endl;
@@ -65,6 +64,7 @@ void DecisionTreeVisualizer() {
                     break;
                 case Event::MouseButtonPressed:
                     if (*followingPath == false) {
+                        cout << "CLICK" << endl;
                         // TODO: Inverse the mouse location or the visualizer?
                         *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition(sceneView.scene)));
                         *newPathExists = true;
@@ -83,9 +83,6 @@ void DecisionTreeVisualizer() {
                 if(closeEnough(character->getPosition(), mapToWindow(SIZE, tree.getPath().getLast()))) {
                     *followingPath = false;
                 }
-                // if (mapToLevel(MAZE_X, SIZE, character->getPosition()) == tree.getPath().getLast()) {
-                //     *followingPath = false;
-                // }
             }
         }
 

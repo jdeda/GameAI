@@ -279,7 +279,19 @@ class FollowPath : Arrive
         int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
         Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
-        if (newTargetPathIndex == path.size()) { return SteeringOutput(); }
+        cout << "idx: " << newTargetPathIndex << endl;
+        cout << "pos: " << character.position.x << " " << character.position.y << endl;
+
+        // Follow to center of last coordinate precise!
+        if(currentPathIndex ==  path.size() - 1) {
+
+        }
+        // TODO: Index surpasses path size.
+        if (newTargetPathIndex >= path.size()) { 
+            cout << "DAMMIT" << endl;
+            currentPathIndex = path.size() - 1;
+            return SteeringOutput();
+            }
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };
