@@ -23,8 +23,6 @@ class MonsterDecisionNode
     MonsterAction action;
     MonsterDecisionNode& trueNode;
     MonsterDecisionNode& falseNode;
-    MonsterDecisionNode testData(MonsterAction data) const;
-    MonsterDecisionNode& getBranch(MonsterAction data) const;
     public:
     MonsterDecisionNode(MonsterDecisionNode& trueNode_, MonsterDecisionNode& falseNode_);
     MonsterDecisionNode makeDecision(MonsterAction data_) const;
@@ -34,8 +32,7 @@ enum CharacterAction
 {
     followClick,
     escaping,
-    sitting,
-    character_no_action
+    sitting
 };
 
 class CharacterDecisionNode
@@ -44,68 +41,115 @@ class CharacterDecisionNode
     CharacterAction action;
     CharacterDecisionNode* trueNode;
     CharacterDecisionNode* falseNode;
-    CharacterAction testData(bool monsterClose, bool followingPath) const;
-    CharacterDecisionNode* getBranch(bool monsterClose, bool followingPath) const;
+
     public:
     CharacterDecisionNode(CharacterAction action, CharacterDecisionNode* trueNode_, CharacterDecisionNode* falseNode_);
-    CharacterDecisionNode makeDecision(bool monsterClose, bool followingPath) const;
-    CharacterAction getAction() const;
-};
-
-class CharacterDecisionTree
-{
-    private:
-
-    /* Mutable state when decision is carried out. */
-    Character* character;
-
-    /** Observable state for decision making. */
-    float *dt;
-    bool* monsterClose;
-    bool* followingPath;
-    Location* mouseLocation;
-    Graph graph;
-
-    /** Root node. */
-    CharacterDecisionNode* root;
-
-    /** Other. */
-    Path path;
-
-    public:
-    CharacterDecisionTree(const Graph& graph, Character* character_, Location* mouse_, float* dt, bool* monsterClose_, bool* followingPath_);
-
-    inline CharacterDecisionNode makeDecision() {
-        CharacterAction action = root->makeDecision(*monsterClose, *followingPath).getAction();
+    
+    inline CharacterDecisionNode makeDecision(bool monsterClose, bool followingPath) const {
+        if(trueNode == NULL && falseNode == NULL) {
+            return CharacterDecisionNode(action, NULL, NULL);
+        } 
         switch (action) {
             case CharacterAction::followClick:
                 {
-                    // Apply path finding to click.
-                    AStar search(graph, character.getLocation(), mouseLocation);
-                    path =  search.search();
-                    FollowPath pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-                    SteeringOutput pathAccelerations = pathFollowing.calculateAcceleration(character->getKinematic(), Kinematic());
-                    character->update(pathAccelerations, *dt, true);
-                    break;
+                    if(followingPath) {
+                        return trueNode->makeDecision(monsterClose, followingPath);
+                    }
+                    else {
+                        return falseNode->makeDecision(monsterClose, followingPath);
+                    }
                 }
             case CharacterAction::escaping:
                 {
-                    break;
+                    if(monsterClose) {
+                        return trueNode->makeDecision(monsterClose, followingPath);
+                    }
+                    else {
+                        return falseNode->makeDecision(monsterClose, followingPath);
+                    }
                 }
             case CharacterAction::sitting:
                 {
-                    break;
+                    return CharacterDecisionNode(CharacterAction::sitting, NULL, NULL);
                 }
-            case CharacterAction::character_no_action:
-                {
-                    break;
-                }
+            default: { // TODO: should never come here.
+                cout << "exit 99" << endl;
+                exit(99);
+                return CharacterDecisionNode(CharacterAction::sitting, NULL, NULL);
+            }
+        }
+    };
+    inline CharacterAction getAction() const { return action; }
+};
+
+
+    class CharacterDecisionTree
+    {
+        private:
+
+        /* Mutable state when decision is carried out. */
+        Character* character;
+
+        /** Observable state for decision making. */
+        bool* monsterClose;
+        bool* followingPath;
+
+        /** Observable state for action code. */
+        float* dt;
+        Graph graph;
+        Location* mouseLocation;
+
+
+        /** Root node. */
+        CharacterDecisionNode* root;
+
+        /** followClick decision functionality. */
+        Path path;
+        AStar* search;
+        FollowPath* pathFollowing;
+        int followingIteration = 0;
+
+        public:
+        CharacterDecisionTree(const Graph& graph, Character* character_, Location* mouse_, float* dt, bool* monsterClose_, bool* followingPath_);
+
+        inline void makeDecision() {
+            CharacterAction action = root->makeDecision(*monsterClose, *followingPath).getAction();  
+
+            // If first iteration of followingClick, find path.
+            if(action == followClick && followingIteration == 0) {
+                search = new AStar(graph, character->getLocation(), *mouseLocation, ManhattanHeuristic(*mouseLocation));
+                path = search->search();
+                pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+            }
+
+            // If followingClick has complete, reset count.
+            if(action != followClick && followingIteration != 0) {
+                followingIteration = 0;
+            }
+
+            cout << action << endl;
+            switch (action) {
+                case CharacterAction::followClick:
+                    {
+                        // Apply path following to click.                  
+                        SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
+                        character->update(pathAccelerations, *dt, true);
+                        followingIteration += 1;
+                        break;
+                    }
+                case CharacterAction::escaping:
+                    {
+                        break;
+                    }
+                case CharacterAction::sitting:
+                    {
+                        break;
+                    }
+            }
         }
 
-    }
-
-    inline Path getPath() { return path; }
-};
+        inline Path getPath() { return path; }
+    };
 
 
 

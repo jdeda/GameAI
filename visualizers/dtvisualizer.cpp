@@ -26,6 +26,7 @@ void DecisionTreeVisualizer() {
     auto levelTexture = generateLevelTexture(environment.getLevel());
     Sprite levelSprite(levelTexture->getTexture());
 
+
     // Path.
     Path path;
     RenderTexture pathTexture;
@@ -33,14 +34,12 @@ void DecisionTreeVisualizer() {
     vector<LevelCell> pathSFML;
     Sprite pathSprite;
 
+
     // Path following.
     FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-    bool* followingPath;
-    *followingPath = false;
-    bool* newPathExists;
-    *newPathExists = false;
-    bool* monsterClose;
-    *monsterClose = false;
+    bool* followingPath = new bool(false);
+    bool* newPathExists = new bool(false);
+    bool* monsterClose = new bool(false);
 
     // SceneView assets.
     SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
@@ -48,13 +47,12 @@ void DecisionTreeVisualizer() {
     Mouse mouse;
 
     // DecisionTree state.
-    Location* mouseLocation;
-    *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition()));
-    float *dt;
-    *dt = 0;
+    Location* mouseLocation = new Location(mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition())));
+    float *dt = new float(0.f);
 
     // DecisionTree.
-    CharacterDecisionTree tree(environment.getGraph(), mouseLocation, dt, monsterClose, followingPath);
+    CharacterDecisionTree tree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
+    cout << "ok" << endl;
 
 
     // Animate.
@@ -70,8 +68,10 @@ void DecisionTreeVisualizer() {
                     sceneView.scene.close();
                     break;
                 case Event::MouseButtonPressed:
-                    if (!followingPath) {
+                    if (*followingPath == false) {
+                        cout << "hi!" << endl;
                         //  Get path and path following.
+                        // TODO: do these do anything? pointer dumb.
                         *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition()));
                         *newPathExists = true;
                         *followingPath = true;
@@ -109,4 +109,8 @@ void DecisionTreeVisualizer() {
     delete characterCrumbs;
     delete characterTexture;
     delete character;
+    delete followingPath;
+    delete newPathExists;
+    delete monsterClose;
+    delete dt;
 }

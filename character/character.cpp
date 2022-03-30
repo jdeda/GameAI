@@ -4,6 +4,7 @@
 #include "../steering/steeringoutput.h"
 #include "../id/id.h"
 #include "../kinematic/kinematic.h"
+#include "../level/location.h"
 #include "character.h"
 
 using namespace std;
@@ -26,6 +27,10 @@ int Character::y() const {
 
 Vector2f Character::getPosition() const {
 	return sprite.getPosition();
+}
+
+Location Character::getLocation() const {
+	return mapToLevel(MAZE_X, SIZE, sprite.getPosition());
 }
 
 float Character::getOrientation() const {

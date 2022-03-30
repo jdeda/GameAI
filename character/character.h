@@ -7,6 +7,8 @@
 #include "../steering/steeringoutput.h"
 #include "../id/id.h"
 #include "../kinematic/kinematic.h"
+#include "../level/location.h"
+
 
 using namespace std;
 using namespace sf;
@@ -51,6 +53,8 @@ class Character
 	int y() const;
 
 	Vector2f getPosition() const;
+
+	Location getLocation() const;
 
 	float getOrientation() const;
 
