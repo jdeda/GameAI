@@ -28,7 +28,7 @@ inline bool closeEnough(const Vector2f& v1_, const Vector2f& v2) {
     Vector2f v1 = v1_;
     v1.x = v1_.y;
     v1.y = v1_.x;
-    float satisfaction = (SIZE / 2.f) / 3.f;
+    float satisfaction = (SIZE / 2.f) / 8.f;
     bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction); 
     bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
     return xSatisfied && ySatisfied;

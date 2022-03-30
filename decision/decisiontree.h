@@ -139,8 +139,13 @@ class CharacterDecisionNode
                         // TODO: indexes can be infinitely large 
                         // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kiindad hacky
                         SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
-                        cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";                        
+                        cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";
+                        if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
+                            character->stop(); // TODO: more hacking to be put here.
+                        }
+                        else {
                         character->update(pathAccelerations, *dt, true);
+                        }
                         followingIteration += 1;
                         break;
                     }

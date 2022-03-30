@@ -274,20 +274,11 @@ class FollowPath : Arrive
             cout << "empty path" << endl;
             return SteeringOutput();
         }
-        
+
         // Follow to center of last coordinate precise!
         if (currentPathIndex == path.size() - 1) {
             cout << "OH FUCK" << endl;
-            // Vector2f v1_ = character.position;
-            // Vector2f v2 = mapToWindow(SIZE, path.getLast());
-            // Vector2f v1 = v1_;
-            // v1.x = v1_.y;
-            // v1.y = v1_.x;
-            // float satisfaction = (SIZE / 2.f) / 3.f;
-            // bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction);
-            // bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
-            // newTarget.position
-            // return xSatisfied && ySatisfied;
+            cout << "idx: " << currentPathIndex << endl;
             Kinematic newTarget;
             newTarget.position = mapToWindow(SIZE, path.getLast());
             return Arrive::calculateAcceleration(character, newTarget);
@@ -304,7 +295,9 @@ class FollowPath : Arrive
         if (newTargetPathIndex >= path.size()) {
             cout << "DAMMIT" << endl;
             currentPathIndex = path.size() - 1;
-            return SteeringOutput();
+            SteeringOutput stopping;
+            stopping.linearAcceleration = Vector2f(-1.f, -1.f);
+            return stopping;
         }
         return Arrive::calculateAcceleration(character, newTarget);
     }
