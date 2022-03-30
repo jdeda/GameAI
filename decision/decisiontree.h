@@ -72,7 +72,7 @@ class CharacterDecisionNode
                 {
                     return CharacterDecisionNode(CharacterAction::sitting, NULL, NULL);
                 }
-            default: { // TODO: should never come here.
+            default: {
                 cout << "exit 99" << endl;
                 exit(99);
                 return CharacterDecisionNode(CharacterAction::sitting, NULL, NULL);
@@ -123,11 +123,10 @@ class CharacterDecisionNode
             }
 
             // If followingClick has complete, reset count.
-            if(action != followClick && followingIteration != 0) {
+            if(*followingPath == false) {
                 followingIteration = 0;
             }
 
-            cout << action << endl;
             switch (action) {
                 case CharacterAction::followClick:
                     {
@@ -147,6 +146,8 @@ class CharacterDecisionNode
                     }
             }
         }
+
+        inline int getFollowingIteration() { return followingIteration; }
 
         inline Path getPath() { return path; }
     };
