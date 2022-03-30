@@ -274,6 +274,24 @@ class FollowPath : Arrive
             cout << "empty path" << endl;
             return SteeringOutput();
         }
+        
+        // Follow to center of last coordinate precise!
+        if (currentPathIndex == path.size() - 1) {
+            cout << "OH FUCK" << endl;
+            // Vector2f v1_ = character.position;
+            // Vector2f v2 = mapToWindow(SIZE, path.getLast());
+            // Vector2f v1 = v1_;
+            // v1.x = v1_.y;
+            // v1.y = v1_.x;
+            // float satisfaction = (SIZE / 2.f) / 3.f;
+            // bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction);
+            // bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
+            // newTarget.position
+            // return xSatisfied && ySatisfied;
+            Kinematic newTarget;
+            newTarget.position = mapToWindow(SIZE, path.getLast());
+            return Arrive::calculateAcceleration(character, newTarget);
+        }
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
         currentPathIndex = path.getIndex(futurePosition, currentPathIndex);
         int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
@@ -282,16 +300,12 @@ class FollowPath : Arrive
         cout << "idx: " << newTargetPathIndex << endl;
         cout << "pos: " << character.position.x << " " << character.position.y << endl;
 
-        // Follow to center of last coordinate precise!
-        if(currentPathIndex ==  path.size() - 1) {
-
-        }
         // TODO: Index surpasses path size.
-        if (newTargetPathIndex >= path.size()) { 
+        if (newTargetPathIndex >= path.size()) {
             cout << "DAMMIT" << endl;
             currentPathIndex = path.size() - 1;
             return SteeringOutput();
-            }
+        }
         return Arrive::calculateAcceleration(character, newTarget);
     }
 };
