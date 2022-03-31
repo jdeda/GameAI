@@ -271,7 +271,7 @@ class FollowPath : Arrive
 
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
         if (path.size() == 0) {
-            cout << "empty path" << endl;
+            cout << "empty path" << endl; // TODO: How is this happening?
             return SteeringOutput();
         }
 

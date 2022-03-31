@@ -117,6 +117,8 @@ class CharacterDecisionNode
 
             // If first iteration of followingClick, find path.
             if(action == followClick && followingIteration == 0) {
+                cout << "START: " << character->getLocation().x << " " << character->getLocation().y << endl;
+                cout << "END: " << mouseLocation->x << " " << mouseLocation->y << endl;
                 search = new AStar(graph, character->getLocation(), *mouseLocation, ManhattanHeuristic(*mouseLocation));
                 path = search->search();
                 path.print();
