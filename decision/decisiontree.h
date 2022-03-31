@@ -136,7 +136,6 @@ class CharacterDecisionNode
                         // TODO: Sometimes gets stuck...
                         // Need to fix start position error...
                         // Apply path following to click.
-                        // TODO: indexes can be infinitely large 
                         // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kiindad hacky
                         SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
                         cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";

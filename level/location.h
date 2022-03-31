@@ -49,4 +49,7 @@ Location mapToLevel(int dimension, float mappingScale, const Vector2f& vector);
 /** Returns mapping of location in graph to position in SFML render window. */
 Vector2f mapToWindow(float mappingScale, const Location& location);
 
+/** Returns Vector2f with x and y flipped. */
+Vector2f flip(const Vector2f& v);
+
 #endif

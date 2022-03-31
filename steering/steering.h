@@ -277,10 +277,10 @@ class FollowPath : Arrive
 
         // Follow to center of last coordinate precise!
         if (currentPathIndex == path.size() - 1) {
-            cout << "OH FUCK" << endl;
+            cout << "OH NO" << endl;
             cout << "idx: " << currentPathIndex << endl;
             Kinematic newTarget;
-            newTarget.position = mapToWindow(SIZE, path.getLast());
+            newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
             return Arrive::calculateAcceleration(character, newTarget);
         }
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
@@ -293,7 +293,7 @@ class FollowPath : Arrive
 
         // TODO: Index surpasses path size.
         if (newTargetPathIndex >= path.size()) {
-            cout << "DAMMIT" << endl;
+            cout << "Dammit" << endl;
             currentPathIndex = path.size() - 1;
             SteeringOutput stopping;
             stopping.linearAcceleration = Vector2f(-1.f, -1.f);
