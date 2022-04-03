@@ -80,7 +80,14 @@ void DecisionTreeVisualizer() {
         // Mark followingPath.
         if (*followingPath) {
             if (!tree.getPath().isEmpty()) {
-                if(closeEnough(character->getPosition(), flip(mapToWindow(SIZE, tree.getPath().getLast())))) {
+                auto path = tree.getPath();
+                auto a = path.getPathList()[path.size() - 1].getLocation();
+                auto b = path.getPathList()[path.size() - 2].getLocation();
+                auto d = getDirection(a, b);
+                auto t = flip(mapToWindow(SIZE, path.getLast()));
+                if (d == 3) { t.x += 3; }
+                if (d == 2) { t.y += 3; }
+                if (closeEnough(character->getPosition(), t)) {
                     *followingPath = false;
                 }
             }

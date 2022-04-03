@@ -3,7 +3,7 @@
 
 #include <functional>
 #include <SFML/Graphics.hpp>
-
+#include <iostream>
 using namespace std;
 using namespace sf;
 
@@ -51,5 +51,28 @@ Vector2f mapToWindow(float mappingScale, const Location& location);
 
 /** Returns Vector2f with x and y flipped. */
 Vector2f flip(const Vector2f& v);
+
+/** Returns direction from a to b. (1=left,2=up,3=right,4=down. */
+inline int getDirection(const Location& a, const Location& b) {
+    // Asssume a and b are not same position.
+    // Assume a and b are adjacent.
+    cout << "a: " << a.x << " " << a.y << endl;
+    cout << "b: " << b.x << " " << b.y << endl;
+    if(a.y + 1 == b.y) {
+        return 1;
+    }
+    if(a.x - 1 == b.x) {
+        return 2;
+    }
+    if(a.y - 1 == b.y) {
+        return 3;
+    }
+    if(a.x + 1 == b.x) { 
+        return 4;
+    }
+    cout << "GOD DAMMIT" << endl;
+    exit(69);
+    return -1;
+}
 
 #endif

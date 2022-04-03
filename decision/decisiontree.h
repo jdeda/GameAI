@@ -138,10 +138,11 @@ class CharacterDecisionNode
                         // TODO: Sometimes gets stuck...
                         // Need to fix start position error...
                         // Apply path following to click.
-                        // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kiindad hacky
+                        // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kinda hacky
                         SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
                         cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";
                         if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
+                            cout << "STOP" << endl;
                             character->stop(); // TODO: more hacking to be put here.
                         }
                         else {

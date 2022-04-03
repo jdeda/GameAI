@@ -278,9 +278,29 @@ class FollowPath : Arrive
         // Follow to center of last coordinate precise!
         if (currentPathIndex == path.size() - 1) {
             cout << "OH NO" << endl;
-            cout << "idx: " << currentPathIndex << endl;
+            // cout << "idx: " << currentPathIndex << endl;
             Kinematic newTarget;
-            newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+
+            // If moving right or down, need to move more (sprite issues).
+            auto a = path.getPathList()[path.size() - 1].getLocation();
+            auto b = path.getPathList()[path.size() - 2].getLocation();
+            auto d = getDirection(a, b);
+            cout << "d: " << d << endl;
+            if (d == 3) { // Moving right.
+                cout << "FUCKERS";
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+                newTarget.position.x += 6;
+
+            }
+            else if (d == 4) { // Moving down.
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+                newTarget.position.y += 3;
+                cout << "FUCKER";
+            }
+            else {
+                cout << "WHY";
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+            }
             return Arrive::calculateAcceleration(character, newTarget);
         }
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
@@ -288,8 +308,8 @@ class FollowPath : Arrive
         int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
         Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
-        cout << "idx: " << newTargetPathIndex << endl;
-        cout << "pos: " << character.position.x << " " << character.position.y << endl;
+        // cout << "idx: " << newTargetPathIndex << endl;
+        // cout << "pos: " << character.position.x << " " << character.position.y << endl;
 
         // TODO: Index surpasses path size.
         if (newTargetPathIndex >= path.size()) {
