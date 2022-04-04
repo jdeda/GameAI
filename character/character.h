@@ -76,6 +76,11 @@ class Character
 
 	/** Returns the breadcrumbs from the character. */
 	vector<Crumb>* getBreadCrumbs();
+
+	inline void stop() {
+		kinematic.angularVelocity = 0;
+		kinematic.linearVelocity = Vector2f(0.f, 0.f);
+	}
 };
 
 #endif

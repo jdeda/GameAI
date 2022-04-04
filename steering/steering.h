@@ -271,25 +271,36 @@ class FollowPath : Arrive
 
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
         if (path.size() == 0) {
-            cout << "empty path" << endl;
+            cout << "empty path" << endl; // TODO: How is this happening?
             return SteeringOutput();
         }
-        
+
         // Follow to center of last coordinate precise!
         if (currentPathIndex == path.size() - 1) {
-            cout << "OH FUCK" << endl;
-            // Vector2f v1_ = character.position;
-            // Vector2f v2 = mapToWindow(SIZE, path.getLast());
-            // Vector2f v1 = v1_;
-            // v1.x = v1_.y;
-            // v1.y = v1_.x;
-            // float satisfaction = (SIZE / 2.f) / 3.f;
-            // bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction);
-            // bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
-            // newTarget.position
-            // return xSatisfied && ySatisfied;
+            cout << "OH NO" << endl;
+            // cout << "idx: " << currentPathIndex << endl;
             Kinematic newTarget;
-            newTarget.position = mapToWindow(SIZE, path.getLast());
+
+            // If moving right or down, need to move more (sprite issues).
+            auto a = path.getPathList()[path.size() - 1].getLocation();
+            auto b = path.getPathList()[path.size() - 2].getLocation();
+            auto d = getDirection(a, b);
+            cout << "d: " << d << endl;
+            if (d == 3) { // Moving right.
+                cout << "FUCKERS";
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+                newTarget.position.x += 6;
+
+            }
+            else if (d == 2) { // Moving down.
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+                newTarget.position.y += 6;
+                cout << "FUCKER";
+            }
+            else {
+                cout << "WHY";
+                newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
+            }
             return Arrive::calculateAcceleration(character, newTarget);
         }
         Vector2f futurePosition = character.position + (character.linearVelocity * predictionTime);
@@ -297,14 +308,16 @@ class FollowPath : Arrive
         int newTargetPathIndex = currentPathIndex == path.size() - 1 ? currentPathIndex : currentPathIndex + pathOffset;
         Kinematic newTarget;
         newTarget.position = path.getPosition(newTargetPathIndex);
-        cout << "idx: " << newTargetPathIndex << endl;
-        cout << "pos: " << character.position.x << " " << character.position.y << endl;
+        // cout << "idx: " << newTargetPathIndex << endl;
+        // cout << "pos: " << character.position.x << " " << character.position.y << endl;
 
         // TODO: Index surpasses path size.
         if (newTargetPathIndex >= path.size()) {
-            cout << "DAMMIT" << endl;
+            cout << "Dammit" << endl;
             currentPathIndex = path.size() - 1;
-            return SteeringOutput();
+            SteeringOutput stopping;
+            stopping.linearAcceleration = Vector2f(-1.f, -1.f);
+            return stopping;
         }
         return Arrive::calculateAcceleration(character, newTarget);
     }

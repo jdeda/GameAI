@@ -117,6 +117,8 @@ class CharacterDecisionNode
 
             // If first iteration of followingClick, find path.
             if(action == followClick && followingIteration == 0) {
+                cout << "START: " << character->getLocation().x << " " << character->getLocation().y << endl;
+                cout << "END: " << mouseLocation->x << " " << mouseLocation->y << endl;
                 search = new AStar(graph, character->getLocation(), *mouseLocation, ManhattanHeuristic(*mouseLocation));
                 path = search->search();
                 path.print();
@@ -136,11 +138,16 @@ class CharacterDecisionNode
                         // TODO: Sometimes gets stuck...
                         // Need to fix start position error...
                         // Apply path following to click.
-                        // TODO: indexes can be infinitely large 
-                        // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kiindad hacky
+                        // TODO: Keeps accelerating even if out of bounds...because velocity neeeds to be set to 0... kinda hacky
                         SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(character->getKinematic(), Kinematic());
-                        cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";                        
+                        cout << "accel: " << pathAccelerations.linearAcceleration.x << " " << pathAccelerations.linearAcceleration.y <<  "\n\n\n";
+                        if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
+                            cout << "STOP" << endl;
+                            character->stop(); // TODO: more hacking to be put here.
+                        }
+                        else {
                         character->update(pathAccelerations, *dt, true);
+                        }
                         followingIteration += 1;
                         break;
                     }

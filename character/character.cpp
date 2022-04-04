@@ -53,6 +53,8 @@ void Character::update(const SteeringOutput& steering, const float dt, const boo
 	kinematic.update(steering, dt, clip);
 	sprite.setPosition(kinematic.position);
 	sprite.setRotation(kinematic.orientation);
+
+	// Update sprite.
 	if (crumb_drop_timer > 0) {
 		crumb_drop_timer -= 0.1f;
 	}
