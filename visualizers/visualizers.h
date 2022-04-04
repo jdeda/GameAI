@@ -12,11 +12,15 @@
 using namespace sf;
 using namespace std;
 
-vector<Crumb>* initializeCharacterCrumbs();
+vector<Crumb>* initializeCrumbs();
 
 Texture* initializeCharacterTexture();
 
 Character* initializeCharacter(vector<Crumb>* crumbs, Texture* texture);
+
+Texture* initializeMonsterTexture();
+
+Character* initializeMonster(vector<Crumb>* crumbs, Texture* texture);
 
 RenderTexture* generateLevelTexture(const Level& level);
 

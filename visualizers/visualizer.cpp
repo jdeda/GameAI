@@ -11,16 +11,21 @@
 using namespace sf;
 using namespace std;
 
-void DecisionTreeVisualizer() {
+void Visualizer() {
 
     // Create all assests.
     cout << "Creating scene assets..." << endl;
     Environment environment;
 
     // Character assets.
-    auto characterCrumbs = initializeCharacterCrumbs();
+    auto characterCrumbs = initializeCrumbs();
     auto characterTexture = initializeCharacterTexture();
     auto character = initializeCharacter(characterCrumbs, characterTexture);
+
+    // Monster assets.
+    auto monsterCrumbs = initializeCrumbs();
+    auto monsterTexture = initializeMonsterTexture();
+    auto monster = initializeMonster(monsterCrumbs, monsterTexture);
 
     // Level assests.
     auto levelTexture = generateLevelTexture(environment.getLevel());
@@ -108,6 +113,7 @@ void DecisionTreeVisualizer() {
         sceneView.scene.draw(levelSprite);
         if (*followingPath) { sceneView.scene.draw(pathSprite); }
         sceneView.scene.draw(character->sprite);
+        sceneView.scene.draw(monster->sprite);
         sceneView.scene.display();
     }
 
@@ -116,6 +122,9 @@ void DecisionTreeVisualizer() {
     delete characterCrumbs;
     delete characterTexture;
     delete character;
+    delete monsterCrumbs;
+    delete monsterTexture;
+    delete monster;
     delete followingPath;
     delete newPathExists;
     delete monsterClose;
