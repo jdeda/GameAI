@@ -30,7 +30,7 @@ Path getPath(const Environment& environment, const Vector2f& start_, const Vecto
 // TODO: This is really a hack...current pathfinding does not work like this so it will get stuck...
 inline bool closeEnough(const Vector2f& v1, const Vector2f& v2) {
     float satisfaction = (SIZE / 2.f) / 4.f;
-    bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction); 
+    bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction);
     bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
     cout << "s: " << satisfaction << endl;
     cout << "v1: " << v1.x << " " << v1.y << endl;
