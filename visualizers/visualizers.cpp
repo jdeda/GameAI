@@ -32,18 +32,18 @@ Texture* initializeCharacterTexture() {
     return texture;
 }
 
-Character initializeCharacter(vector<Crumb>* crumbs, Texture* texture) {
+Character* initializeCharacter(vector<Crumb>* crumbs, Texture* texture) {
     float scale = 1.5 / SIZE;
-    Character character(crumbs);
-    character.scale = scale;
-    character.texture = *texture;
-    character.sprite = *(new Sprite(*texture));
-    character.sprite.setScale(scale, scale);
+    Character* character = new Character(crumbs);
+    character->scale = scale;
+    character->texture = *texture;
+    character->sprite = *(new Sprite(*texture));
+    character->sprite.setScale(scale, scale);
     Vector2f start = mapToWindow(SIZE, Location(1, 1));
     Kinematic initialState;
     initialState.position = start;
-    character.setKinematic(initialState);
-    character.update(SteeringOutput(), 0, true);
+    character->setKinematic(initialState);
+    character->update(SteeringOutput(), 0, true);
     return character;
 }
 

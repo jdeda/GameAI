@@ -3,7 +3,7 @@
 #include "../graph/graph.h"
 #include "environment.h"
 
-Environment::Environment() : level(generateCharacterLevel()), graph(levelToGraph(level)) {
+Environment::Environment() : level(generateCharacterLevel()), graph(levelToGraph(level, true)) {
     Environment::rows = level.rows;
     Environment::cols = level.cols;
 }

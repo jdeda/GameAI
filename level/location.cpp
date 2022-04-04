@@ -39,3 +39,7 @@ Vector2f mapToWindow(float mappingScale, const Location& location) {
 	// cout << "Mapped to: " << vector.x << " " << vector.y << endl << endl;
 	return vector;
 }
+
+Vector2f flip(const Vector2f& v) {
+	return Vector2f(v.y, v.x);
+}
