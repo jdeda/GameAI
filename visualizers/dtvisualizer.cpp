@@ -85,8 +85,8 @@ void DecisionTreeVisualizer() {
                 auto b = path.getPathList()[path.size() - 2].getLocation();
                 auto d = getDirection(a, b);
                 auto t = flip(mapToWindow(SIZE, path.getLast()));
-                if (d == 3) { t.x += 3; }
-                if (d == 2) { t.y += 3; }
+                if (d == 3) { t.x += 6; }
+                if (d == 2) { t.y += 6; }
                 if (closeEnough(character->getPosition(), t)) {
                     *followingPath = false;
                 }

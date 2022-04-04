@@ -292,9 +292,9 @@ class FollowPath : Arrive
                 newTarget.position.x += 6;
 
             }
-            else if (d == 4) { // Moving down.
+            else if (d == 2) { // Moving down.
                 newTarget.position = flip(mapToWindow(SIZE, path.getLast()));
-                newTarget.position.y += 3;
+                newTarget.position.y += 6;
                 cout << "FUCKER";
             }
             else {

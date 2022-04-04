@@ -71,8 +71,8 @@ inline int getDirection(const Location& a, const Location& b) {
         return 4;
     }
     cout << "GOD DAMMIT" << endl;
-    exit(69);
-    return -1;
+    // exit(69);
+    return 0;
 }
 
 #endif
