@@ -7,6 +7,8 @@
 #include "../steering/steeringoutput.h"
 #include "../id/id.h"
 #include "../kinematic/kinematic.h"
+#include "../level/location.h"
+
 
 using namespace std;
 using namespace sf;
@@ -52,6 +54,8 @@ class Character
 
 	Vector2f getPosition() const;
 
+	Location getLocation() const;
+
 	float getOrientation() const;
 
 	/** Returns the character's id. */
@@ -72,6 +76,11 @@ class Character
 
 	/** Returns the breadcrumbs from the character. */
 	vector<Crumb>* getBreadCrumbs();
+
+	inline void stop() {
+		kinematic.angularVelocity = 0;
+		kinematic.linearVelocity = Vector2f(0.f, 0.f);
+	}
 };
 
 #endif

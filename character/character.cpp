@@ -4,6 +4,7 @@
 #include "../steering/steeringoutput.h"
 #include "../id/id.h"
 #include "../kinematic/kinematic.h"
+#include "../level/location.h"
 #include "character.h"
 
 using namespace std;
@@ -28,6 +29,10 @@ Vector2f Character::getPosition() const {
 	return sprite.getPosition();
 }
 
+Location Character::getLocation() const {
+	return mapToLevel(MAZE_X, SIZE, sprite.getPosition());
+}
+
 float Character::getOrientation() const {
 	return sprite.getRotation();
 }
@@ -48,6 +53,8 @@ void Character::update(const SteeringOutput& steering, const float dt, const boo
 	kinematic.update(steering, dt, clip);
 	sprite.setPosition(kinematic.position);
 	sprite.setRotation(kinematic.orientation);
+
+	// Update sprite.
 	if (crumb_drop_timer > 0) {
 		crumb_drop_timer -= 0.1f;
 	}

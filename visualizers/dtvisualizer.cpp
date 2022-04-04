@@ -13,7 +13,7 @@ using namespace std;
 
 void DecisionTreeVisualizer() {
 
-    // Create visualization assests.
+    // Create all assests.
     cout << "Creating scene assets..." << endl;
     Environment environment;
 
@@ -26,26 +26,34 @@ void DecisionTreeVisualizer() {
     auto levelTexture = generateLevelTexture(environment.getLevel());
     Sprite levelSprite(levelTexture->getTexture());
 
-    // Path.
-    Path path;
+    // Path textures.
     RenderTexture pathTexture;
     pathTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
     vector<LevelCell> pathSFML;
     Sprite pathSprite;
 
     // Path following.
-    FollowPath pathFollowing(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-    bool followingPath = false;
-    bool newPathExists = false;
+    FollowPath pathFollowing(Path(), PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+    bool* followingPath = new bool(false);
+    bool* newPathExists = new bool(false);
+    bool* monsterClose = new bool(false);
 
     // SceneView assets.
     SceneView sceneView(SCENE_WINDOW_X, SCENE_WINDOW_Y, SCENE_WINDOW_FR);
     Clock clock;
     Mouse mouse;
 
+    // Additional state for DecisionTree.
+    Location* mouseLocation = new Location(mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition())));
+    float* dt = new float(0.f);
+
+    // DecisionTree.
+    CharacterDecisionTree tree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
+
+    // Animate.
     cout << "Rendering level..." << endl;
     while (sceneView.scene.isOpen()) {
-        float dt = clock.restart().asSeconds();
+        *dt = clock.restart().asSeconds();
 
         // Handle scene poll event.
         Event event;
@@ -55,39 +63,51 @@ void DecisionTreeVisualizer() {
                     sceneView.scene.close();
                     break;
                 case Event::MouseButtonPressed:
-                    if (!followingPath) {
-                        //  Get path and path following.
-                        path = getPath(environment, character.getPosition(), Vector2f(mouse.getPosition(sceneView.scene)));
-                        pathFollowing = FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-                        newPathExists = true;
-                        followingPath = true;
-
-                        // Recreate path sprite.
-                        pathSFML = path.toSFML();
-                        pathTexture.clear(sf::Color{ 255,255,255,0 });
-                        for (const auto& element : pathSFML) { pathTexture.draw(element); }
-                        pathTexture.display();
-                        pathSprite = Sprite(pathTexture.getTexture());
+                    if (*followingPath == false) {
+                        cout << "CLICK" << endl;
+                        // TODO: Inverse the mouse location or the visualizer?
+                        *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition(sceneView.scene)));
+                        *newPathExists = true;
+                        *followingPath = true;
                     }
                     break;
             }
         }
+
+        // DecisionTree makes decision.
+        tree.makeDecision();
+
         // Mark followingPath.
-        if (!path.isEmpty() && mapToLevel(MAZE_X, SIZE, character.getPosition()) == path.getLast()) {
-            followingPath = false;
+        if (*followingPath) {
+            if (!tree.getPath().isEmpty()) {
+                auto path = tree.getPath();
+                auto a = path.getPathList()[path.size() - 1].getLocation();
+                auto b = path.getPathList()[path.size() - 2].getLocation();
+                auto d = getDirection(a, b);
+                auto t = flip(mapToWindow(SIZE, path.getLast()));
+                if (d == 3) { t.x += 6; }
+                if (d == 2) { t.y += 6; }
+                if (closeEnough(character->getPosition(), t)) {
+                    *followingPath = false;
+                }
+            }
         }
 
-        // Update if and only if newPathExists.
-        if (newPathExists) {
-            SteeringOutput pathAcceleration = pathFollowing.calculateAcceleration(character.getKinematic(), Kinematic());
-            character.update(pathAcceleration, dt, true);
+        // Update path first iteration of tree path finding.
+        if (*followingPath) {
+            if (!tree.getPath().isEmpty() && tree.getFollowingIteration() == 1) {
+                pathSFML = tree.getPath().toSFML();
+                pathTexture.clear(sf::Color{ 255,255,255,0 });
+                for (const auto& element : pathSFML) { pathTexture.draw(element); }
+                pathTexture.display();
+                pathSprite = Sprite(pathTexture.getTexture());
+            }
         }
-
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);
-        sceneView.scene.draw(pathSprite);
-        sceneView.scene.draw(character.sprite);
+        if (*followingPath) { sceneView.scene.draw(pathSprite); }
+        sceneView.scene.draw(character->sprite);
         sceneView.scene.display();
     }
 
@@ -95,5 +115,9 @@ void DecisionTreeVisualizer() {
     delete levelTexture;
     delete characterCrumbs;
     delete characterTexture;
-    // delete character;
+    delete character;
+    delete followingPath;
+    delete newPathExists;
+    delete monsterClose;
+    delete dt;
 }
