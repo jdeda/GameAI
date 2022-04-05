@@ -10,24 +10,6 @@
 #include "../steering/steering.h"
 #include "../kinematic/kinematic.h"
 
-enum MonsterAction
-{
-    wandering,
-    chasing,
-    waiting
-};
-
-class MonsterDecisionNode
-{
-    private:
-    MonsterAction action;
-    MonsterDecisionNode& trueNode;
-    MonsterDecisionNode& falseNode;
-    public:
-    MonsterDecisionNode(MonsterDecisionNode& trueNode_, MonsterDecisionNode& falseNode_);
-    MonsterDecisionNode makeDecision(MonsterAction data_) const;
-};
-
 enum CharacterAction
 {
     followClick,
