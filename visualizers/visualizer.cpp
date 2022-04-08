@@ -6,6 +6,7 @@
 #include "../search/search.h"
 #include "../scene/scene.h"
 #include "../decision/decisiontree.h"
+#include "../decision/behaviortree.h"
 #include "visualizers.h"
 
 using namespace sf;
@@ -53,7 +54,10 @@ void Visualizer() {
     float* dt = new float(0.f);
 
     // DecisionTree.
-    CharacterDecisionTree tree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
+    CharacterDecisionTree characterTree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
+
+     // BehaviorTree.
+    MonsterBehaviorTree monsterTree(environment.getGraph(), monster, dt, monsterClose);
 
     // Animate.
     cout << "Rendering level..." << endl;
@@ -80,12 +84,12 @@ void Visualizer() {
         }
 
         // DecisionTree makes decision.
-        tree.makeDecision();
+        characterTree.makeDecision();
 
-        // Mark followingPath.
+        // Mark followingPath (decision tree).
         if (*followingPath) {
-            if (!tree.getPath().isEmpty()) {
-                auto path = tree.getPath();
+            if (!characterTree.getPath().isEmpty()) {
+                auto path = characterTree.getPath();
                 auto a = path.getPathList()[path.size() - 1].getLocation();
                 auto b = path.getPathList()[path.size() - 2].getLocation();
                 auto d = getDirection(a, b);
@@ -98,16 +102,20 @@ void Visualizer() {
             }
         }
 
-        // Update path first iteration of tree path finding.
+        // Update path first iteration of tree path finding (decision tree).
         if (*followingPath) {
-            if (!tree.getPath().isEmpty() && tree.getFollowingIteration() == 1) {
-                pathSFML = tree.getPath().toSFML();
+            if (!characterTree.getPath().isEmpty() && characterTree.getFollowingIteration() == 1) {
+                pathSFML = characterTree.getPath().toSFML();
                 pathTexture.clear(sf::Color{ 255,255,255,0 });
                 for (const auto& element : pathSFML) { pathTexture.draw(element); }
                 pathTexture.display();
                 pathSprite = Sprite(pathTexture.getTexture());
             }
         }
+
+        // Behavior tree makes decision.
+        monsterTree.run();
+
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);
