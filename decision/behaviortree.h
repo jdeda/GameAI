@@ -27,7 +27,7 @@ public:
     virtual bool run() const = 0;
 };
 
-class MonsterChasing : MonsterTask
+class MonsterChasing : public MonsterTask
 {
 private:
     const float MAX_D = 20.f;
@@ -35,13 +35,13 @@ private:
     Location enemyLocation;
 
 public:
+    MonsterChasing(const Location& monsterLocation_, const Location& enemyLocation_);
     inline bool run() const {
         return sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
     }
-
 };
 
-class MonsterWandering : MonsterTask
+class MonsterWandering : public MonsterTask
 {
 private:
     const float MAX_D = 20.f;
@@ -49,21 +49,23 @@ private:
     Location enemyLocation;
 
 public:
+    MonsterWandering(const Location& monsterLocation_, const Location& enemyLocation_);
     inline bool run() const {
         return sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
     }
 };
 
-class MonsterGuessing : MonsterTask
+class MonsterGuessing : public MonsterTask
 {
 private:
     const float MAX_D = 20.f;
     const float MAX_T = 2.f;
-    float time;
+    float time = 0;
     Location monsterLocation;
     Location enemyLocation;
 
 public:
+    MonsterGuessing(const Location& monsterLocation_, const Location& enemyLocation_);
     inline bool run() const {
         bool chasing = sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
         if (!chasing) {
@@ -76,41 +78,49 @@ public:
 };
 
 // For monster chase.
-class MonsterSelector : MonsterTask
+class MonsterSelector : public MonsterTask
 {
 private:
-    vector<MonsterTask> children;
+    vector<MonsterTask*> children;
     inline bool run() const {
         for (const auto& c : children) {
-            if (c.run()) { return true; }
+            if (c->run()) { return true; }
         }
         return false;
     }
+    public:
+     MonsterSelector(const vector<MonsterTask*>& children);
 };
 
 // For monster wander.
-class MonsterSequence : MonsterTask
+class MonsterSequence : public MonsterTask
 {
 private:
-    vector<MonsterTask> children;
+    vector<MonsterTask*> children;
     inline bool run() const {
         for (const auto& c : children) {
-            if (!c.run()) { return false; }
+            if (!c->run()) { return false; }
         }
         return true;
     }
+
+    public:
+    MonsterSequence(const vector<MonsterTask*>& children);
+
 };
 
 // For monster guess.
-class MonsterRandomSelector : MonsterTask
+class MonsterRandomSelector : public MonsterTask
 {
 private:
-    vector<MonsterTask> children;
+    vector<MonsterTask*> children;
     inline bool run() const {
         while (true) {
-            if (children[rand() % (children.size() - 1)].run()) { return true; }
+            if (children[rand() % (children.size() - 1)]->run()) { return true; }
         }
     }
+    public:
+    MonsterRandomSelector(const vector<MonsterTask*>& children);
 };
 
 
@@ -128,9 +138,10 @@ private:
     /** Observable state for action code. */
     float* dt;
     Graph graph;
+    Character* character;
 
     /** Root node. */
-    MonsterTask& root;
+    MonsterTask* root;
 
     /** Monster movement path functionality. */
     Path path;
@@ -139,12 +150,9 @@ private:
     int followingIteration = 0;
 
     public:
-
-    MonsterBehaviorTree(const Graph& graph_, Character* monster_, float* dt_, bool* monsterClose_);
-
+    MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_, bool* monsterClose_);
     inline void run() {
-        auto decision = root.run();
+        auto decision = root->run();
     }
-
 };
 #endif
