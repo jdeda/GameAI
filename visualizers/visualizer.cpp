@@ -57,7 +57,7 @@ void Visualizer() {
     CharacterDecisionTree characterTree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
 
      // BehaviorTree.
-    MonsterBehaviorTree monsterTree(environment.getGraph(), character, monster, dt, monsterClose);
+    MonsterBehaviorTree monsterTree(environment.getGraph(), character, monster, dt);
 
     // Animate.
     cout << "Rendering level..." << endl;

@@ -17,91 +17,96 @@ enum MonsterAction
 {
     chasing,
     wandering,
-    guessing
+    guessing,
+    nothing
 };
 
 class MonsterTask
 {
-
-public:
-    virtual bool run() const = 0;
+    public:
+    virtual MonsterAction run() = 0;
 };
 
-class MonsterChasing : public MonsterTask
+class MonsterNearby : public MonsterTask
 {
-private:
+    private:
     const float MAX_D = 20.f;
     Location monsterLocation;
     Location enemyLocation;
 
-public:
+    public:
+    MonsterNearby(const Location& monsterLocation_, const Location& enemyLocation_);
+    inline MonsterAction run() {
+        bool nearby = sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
+        return nearby ? chasing : nothing;
+    }
+};
+
+class MonsterChasing : public MonsterTask
+{
+    private:
+    Location monsterLocation;
+    Location enemyLocation;
+
+    public:
     MonsterChasing(const Location& monsterLocation_, const Location& enemyLocation_);
-    inline bool run() const {
-        return sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
+    inline MonsterAction run() {
+        return chasing;
     }
 };
 
 class MonsterWandering : public MonsterTask
 {
-private:
-    const float MAX_D = 20.f;
+    private:
     Location monsterLocation;
     Location enemyLocation;
 
-public:
+    public:
     MonsterWandering(const Location& monsterLocation_, const Location& enemyLocation_);
-    inline bool run() const {
-        return sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
+    inline MonsterAction run() {
+        return wandering;
     }
 };
 
 class MonsterGuessing : public MonsterTask
 {
-private:
-    const float MAX_D = 20.f;
-    const float MAX_T = 2.f;
-    float time = 0;
+    private:
     Location monsterLocation;
     Location enemyLocation;
 
-public:
+    public:
     MonsterGuessing(const Location& monsterLocation_, const Location& enemyLocation_);
-    inline bool run() const {
-        bool chasing = sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
-        if (!chasing) {
-            return time < MAX_T;
-        }
-        else {
-            return false;
-        }
+    inline MonsterAction run() {
+        return guessing;
     }
 };
 
-// For monster chase.
 class MonsterSelector : public MonsterTask
 {
-private:
+    private:
     vector<MonsterTask*> children;
-    inline bool run() const {
+    inline MonsterAction run() {
         for (const auto& c : children) {
-            if (c->run()) { return true; }
+            auto status = c->run();
+            if (status != nothing) { return status; }
         }
-        return false;
+        return nothing;
     }
     public:
-     MonsterSelector(const vector<MonsterTask*>& children);
+    MonsterSelector(const vector<MonsterTask*>& children);
 };
 
-// For monster wander.
 class MonsterSequence : public MonsterTask
 {
-private:
+    private:
     vector<MonsterTask*> children;
-    inline bool run() const {
+    inline MonsterAction run() {
+        auto status = nothing;
         for (const auto& c : children) {
-            if (!c->run()) { return false; }
+            status = c->run();
+            if (status == nothing) { return nothing; }
         }
-        return true;
+        return status; // todo: which one to call status, prob last one ran
     }
 
     public:
@@ -109,14 +114,40 @@ private:
 
 };
 
-// For monster guess.
+// int i = rand() % (children.size());
+// cout << "rand: " << i << endl;
+// choice = i;
 class MonsterRandomSelector : public MonsterTask
 {
-private:
+    private:
+    int choice = -1;
+    float timer = 0;
     vector<MonsterTask*> children;
-    inline bool run() const {
+    inline MonsterAction run() {
+        cout << "TIMER:  " << timer << endl;
         while (true) {
-            if (children[rand() % (children.size() - 1)]->run()) { return true; }
+            if (choice == -1) {
+                choice = rand() % (children.size());
+                auto status = children[choice]->run();
+                if (status != nothing) {
+                    return status;
+                }
+                else {
+                    choice = -1;
+                }
+            }
+            else {
+                cout << "GOOD\n";
+                if (timer > 5.f) {
+                    timer = 0.f;
+                    choice = -1;
+                }
+                else { 
+                    timer += 0.1;
+                    cout << "INCR: " << timer << endl;
+                    return children[choice]->run();
+                }
+            }
         }
     }
     public:
@@ -127,13 +158,10 @@ private:
 class MonsterBehaviorTree
 {
 
-private:
+    private:
 
     /* Mutable state when decision is carried out. */
     Character* monster;
-
-    /** Observable state for decision making. */
-    bool* monsterClose;
 
     /** Observable state for action code. */
     float* dt;
@@ -143,16 +171,62 @@ private:
     /** Root node. */
     MonsterTask* root;
 
+    /** Last node that was successful. */
+    // MonsterTask* last; // TODO: Add to constructor and add to BT.run().
+
     /** Monster movement path functionality. */
     Path path;
     AStar* search;
     FollowPath* pathFollowing;
-    int followingIteration = 0;
+    int chasingIteration = 0;
 
     public:
-    MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_, bool* monsterClose_);
+    MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
     inline void run() {
         auto decision = root->run();
+
+        cout << "MONSTER: " << decision << endl;
+
+        // If first iteration of chasingIteration, find path.
+        if (decision == chasing && chasingIteration == 0) {
+            search = new AStar(graph, monster->getLocation(), character->getLocation(), ManhattanHeuristic(character->getLocation()));
+            path = search->search();
+            path.print();
+            pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+        }
+
+        // If chasingIteration has complete, reset count. TODO: Probably bad way to do this.
+        if (decision != chasing) {
+            chasingIteration = 0;
+        }
+
+        switch (decision) {
+            case chasing:
+                {
+                    SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
+                    if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
+                        monster->stop(); // TODO: more hacking to be put here.
+                    }
+                    else {
+                        monster->update(pathAccelerations, *dt, true);
+                    }
+                    chasingIteration += 1;
+                    break;
+
+                }
+            case wandering:
+                {
+                    break;
+                }
+            case guessing:
+                {
+                    break;
+                }
+            case nothing:
+                {
+                    break;
+                }
+        }
     }
 };
 #endif
