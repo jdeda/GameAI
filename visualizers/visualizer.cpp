@@ -73,7 +73,6 @@ void Visualizer() {
                     break;
                 case Event::MouseButtonPressed:
                     if (*followingPath == false) {
-                        cout << "CLICK" << endl;
                         // TODO: Inverse the mouse location or the visualizer?
                         *mouseLocation = mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition(sceneView.scene)));
                         *newPathExists = true;

@@ -10,6 +10,7 @@
 #include "../level/location.h"
 #include "../steering/steering.h"
 #include "../kinematic/kinematic.h"
+#include "../debug/debug.h"
 
 using namespace std;
 
@@ -31,25 +32,23 @@ class MonsterNearby : public MonsterTask
 {
     private:
     const float MAX_D = 20.f;
-    Location monsterLocation;
-    Location enemyLocation;
+    Character* character;
+    Character* monster;
 
     public:
-    MonsterNearby(const Location& monsterLocation_, const Location& enemyLocation_);
+    MonsterNearby(Character* character_, Character* monster_);
     inline MonsterAction run() {
-        bool nearby = sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2)) < MAX_D;
+        auto enemyLocation = character->getLocation();
+        auto monsterLocation = monster->getLocation();
+        float distance = sqrt(pow(enemyLocation.x - monsterLocation.x, 2) + pow(enemyLocation.y - monsterLocation.y, 2));
+        bool nearby = distance < MAX_D;
         return nearby ? chasing : nothing;
     }
 };
 
 class MonsterChasing : public MonsterTask
 {
-    private:
-    Location monsterLocation;
-    Location enemyLocation;
-
     public:
-    MonsterChasing(const Location& monsterLocation_, const Location& enemyLocation_);
     inline MonsterAction run() {
         return chasing;
     }
@@ -57,12 +56,7 @@ class MonsterChasing : public MonsterTask
 
 class MonsterWandering : public MonsterTask
 {
-    private:
-    Location monsterLocation;
-    Location enemyLocation;
-
     public:
-    MonsterWandering(const Location& monsterLocation_, const Location& enemyLocation_);
     inline MonsterAction run() {
         return wandering;
     }
@@ -70,12 +64,7 @@ class MonsterWandering : public MonsterTask
 
 class MonsterGuessing : public MonsterTask
 {
-    private:
-    Location monsterLocation;
-    Location enemyLocation;
-
     public:
-    MonsterGuessing(const Location& monsterLocation_, const Location& enemyLocation_);
     inline MonsterAction run() {
         return guessing;
     }
@@ -114,37 +103,44 @@ class MonsterSequence : public MonsterTask
 
 };
 
-// int i = rand() % (children.size());
-// cout << "rand: " << i << endl;
-// choice = i;
 class MonsterRandomSelector : public MonsterTask
 {
     private:
+    MonsterAction choiceStatus = nothing;
     int choice = -1;
     float timer = 0;
     vector<MonsterTask*> children;
     inline MonsterAction run() {
-        cout << "TIMER:  " << timer << endl;
         while (true) {
             if (choice == -1) {
                 choice = rand() % (children.size());
-                auto status = children[choice]->run();
-                if (status != nothing) {
-                    return status;
+                choiceStatus = children[choice]->run();
+                if (choiceStatus != nothing) {
+                    return choiceStatus;
                 }
                 else {
                     choice = -1;
                 }
             }
             else {
-                cout << "GOOD\n";
                 if (timer > 5.f) {
                     timer = 0.f;
                     choice = -1;
+                    choiceStatus = nothing;
                 }
-                else { 
-                    timer += 0.1;
-                    cout << "INCR: " << timer << endl;
+                else {
+                    if (choiceStatus == guessing) {
+                        timer += 0.2;
+
+                    }
+                    else if (choiceStatus == wandering) {
+                        timer += 0.05;
+
+                    }
+                    else {
+                        fail("random selector invalid choice status");
+
+                    }
                     return children[choice]->run();
                 }
             }
@@ -153,7 +149,6 @@ class MonsterRandomSelector : public MonsterTask
     public:
     MonsterRandomSelector(const vector<MonsterTask*>& children);
 };
-
 
 class MonsterBehaviorTree
 {
@@ -189,7 +184,7 @@ class MonsterBehaviorTree
 
         // If first iteration of chasingIteration, find path.
         if (decision == chasing && chasingIteration == 0) {
-            search = new AStar(graph, monster->getLocation(), character->getLocation(), ManhattanHeuristic(character->getLocation()));
+            search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
             path = search->search();
             path.print();
             pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
@@ -198,11 +193,21 @@ class MonsterBehaviorTree
         // If chasingIteration has complete, reset count. TODO: Probably bad way to do this.
         if (decision != chasing) {
             chasingIteration = 0;
+            monster->stop();
+            cout << "STOPPED" << endl;
         }
 
         switch (decision) {
             case chasing:
                 {
+                    // TODO: Run inadmissible heuristic every time because character moves. 
+                    // You could adjust this to only recalibrate when character has changed an entire square (or two).
+                    // monster->stop();
+                    // search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
+                    // path = search->search();
+                    // path.print();
+                    // pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+
                     SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
                     if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
                         monster->stop(); // TODO: more hacking to be put here.
