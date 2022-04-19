@@ -31,7 +31,7 @@ class MonsterTask
 class MonsterNearby : public MonsterTask
 {
     private:
-    const float MAX_D = 20.f;
+    const float MAX_D = 5.f;
     Character* character;
     Character* monster;
 
@@ -166,8 +166,9 @@ class MonsterBehaviorTree
     /** Root node. */
     MonsterTask* root;
 
-    /** Last node that was successful. */
+    /** Last decision functionality. */
     // MonsterTask* last; // TODO: Add to constructor and add to BT.run().
+    MonsterAction lastDecision = nothing;
 
     /** Monster movement path functionality. */
     Path path;
@@ -177,28 +178,34 @@ class MonsterBehaviorTree
     int chasingPauseIteration = 0;
     bool chasingPause = false;
 
-    public:
-    bool isChasing = false;
-    MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
-    inline void run() {
-        auto decision = root->run();
-        cout << "IT : " << chasingIteration << endl;
-        cout << "[IT] : " << chasingPause << endl;
+    /** Monster wandering functionality. */
+    Wander* wander;
+    int wanderIteration = 0;
+    bool wanderPause = false;
 
-        cout << "MONSTER: " << decision << endl;
+    /** Monster guessing functionality. */
+    int guessIteration = 0;
+    bool guessPause = false;
+
+    public:
+    inline MonsterAction generateAction(MonsterAction decision) {
+        MonsterAction newDecision = decision;
+        while (newDecision != decision) {
+            newDecision = root->run();
+        }
+        return newDecision;
+    }
+
+    inline bool setupChasing(MonsterAction decision) {
         // If been chasing long enough, pause momentarily from taking chasing action again.
         if (chasingPause == true) {
-            cout << "YAY" << endl;
             if (chasingPauseIteration > 50) {
                 chasingPauseIteration = 0;
                 chasingPause = false;
-                return;
+                return true;
             }
             else {
-                cout << "NOOOOOO" << endl;
-                while (decision != chasing) {
-                    decision = root->run();
-                }
+                return false;
                 chasingPauseIteration += 1;
             }
         }
@@ -206,7 +213,7 @@ class MonsterBehaviorTree
         // If been chasing long enough, do nothing and pause momentarily from taking chasing action again.
         if (decision == chasing && chasingIteration > 200) {
             chasingPause = true; // TODO: Set location or arrive to nearest square.
-            return;
+            return true;
         }
 
         // If first iteration of chasingIteration, find path.
@@ -224,9 +231,87 @@ class MonsterBehaviorTree
             isChasing = false;
             cout << "STOPPED" << endl;
         }
+        return true;
+    }
+
+    inline bool setupWandering() {
+        if (wanderIteration > 200) {
+            wanderIteration = 0;
+            wanderPause = true; // TODO: Set location or arrive to nearest square.
+            return true;
+        }
+
+        if (wanderIteration == 0) {
+            wander = new Wander(
+                WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
+                TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED
+            );
+            search = new AStar(graph, monster->getLocation(), monster->getLocation(), CustomHeuristic(monster->getLocation()));
+            path = search->search();
+            path.print();
+            pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+        }
+
+        return true;
+
+    }
+
+    inline void preCheck(MonsterAction decision) {
+        if (lastDecision == chasing && decision != chasing) {
+            chasingIteration = 0;
+            monster->stop();
+            isChasing = false;
+        }
+        else if (lastDecision == wandering && decision != wandering) {
+            wanderIteration = 0;
+            monster->stop();
+            wanderPause = false;
+        }
+        else if (lastDecision == guessing && decision != guessing) {
+            guessIteration = 0;
+            monster->stop();
+            guessPause = false;
+        }
+        else {
+            // Do nothing.
+        }
+    }
+
+    inline MonsterAction setupAction(MonsterAction decision) {
+        cout << "YAY" << endl;
+        preCheck(decision);
+        cout << "DAMMIT" << endl;
         switch (decision) {
             case chasing:
                 {
+                    auto status = setupChasing(decision);
+                    return status ? decision : generateAction(decision);
+                }
+            case wandering:
+                {
+                    auto status = setupWandering();
+                    return decision;
+                }
+            case guessing:
+                {
+                    return decision;
+
+                }
+            default:
+                {
+                    return decision;
+                }
+        }
+    }
+    bool isChasing = false;
+    MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
+    inline void run() {
+        auto decision = setupAction(root->run());
+        lastDecision = decision;
+        switch (decision) {
+            case chasing:
+                {
+                    cout << "CHASING" << endl;
                     isChasing = true;
                     SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
                     if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
@@ -241,14 +326,29 @@ class MonsterBehaviorTree
                 }
             case wandering:
                 {
+                    cout << "WANDERING" << endl;
+                    SteeringOutput wanderAccelerations = wander->calculateAcceleration(monster->getKinematic(), monster->getKinematic());
+                    monster->update(wanderAccelerations, *dt, true);
+                    cout << "OK" << endl;
+                    // cout << "oh: " << wanderAccelerations.linearAcceleration.x << " " << wanderAccelerations.linearAcceleration.y << endl;
+                    // Kinematic check = monster->getKinematic();
+                    // check.update(wanderAccelerations, *dt, true);
+                    // if(mapToLevel(graph.getRows(), SIZE, check.position) == Location(-1, -1)) {
+                    //     monster->update(SteeringOutput(), *dt, true);
+                    // }
+                    // else {
+                    //     monster->update(wanderAccelerations, *dt, true);
+                    // }
                     break;
                 }
             case guessing:
                 {
+                    cout << "GUESSING" << endl;
                     break;
                 }
             case nothing:
                 {
+                    cout << "DOING NOTHING" << endl;
                     break;
                 }
         }

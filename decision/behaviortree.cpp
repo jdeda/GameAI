@@ -24,6 +24,10 @@ MonsterBehaviorTree::MonsterBehaviorTree(const Graph& graph_, Character* charact
 	monster = monster_;
 	search = new AStar(graph, monster->getLocation(), monster->getLocation(), CustomHeuristic(monster->getLocation()));
 	pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+	wander = new Wander(
+		WANDER_OFFSET, WANDER_RADIUS, WANDER_RATE, WANDER_ORIENTATION, WANDER_MAX_ACCELERATION,
+		TIME_TO_REACH_TARGET_SPEED, WANDER_RADIUS_OF_ARRIVAL, WANDER_RADIUS_OF_DECELERATION, MAX_SPEED
+	);
 
 	// Create sequence branch.
 	vector<MonsterTask*> sequenceChildren;

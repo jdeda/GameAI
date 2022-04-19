@@ -61,7 +61,8 @@ Character* initializeMonster(vector<Crumb>* crumbs, Texture* texture) {
     character->texture = *texture;
     character->sprite = *(new Sprite(*texture));
     character->sprite.setScale(scale, scale);
-    Vector2f start = mapToWindow(SIZE, Location(18, 18));
+    // Vector2f start = mapToWindow(SIZE, Location(18, 18));
+    Vector2f start = mapToWindow(SIZE, Location(10, 10));
     Kinematic initialState;
     initialState.position = start;
     character->setKinematic(initialState);
@@ -77,7 +78,6 @@ RenderTexture* generateLevelTexture(const Level& level) {
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
             levelTexture->draw(levelSFML[i][j]);
-
         }
     }
     levelTexture->display();

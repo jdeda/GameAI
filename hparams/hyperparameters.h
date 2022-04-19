@@ -37,6 +37,16 @@ const float RADIUS_OF_DECELERATION = 25.f;
 const float PATH_OFFSET = 1;
 const float PREDICTION_TIME = 0.15;
 
+// Wander.
+const float WANDER_RADIUS_OF_ARRIVAL = 25.f;
+const float WANDER_RADIUS_OF_DECELERATION = 500.f;
+const float WANDER_OFFSET = 600.f;
+const float WANDER_RADIUS = 200.f;
+const float WANDER_RATE = 200.f;
+const float WANDER_ORIENTATION = -90.f;
+const float WANDER_MAX_ACCELERATION = 200.f;
+
+
 
 // Other.
 const float MAZE_X = 22.f;

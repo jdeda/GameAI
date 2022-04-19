@@ -314,4 +314,67 @@ class FollowPath : Arrive
     }
 };
 
+class Wander: Arrive {
+
+    private:
+        float wanderOffset;
+        float wanderRadius;
+        float wanderRate;
+        float wanderOrientation;
+        float maxAcceleration;
+        Vector2f wanderTargetPosition; // This is cheese...
+
+    public:
+
+        /** Constructor for  Wander. */
+        inline  Wander(const float off, const float radius, const float rate, const float orient, const float accel,
+               const float t, const float r1, const float r2, float s) : Arrive(t, r1, r2, s) {
+            this->wanderOffset = off;
+            this->wanderRadius = radius;
+            this->wanderRate = rate;
+            this->wanderOrientation = orient;
+            this->maxAcceleration = accel;
+        }
+
+        inline  float getWanderOffset() { return this->wanderOffset; }
+        inline  float getWanderRadius() { return this->wanderRadius; }
+        inline  float getWanderRate() { return this->wanderRate; }
+        inline  float getWanderOrientation() { return this->wanderOrientation; }
+        inline  float getmaxAcceleration() { return this->maxAcceleration; }
+
+        inline  float mapToRange(int rotation) {
+            int r = rotation % 360;
+            if (abs(r) <= 180) {
+                return r;
+            }
+            else if (abs(r) > 180) {
+                return 180 - r;
+            }
+            else {
+                return 180 + r;
+            }
+        }
+
+        /** Returns variable-matching steering output to achieve Wander. */
+        inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
+            SteeringOutput output;
+            Kinematic target;
+            float randomBinomial = ((double) rand() / (RAND_MAX));
+            float randomDirection = ((double) rand() / (RAND_MAX));
+            if(randomDirection < 0.5) { randomBinomial *= -1; }
+            target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;
+            auto vec = vmath::asVector(character.orientation);
+            target.position.x = (character.position.x + wanderOffset) * vec.x;
+            target.position.y = (character.position.y + wanderOffset) * vec.y;
+            auto vecc = this->getWanderRadius() * vmath::asVector(target.orientation);
+            target.position.x += vecc.x;
+            target.position.y += vecc.y;
+            this->wanderTargetPosition = target.position; // Set wanderTargetPosition for applying align.
+            return Arrive::calculateAcceleration(character, target);    
+        }
+        
+        inline  Vector2f getWanderTargetPosition() { return this->wanderTargetPosition; }
+        inline  void setWanderTargetPosition(const Vector2f& p) { this->wanderTargetPosition = p; }
+};
+
 #endif
