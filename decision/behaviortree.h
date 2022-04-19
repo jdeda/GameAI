@@ -205,8 +205,7 @@ class MonsterBehaviorTree
 
         // If been chasing long enough, do nothing and pause momentarily from taking chasing action again.
         if (decision == chasing && chasingIteration > 200) {
-            chasingPause = true;
-            
+            chasingPause = true; // TODO: Set location or arrive to nearest square.
             return;
         }
 
