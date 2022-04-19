@@ -174,14 +174,41 @@ class MonsterBehaviorTree
     AStar* search;
     FollowPath* pathFollowing;
     int chasingIteration = 0;
+    int chasingPauseIteration = 0;
+    bool chasingPause = false;
 
     public:
     bool isChasing = false;
     MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
     inline void run() {
         auto decision = root->run();
+        cout << "IT : " << chasingIteration << endl;
+        cout << "[IT] : " << chasingPause << endl;
 
         cout << "MONSTER: " << decision << endl;
+        // If been chasing long enough, pause momentarily from taking chasing action again.
+        if (chasingPause == true) {
+            cout << "YAY" << endl;
+            if (chasingPauseIteration > 50) {
+                chasingPauseIteration = 0;
+                chasingPause = false;
+                return;
+            }
+            else {
+                cout << "NOOOOOO" << endl;
+                while (decision != chasing) {
+                    decision = root->run();
+                }
+                chasingPauseIteration += 1;
+            }
+        }
+
+        // If been chasing long enough, do nothing and pause momentarily from taking chasing action again.
+        if (decision == chasing && chasingIteration > 200) {
+            chasingPause = true;
+            
+            return;
+        }
 
         // If first iteration of chasingIteration, find path.
         if (decision == chasing && chasingIteration == 0) {
@@ -198,19 +225,10 @@ class MonsterBehaviorTree
             isChasing = false;
             cout << "STOPPED" << endl;
         }
-
         switch (decision) {
             case chasing:
                 {
                     isChasing = true;
-                    // TODO: Run inadmissible heuristic every time because character moves. 
-                    // You could adjust this to only recalibrate when character has changed an entire square (or two).
-                    // monster->stop();
-                    // search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
-                    // path = search->search();
-                    // path.print();
-                    // pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-
                     SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
                     if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
                         monster->stop(); // TODO: more hacking to be put here.
@@ -240,4 +258,13 @@ class MonsterBehaviorTree
 
     inline Path getPath() { return path; }
 };
+
+// TODO: Run inadmissible heuristic every time because character moves. 
+       // You could adjust this to only recalibrate when character has changed an entire square (or two).
+       // monster->stop();
+       // search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
+       // path = search->search();
+       // path.print();
+       // pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+
 #endif
