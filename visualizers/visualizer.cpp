@@ -38,6 +38,12 @@ void Visualizer() {
     vector<LevelCell> pathSFML;
     Sprite pathSprite;
 
+    // Path textures.
+    RenderTexture mpathTexture;
+    mpathTexture.create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
+    vector<LevelCell> mpathSFML;
+    Sprite mpathSprite;
+
     // Path following.
     FollowPath pathFollowing(Path(), PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
     bool* followingPath = new bool(false);
@@ -56,7 +62,7 @@ void Visualizer() {
     // DecisionTree.
     CharacterDecisionTree characterTree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
 
-     // BehaviorTree.
+    // BehaviorTree.
     MonsterBehaviorTree monsterTree(environment.getGraph(), character, monster, dt);
 
     // Animate.
@@ -115,10 +121,35 @@ void Visualizer() {
         // Behavior tree makes decision.
         monsterTree.run();
 
+        if (monsterTree.isChasing) {
+            if (!monsterTree.getPath().isEmpty()) {
+                auto path = monsterTree.getPath();
+                auto a = path.getPathList()[path.size() - 1].getLocation();
+                auto b = path.getPathList()[path.size() - 2].getLocation();
+                auto d = getDirection(a, b);
+                auto t = flip(mapToWindow(SIZE, path.getLast()));
+                if (d == 3) { t.x += 6; }
+                if (d == 2) { t.y += 6; }
+                if (closeEnough(monster->getPosition(), t)) {
+                    monsterTree.isChasing = false;
+                }
+            }
+        }
+        if (monsterTree.isChasing) {
+            if (!monsterTree.getPath().isEmpty() && monsterTree.getChasingIteration() == 1) {
+                mpathSFML = monsterTree.getPath().toSFML();
+                mpathTexture.clear(sf::Color{ 255,255,255,0 });
+                for (const auto& element : mpathSFML) { mpathTexture.draw(element); }
+                mpathTexture.display();
+                mpathSprite = Sprite(mpathTexture.getTexture());
+            }
+        }
+
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);
         if (*followingPath) { sceneView.scene.draw(pathSprite); }
+        if (monsterTree.isChasing) { sceneView.scene.draw(mpathSprite); }
         sceneView.scene.draw(character->sprite);
         sceneView.scene.draw(monster->sprite);
         sceneView.scene.display();

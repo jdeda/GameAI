@@ -176,6 +176,7 @@ class MonsterBehaviorTree
     int chasingIteration = 0;
 
     public:
+    bool isChasing = false;
     MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
     inline void run() {
         auto decision = root->run();
@@ -194,12 +195,14 @@ class MonsterBehaviorTree
         if (decision != chasing) {
             chasingIteration = 0;
             monster->stop();
+            isChasing = false;
             cout << "STOPPED" << endl;
         }
 
         switch (decision) {
             case chasing:
                 {
+                    isChasing = true;
                     // TODO: Run inadmissible heuristic every time because character moves. 
                     // You could adjust this to only recalibrate when character has changed an entire square (or two).
                     // monster->stop();
@@ -233,5 +236,8 @@ class MonsterBehaviorTree
                 }
         }
     }
+    inline int getChasingIteration() { return chasingIteration; }
+
+    inline Path getPath() { return path; }
 };
 #endif

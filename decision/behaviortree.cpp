@@ -3,6 +3,7 @@
 
 using namespace std;
 
+
 MonsterNearby::MonsterNearby(Character* character_, Character* monster_) {
 	character = character_;
 	monster = monster_;
