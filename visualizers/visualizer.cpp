@@ -146,11 +146,39 @@ void Visualizer() {
             }
         }
         cout << "END" << endl << endl << endl;
+
+
+        if (snatched(monster, character)) {
+            // Recreate assests.
+            characterCrumbs = initializeCrumbs();
+            characterTexture = initializeCharacterTexture();
+            character = initializeCharacter(characterCrumbs, characterTexture);
+            monsterCrumbs = initializeCrumbs();
+            monsterTexture = initializeMonsterTexture();
+            monster = initializeMonster(monsterCrumbs, monsterTexture);
+
+            // Path following.
+            FollowPath pathFollowing(Path(), PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
+            *followingPath = false;
+            *newPathExists = false;
+            *monsterClose = false;
+
+            // Additional state for DecisionTree.
+            *mouseLocation = Location(mapToLevel(MAZE_X, SIZE, Vector2f(mouse.getPosition())));
+            *dt = 0.f;
+
+            // DecisionTree.
+            characterTree = CharacterDecisionTree(environment.getGraph(), character, mouseLocation, dt, monsterClose, followingPath);
+
+            // BehaviorTree.
+            monsterTree = MonsterBehaviorTree(environment.getGraph(), character, monster, dt);
+        }
+
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);
         if (*followingPath) { sceneView.scene.draw(pathSprite); }
-        if (monsterTree.isChasing) { sceneView.scene.draw(mpathSprite); }
+        // if (monsterTree.isChasing) { sceneView.scene.draw(mpathSprite); }
         sceneView.scene.draw(character->sprite);
         sceneView.scene.draw(monster->sprite);
         sceneView.scene.display();

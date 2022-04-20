@@ -37,4 +37,14 @@ inline bool closeEnough(const Vector2f& v1, const Vector2f& v2) {
     // cout << "v2: " << v2.x << " " << v2.y << endl;
     return xSatisfied && ySatisfied;
 }
+
+inline bool snatched(Character* c1, Character* c2) {
+    auto a = c1->getLocation();
+    auto b = c2->getLocation();
+    cout << "SNATCHED? " << endl;
+    cout << a.x << " " << a.y << endl;
+    cout << b.x << " " << b.y << endl << endl;
+    return a == b;
+}
+
 #endif

@@ -31,7 +31,7 @@ class MonsterTask
 class MonsterNearby : public MonsterTask
 {
     private:
-    const float MAX_D = 5.f;
+    const float MAX_D = 10.f;
     Character* character;
     Character* monster;
 
@@ -430,7 +430,7 @@ class MonsterBehaviorTree
                     isChasing = true;
                     SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
                     if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
-                        monster->stop(); // TODO: more hacking to be put here.
+                        monster->stop();
                     }
                     else {
                         monster->update(pathAccelerations, *dt, true);
