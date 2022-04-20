@@ -145,6 +145,8 @@ void Visualizer() {
             }
         }
 
+        cout << "POS: " << character->getPosition().x << " " << character->getPosition().y << endl;
+
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });
         sceneView.scene.draw(levelSprite);

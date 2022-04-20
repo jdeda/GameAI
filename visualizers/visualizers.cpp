@@ -62,7 +62,7 @@ Character* initializeMonster(vector<Crumb>* crumbs, Texture* texture) {
     character->sprite = *(new Sprite(*texture));
     character->sprite.setScale(scale, scale);
     // Vector2f start = mapToWindow(SIZE, Location(18, 18));
-    Vector2f start = mapToWindow(SIZE, Location(10, 10));
+    Vector2f start = mapToWindow(SIZE, Location(14, 14));
     Kinematic initialState;
     initialState.position = start;
     character->setKinematic(initialState);

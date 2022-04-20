@@ -278,9 +278,9 @@ class MonsterBehaviorTree
     }
 
     inline MonsterAction setupAction(MonsterAction decision) {
-        cout << "YAY" << endl;
+        // cout << "YAY" << endl;
         preCheck(decision);
-        cout << "DAMMIT" << endl;
+        // cout << "DAMMIT" << endl;
         switch (decision) {
             case chasing:
                 {
