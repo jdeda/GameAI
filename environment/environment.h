@@ -26,7 +26,10 @@ class Environment
     }
 
     inline GraphNode quantize(const Location& location) {
-        return graph.quantize(location);
+        cout << "GOD DAMMIT" << endl;
+        auto x = graph.quantize(location);
+        cout << "NOOOOOOOOO" << endl;
+        return x;
     }
 
     inline void draw(RenderWindow* window) const {

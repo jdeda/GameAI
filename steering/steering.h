@@ -359,50 +359,31 @@ class Wander : Arrive
     /** Returns variable-matching steering output to achieve Wander. */
     inline SteeringOutput calculateAcceleration(const Kinematic& character, const Kinematic& notUsed) {
 
-        // Build target position.
+        // Build random values and target position.
         SteeringOutput output;
         Kinematic target;
         float randomBinomial = ((double)rand() / (RAND_MAX));
         float randomDirection = ((double)rand() / (RAND_MAX));
         if (randomDirection < 0.5) { randomBinomial *= -1; }
         float randomOrientation = mapToRange((randomBinomial * 100));
-        cout << "ORI: " << randomOrientation << endl;
         target.orientation = (randomBinomial * this->getWanderRate()) + randomOrientation;
-        cout << "ORI2: " << target.orientation << endl;
 
-        if (randomDirection < 0.5) { target.orientation *= -1; }
-        cout << "ORI2: " << target.orientation << endl;
+        // Init target position.
         auto vec = vmath::asVector(character.orientation);
         cout << "vec: " << vec.x << " " << vec.y << endl;
-
-        // auto flag = randomOrientation < 0 ? true : false;
-        // if (flag) {
-        //     target.position.x = (character.position.x + wanderOffset) * 1.f;
-        //     target.position.y = (character.position.y + wanderOffset) * 0.f;
-        // }
-        // else {
-        //     target.position.x = (character.position.x + wanderOffset) * 0.f;
-        //     target.position.y = (character.position.y + wanderOffset) * 1.f;
-        // }
-        // target.position.x = (character.position.x + wanderOffset) * vec.x;
-        // target.position.y = (character.position.y + wanderOffset) * vec.y;
+        target.position.x = (character.position.x + wanderOffset) * vec.x;
+        target.position.y = (character.position.y + wanderOffset) * vec.y;
         auto vecc = this->getWanderRadius() * vmath::asVector(target.orientation);
-        cout << "vecc: " << vecc.x << " " << vecc.y << endl;
-
         target.position.x += vecc.x;
         target.position.y += vecc.y;
 
-        cout << "BI: " << randomBinomial << endl;
-
-        // Target positions should never be negative (either fix with abs or hparams).
+        // Target position should never be negative (either fix with abs or hparams).
         target.position.x = abs(target.position.x);
         target.position.y = abs(target.position.y);
 
-        // Target positions should be made between 0 and ROW or COL.
-
         // Check if wander goes onto an invalid tile.
         cout << "target: " << target.position.x << " " << target.position.y << endl;
-        auto temp = mapToLevel(22, SIZE, target.position);
+        auto temp = mapToLevel(22, 29.0909, target.position);
         if (temp == Location(-1, -1)) {
             cout << "OH NO!" << endl;
             return SteeringOutput();
