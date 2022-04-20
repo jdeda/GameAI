@@ -382,19 +382,36 @@ class MonsterBehaviorTree
         }
     }
 
-    inline float makeRandom() {
-        return ((float)rand() / RAND_MAX) * 10.f;
+    inline float makeRandom(const Vector2f& p) {
+        int offset = 15;
+        int max = 0;
+        int min = 0;
+        if (p.x > p.y) {
+            max = p.x + offset;
+            min = p.y - offset;
+        }
+        else {
+            max = p.y + offset;
+            min = p.x - offset;
+        }
+        float x = float(rand() % (max - min + 1) + min);
+        return x;
     }
+
     inline Vector2f makeGuess(const Vector2f& p) {
-        float timer = 5;
-        Vector2f guessPosition(makeRandom(), makeRandom());
-        while (!(mapToLevel(22, 29.09, guessPosition) == Location(-1, -1))) {
-            guessPosition = Vector2f(makeRandom(), makeRandom());
-            timer += 0.1;
-            if (timer == 5) {
+        float timer = 0.0;
+        Vector2f guessPosition(makeRandom(p), makeRandom(p));
+        cout << "WTF: " << guessPosition.x << " " << guessPosition.y << endl;
+        while (mapToLevel(22, 29.0909, guessPosition) == Location(-1, -1)) {
+            guessPosition = Vector2f(makeRandom(p), makeRandom(p));
+            cout << "WTF: " << guessPosition.x << " " << guessPosition.y << endl;
+
+            if (timer > 5.0) {
                 return p;
             }
+            timer += 0.1;
         }
+        cout << "RAND: " << guessPosition.x << " " << guessPosition.y << endl;
         return guessPosition;
     }
     bool isChasing = false;
@@ -453,7 +470,9 @@ class MonsterBehaviorTree
                     // what if guess is bad
                     // handle index out of bounds.
                     Vector2f guessPosition = makeGuess(monster->getPosition());
+                    cout << "GP: " << guessPosition.x << " " << guessPosition.y << endl;
                     monster->moveTo(guessPosition);
+                    cout << "GP: " << monster->getPosition().x << " " << monster->getPosition().y << endl;
                     guessIteration += 1;
                     break;
                 }

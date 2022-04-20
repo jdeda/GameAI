@@ -145,9 +145,6 @@ void Visualizer() {
                 mpathSprite = Sprite(mpathTexture.getTexture());
             }
         }
-
-        cout << "POS: " << character->getPosition().x << " " << character->getPosition().y << endl;
-
         cout << "END" << endl << endl << endl;
         // Re-draw scene.
         sceneView.scene.clear(sf::Color{ 255,255,255,255 });

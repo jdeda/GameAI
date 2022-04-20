@@ -11,7 +11,7 @@ const int SCENE_WINDOW_Y = 640;
 const int SCENE_WINDOW_FR = 100;
 const int BOUND_BUFFER = 25;
 
-const float MAX_SPEED = 75.f;
+const float MAX_SPEED = 50.f;
 
 const float MAX_VELOCITY_POS = 75.f;
 const float MAX_VELOCITY_NEG = -75.f;
