@@ -365,12 +365,27 @@ class Wander : Arrive
         float randomBinomial = ((double)rand() / (RAND_MAX));
         float randomDirection = ((double)rand() / (RAND_MAX));
         if (randomDirection < 0.5) { randomBinomial *= -1; }
-        target.orientation = (randomBinomial * this->getWanderRate()) + character.orientation;
+        float randomOrientation = mapToRange((randomBinomial * 100));
+        cout << "ORI: " << randomOrientation << endl;
+        target.orientation = (randomBinomial * this->getWanderRate()) + randomOrientation;
+        cout << "ORI2: " << target.orientation << endl;
+
+        if (randomDirection < 0.5) { target.orientation *= -1; }
+        cout << "ORI2: " << target.orientation << endl;
         auto vec = vmath::asVector(character.orientation);
         cout << "vec: " << vec.x << " " << vec.y << endl;
 
-        target.position.x = (character.position.x + wanderOffset) * vec.x;
-        target.position.y = (character.position.y + wanderOffset) * vec.y;
+        // auto flag = randomOrientation < 0 ? true : false;
+        // if (flag) {
+        //     target.position.x = (character.position.x + wanderOffset) * 1.f;
+        //     target.position.y = (character.position.y + wanderOffset) * 0.f;
+        // }
+        // else {
+        //     target.position.x = (character.position.x + wanderOffset) * 0.f;
+        //     target.position.y = (character.position.y + wanderOffset) * 1.f;
+        // }
+        // target.position.x = (character.position.x + wanderOffset) * vec.x;
+        // target.position.y = (character.position.y + wanderOffset) * vec.y;
         auto vecc = this->getWanderRadius() * vmath::asVector(target.orientation);
         cout << "vecc: " << vecc.x << " " << vecc.y << endl;
 
