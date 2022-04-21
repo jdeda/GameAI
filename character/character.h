@@ -72,14 +72,58 @@ class Character
 	 * the sprite by setting its to the new kinematic position (and orientation) and updates
 	 * bread crumbs.
 	 */
-	void update(const SteeringOutput& steering, const float dt, const bool clip);
+	void update(const SteeringOutput& steering, const float dt, const bool clip) {
+		kinematic.update(steering, dt, clip);
+		sprite.setPosition(kinematic.position);
+		sprite.setRotation(kinematic.orientation);
 
+		// Update sprite.
+		if (crumb_drop_timer > 0) {
+			crumb_drop_timer -= 0.1f;
+		}
+		else {
+			crumb_drop_timer = 1.f;
+			breadcrumbs->at(crumb_idx).drop(kinematic.position);
+
+			if (crumb_idx < NUM_CRUMBS - 1) {
+				crumb_idx++;
+			}
+			else {
+				crumb_idx = 0;
+			}
+		}
+	}
 	/** Returns the breadcrumbs from the character. */
 	vector<Crumb>* getBreadCrumbs();
 
 	inline void stop() {
 		kinematic.angularVelocity = 0;
 		kinematic.linearVelocity = Vector2f(0.f, 0.f);
+	}
+
+	inline void moveTo(const Vector2f& p) {
+		kinematic.position = p;
+		kinematic.linearVelocity = Vector2f(0.f, 0.f);
+		kinematic.angularVelocity = 0.f;
+		kinematic.orientation = 0.f;
+		sprite.setPosition(p);
+		sprite.setRotation(0);
+
+		// Update sprite.
+		if (crumb_drop_timer > 0) {
+			crumb_drop_timer -= 0.1f;
+		}
+		else {
+			crumb_drop_timer = 1.f;
+			breadcrumbs->at(crumb_idx).drop(kinematic.position);
+
+			if (crumb_idx < NUM_CRUMBS - 1) {
+				crumb_idx++;
+			}
+			else {
+				crumb_idx = 0;
+			}
+		}
 	}
 };
 

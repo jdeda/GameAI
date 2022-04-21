@@ -56,21 +56,18 @@ Vector2f flip(const Vector2f& v);
 inline int getDirection(const Location& a, const Location& b) {
     // Asssume a and b are not same position.
     // Assume a and b are adjacent.
-    cout << "a: " << a.x << " " << a.y << endl;
-    cout << "b: " << b.x << " " << b.y << endl;
-    if(a.y + 1 == b.y) {
+    if (a.y + 1 == b.y) {
         return 1;
     }
-    if(a.x - 1 == b.x) {
+    if (a.x - 1 == b.x) {
         return 2;
     }
-    if(a.y - 1 == b.y) {
+    if (a.y - 1 == b.y) {
         return 3;
     }
-    if(a.x + 1 == b.x) { 
+    if (a.x + 1 == b.x) {
         return 4;
     }
-    cout << "GOD DAMMIT" << endl;
     // exit(69);
     return 0;
 }

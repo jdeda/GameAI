@@ -18,7 +18,7 @@
 using namespace sf;
 using namespace std;
 
-vector<Crumb>* initializeCharacterCrumbs() {
+vector<Crumb>* initializeCrumbs() {
     vector<Crumb>* crumbs = new vector<Crumb>();
     for (int i = 0; i < NUM_CRUMBS; i++) {
         crumbs->push_back(Crumb(i, Vector2f(SCENE_WINDOW_X / 2, SCENE_WINDOW_Y / 2)));
@@ -47,6 +47,29 @@ Character* initializeCharacter(vector<Crumb>* crumbs, Texture* texture) {
     return character;
 }
 
+Texture* initializeMonsterTexture() {
+    Texture* texture = new Texture;
+    texture->loadFromFile("assets/monster.png");
+    return texture;
+}
+
+Character* initializeMonster(vector<Crumb>* crumbs, Texture* texture) {
+    // float scale = 1.5 / SIZE;
+    float scale = 3 / SIZE;
+    Character* character = new Character(crumbs);
+    character->scale = scale;
+    character->texture = *texture;
+    character->sprite = *(new Sprite(*texture));
+    character->sprite.setScale(scale, scale);
+    // Vector2f start = mapToWindow(SIZE, Location(18, 18));
+    Vector2f start = mapToWindow(SIZE, Location(14, 14));
+    Kinematic initialState;
+    initialState.position = start;
+    character->setKinematic(initialState);
+    character->update(SteeringOutput(), 0, true);
+    return character;
+}
+
 RenderTexture* generateLevelTexture(const Level& level) {
     RenderTexture* levelTexture = new RenderTexture;
     levelTexture->create(SCENE_WINDOW_X, SCENE_WINDOW_Y);
@@ -55,7 +78,6 @@ RenderTexture* generateLevelTexture(const Level& level) {
     for (int i = 0; i < level.rows; i++) {
         for (int j = 0; j < level.cols; j++) {
             levelTexture->draw(levelSFML[i][j]);
-
         }
     }
     levelTexture->display();

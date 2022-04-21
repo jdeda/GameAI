@@ -49,28 +49,6 @@ void Character::setKinematic(Kinematic kinematic) {
 	this->kinematic = kinematic;
 }
 
-void Character::update(const SteeringOutput& steering, const float dt, const bool clip) {
-	kinematic.update(steering, dt, clip);
-	sprite.setPosition(kinematic.position);
-	sprite.setRotation(kinematic.orientation);
-
-	// Update sprite.
-	if (crumb_drop_timer > 0) {
-		crumb_drop_timer -= 0.1f;
-	}
-	else {
-		crumb_drop_timer = 1.f;
-		breadcrumbs->at(crumb_idx).drop(kinematic.position);
-
-		if (crumb_idx < NUM_CRUMBS - 1) {
-			crumb_idx++;
-		}
-		else {
-			crumb_idx = 0;
-		}
-	}
-}
-
 vector<Crumb>* Character::getBreadCrumbs() {
 	return breadcrumbs;
 }
