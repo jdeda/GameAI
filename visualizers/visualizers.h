@@ -32,19 +32,28 @@ inline bool closeEnough(const Vector2f& v1, const Vector2f& v2) {
     float satisfaction = (SIZE / 2.f) / 4.f;
     bool xSatisfied = (v1.x <= v2.x + satisfaction) && (v1.x >= v2.x - satisfaction);
     bool ySatisfied = (v1.y <= v2.y + satisfaction) && (v1.y >= v2.y - satisfaction);
-    // cout << "s: " << satisfaction << endl;
-    // cout << "v1: " << v1.x << " " << v1.y << endl;
-    // cout << "v2: " << v2.x << " " << v2.y << endl;
     return xSatisfied && ySatisfied;
 }
 
+/** c1=monster*/
 inline bool snatched(Character* c1, Character* c2) {
-    auto a = c1->getLocation();
+    auto a1 = c1->getLocation();
+    a1.x += 1;
+    a1.y += 1;
+    auto a2 = a1;
+    a2.y -=  1;
     auto b = c2->getLocation();
-    cout << "SNATCHED? " << endl;
-    cout << a.x << " " << a.y << endl;
-    cout << b.x << " " << b.y << endl << endl;
-    return a == b;
+    // cout << "SNATCHED? " << endl;
+    // cout << a1.x << " " << a1.y << endl;
+    // cout << a2.x << " " << a2.y << endl;
+    // cout << b.x << " " << b.y << endl << endl;
+    return (a1 == b) || (a2 == b);
 }
 
+inline float distance(Character* character, Character* monster) {
+    auto a = character->getPosition();
+    auto b = monster->getPosition();
+    auto d = sqrt(pow(b.x - a.x, 2) + pow(b.y - a.y, 2));
+    return d;
+}
 #endif

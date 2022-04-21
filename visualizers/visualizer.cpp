@@ -88,6 +88,11 @@ void Visualizer() {
             }
         }
 
+        // Check if monster is close.
+        if(distance(character, monster) < 300) {
+            *monsterClose = true;
+        }
+
         // DecisionTree makes decision.
         characterTree.makeDecision();
 
@@ -118,7 +123,6 @@ void Visualizer() {
             }
         }
 
-        cout << "START" << endl;
         // Behavior tree makes decision.
         monsterTree.run();
 
@@ -145,8 +149,8 @@ void Visualizer() {
                 mpathSprite = Sprite(mpathTexture.getTexture());
             }
         }
-        cout << "END" << endl << endl << endl;
 
+        cout << "\n\n";
 
         if (snatched(monster, character)) {
             // Recreate assests.

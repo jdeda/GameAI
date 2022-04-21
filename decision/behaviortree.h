@@ -188,6 +188,7 @@ class MonsterBehaviorTree
     bool guessPause = false;
 
     public:
+    bool isChasing = false;
     inline MonsterAction generateAction(MonsterAction decision) {
         MonsterAction newDecision = decision;
         while (newDecision != decision) {
@@ -197,31 +198,36 @@ class MonsterBehaviorTree
     }
 
     inline bool setupChasing(MonsterAction decision) {
+        // cout << "CHASE IT:  " <<  chasingIteration << endl;
         // If been chasing long enough, pause momentarily from taking chasing action again.
         if (chasingPause == true) {
+            // cout << "YES" << endl;
+            // cout << "CPAUSE IT: " << chasingPauseIteration << endl;
             if (chasingPauseIteration > 50) {
                 chasingPauseIteration = 0;
                 chasingPause = false;
                 return true;
             }
             else {
-                return false;
                 chasingPauseIteration += 1;
+                return false;
             }
         }
 
         // If been chasing long enough, do nothing and pause momentarily from taking chasing action again.
         if (decision == chasing && chasingIteration > 200) {
+            chasingIteration = 0;
+            isChasing = false;
             chasingPause = true; // TODO: Set location or arrive to nearest square.
             return true;
         }
+        
 
         // If first iteration of chasingIteration, find path.
         if (decision == chasing && chasingIteration == 0) {
-            cout << "YEP" << endl;
+            // cout << "YEP" << endl;
+            // isChasing = true;
             if (monster->getLocation() == Location(-1, -1)) {
-                cout << "HOLY SHIT" << endl;
-
                 auto p = monster->getPosition();
 
                 auto p1 = p;
@@ -253,38 +259,22 @@ class MonsterBehaviorTree
                 neighbors.push_back(p7);
                 neighbors.push_back(p8);
 
-                // TODO: Get closest one!
-                // cout << "CHECK IT" << endl;
-                // for (const auto& neighbor : neighbors) {
-                //     auto v = mapToLevel(22, 29.0909, neighbor);
-                //     cout << neighbor.x << " " << neighbor.y << endl;
-                //     cout << v.x << " " << v.y << endl << endl;
-                // }
-                // cout << endl;
-
-
-                // cout << monster->getLocation().x << " " << monster->getLocation().y << endl;
-                // cout << p.x << " " << p.y << endl;
                 bool found = false;
                 for (const auto& neighbor : neighbors) {
                     auto v = mapToLevel(22, 29.0909, neighbor);
                     if (!(v == Location(-1, -1))) {
                         found = true;
                         monster->moveTo(neighbor);
-                        cout << "WOAH" << endl;
                     }
                 }
                 if (!found) {
-                    cout << "FUCK" << endl;
                     exit(99);
                 }
             }
-            cout << "OK" << endl;
             search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
             path = search->search();
-            path.print();
+            // path.print();
             pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
-            cout << "DIDN'T GET HERE" << endl;
         }
 
         // If chasingIteration has complete, reset count. TODO: Probably bad way to do this.
@@ -292,13 +282,12 @@ class MonsterBehaviorTree
             chasingIteration = 0;
             monster->stop();
             isChasing = false;
-            cout << "STOPPED" << endl;
         }
         return true;
     }
 
     inline bool setupWandering() {
-        if (wanderIteration > 200) {
+        if (wanderIteration > 100) {
             wanderIteration = 0;
             wanderPause = true; // TODO: Set location or arrive to nearest square.
             return true;
@@ -311,7 +300,7 @@ class MonsterBehaviorTree
             );
             search = new AStar(graph, monster->getLocation(), monster->getLocation(), CustomHeuristic(monster->getLocation()));
             path = search->search();
-            path.print();
+            // path.print();
             pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
         }
 
@@ -330,6 +319,7 @@ class MonsterBehaviorTree
     inline void preCheck(MonsterAction decision) {
         if (lastDecision == chasing && decision != chasing) {
             chasingIteration = 0;
+            chasingPauseIteration= 0;
             monster->stop();
             isChasing = false;
         }
@@ -353,81 +343,87 @@ class MonsterBehaviorTree
         switch (decision) {
             case chasing:
                 {
-                    cout << "YAY 1" << endl;
                     auto status = setupChasing(decision);
-                    cout << "DAMMIT" << endl;
                     return status ? decision : generateAction(decision);
                 }
             case wandering:
                 {
-                    cout << "YAY 2" << endl;
                     auto status = setupWandering();
-                    cout << "DAMMIT" << endl;
                     return decision;
                 }
             case guessing:
                 {
-                    cout << "YAY 3" << endl;
                     auto status = setupGuessing();
-                    cout << "DAMMIT" << endl;
                     return decision;
 
                 }
             default:
                 {
-                    cout << "YAY 4" << endl;
                     return decision;
-                    cout << "DAMMIT" << endl;
                 }
         }
     }
 
     inline float makeRandom(const Vector2f& p) {
+        // int offset = 15;
+        // int max = 600 - offset;
+        // int min = 30 + offset;
+        // if (p.x > p.y) {
+        //     max = p.x + offset;
+        //     min = p.y - offset;
+        // }
+        // else {
+        //     max = p.y + offset;
+        //     min = p.x - offset;
+        // }
+        // float x = float(rand() % (max - min + 1) + min);
+        // return x;
+
+        // int max = 600;
+        // int min = 30;
+        // float x = float(rand() % (max - min + 1) + min);
+        // return x;
+
         int offset = 15;
-        int max = 0;
-        int min = 0;
-        if (p.x > p.y) {
+        int max = SCENE_WINDOW_X - offset; // Global.
+        int min = SCENE_WINDOW_X + offset;
+        if (p.x > p.y) { // Localize to p with some offset.
             max = p.x + offset;
             min = p.y - offset;
         }
-        else {
+        else { // Localize to p with some offset.
             max = p.y + offset;
             min = p.x - offset;
         }
         float x = float(rand() % (max - min + 1) + min);
         return x;
+
+
+        // float x = float(rand() % (max - min + 1) + min);
     }
 
     inline Vector2f makeGuess(const Vector2f& p) {
         float timer = 0.0;
         Vector2f guessPosition(makeRandom(p), makeRandom(p));
-        cout << "WTF: " << guessPosition.x << " " << guessPosition.y << endl;
         while (mapToLevel(22, 29.0909, guessPosition) == Location(-1, -1)) {
             guessPosition = Vector2f(makeRandom(p), makeRandom(p));
-            cout << "WTF: " << guessPosition.x << " " << guessPosition.y << endl;
-
             if (timer > 5.0) {
                 return p;
             }
             timer += 0.1;
         }
-        cout << "RAND: " << guessPosition.x << " " << guessPosition.y << endl;
         return guessPosition;
     }
-    bool isChasing = false;
 
     MonsterBehaviorTree(const Graph& graph_, Character* character_, Character* monster_, float* dt_);
 
     inline void run() {
-        cout << "K." << endl;
         auto decision = setupAction(root->run());
-        cout << "K..." << endl;
         lastDecision = decision;
         switch (decision) {
             case chasing:
                 {
                     cout << "CHASING" << endl;
-                    isChasing = true;
                     SteeringOutput pathAccelerations = pathFollowing->calculateAcceleration(monster->getKinematic(), Kinematic());
                     if (pathAccelerations.linearAcceleration == Vector2f(-1.f, -1.f)) {
                         monster->stop();
@@ -470,9 +466,7 @@ class MonsterBehaviorTree
                     // what if guess is bad
                     // handle index out of bounds.
                     Vector2f guessPosition = makeGuess(monster->getPosition());
-                    cout << "GP: " << guessPosition.x << " " << guessPosition.y << endl;
                     monster->moveTo(guessPosition);
-                    cout << "GP: " << monster->getPosition().x << " " << monster->getPosition().y << endl;
                     guessIteration += 1;
                     break;
                 }
@@ -488,13 +482,5 @@ class MonsterBehaviorTree
 
     inline Path getPath() { return path; }
 };
-
-// TODO: Run inadmissible heuristic every time because character moves. 
-       // You could adjust this to only recalibrate when character has changed an entire square (or two).
-       // monster->stop();
-       // search = new AStar(graph, monster->getLocation(), character->getLocation(), CustomHeuristic(character->getLocation()));
-       // path = search->search();
-       // path.print();
-       // pathFollowing = new FollowPath(path, PATH_OFFSET, 0, PREDICTION_TIME, TIME_TO_REACH_TARGET_SPEED, RADIUS_OF_ARRIVAL, RADIUS_OF_DECELERATION, MAX_SPEED);
 
 #endif
