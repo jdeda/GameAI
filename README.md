@@ -77,7 +77,7 @@ As previously explained, there are three directories, each which visualize diffe
 Once any of the programs are  built, run `./main` to run the program. `main` is the exectuable for each program. The program takes user input, and even user control, so read below for details.
 
 ## 🕹 Interacting with the Programs
-This is the fun part. Everything is pretty intuitive.
+Each program will prompt you to respond in some manner (terminal command and or using your mouse cursor position or clicking), which should all be pretty intuitive.
 
 ## 🔧 Status of Project
 This project is permanently archived.
