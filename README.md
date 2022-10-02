@@ -1,6 +1,6 @@
 # Game AI
 
-<img src="https://github.com/jdeda/GameAI/blob/main/images/banner_gameAI_01.png" alt="drawing" width="800"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/banner_gameAI_01.png" alt="drawing" width="800"/>
 
 
 # Welcome to GameAI!
