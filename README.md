@@ -8,18 +8,18 @@ This program visualizes many fundamental algorithms of Game AI. Game AI is broke
 
 Table
 - [Game AI](#game-ai)
-- [Welcome to GameAI!](#welcome-to-gameai)
-  - [📦 Environment and Dependencies](#📦environment-and-dependencies)
-  - [🛠 Setting up Environment](#🛠setting-up-environment)
-    - [1. Creating the VM](#1-creating-the-vm)
-    - [2. Connecting to the VM](#2-connecting-to-the-vm)
-    - [3. Setting up XQuartz](#3-setting-up-xquartz)
-    - [4. Setting up OpenGL](#4-setting-up-opengl)
-    - [5. Setting up SFML](#5-setting-up-sfml)
-  - [🔨Building the Programs](#🔨building-the-programs)
-  - [&#129302; Running the Programs](#129302-running-the-programs)
-  - [🕹 Interacting with the Program](#🕹interacting-with-the-program)
-  - [🔧 Status of Project](#🔧status-of-project)
+- [Welcome to GameAI!](#welcome-to-gameai-)
+  * [📦 Environment and Dependencies](#---environment-and-dependencies)
+  * [🛠 Setting up Environment](#---setting-up-environment)
+    + [1. Creating the VM](#1-creating-the-vm)
+    + [2. Connecting to the VM](#2-connecting-to-the-vm)
+    + [3. Setting up XQuartz](#3-setting-up-xquartz)
+    + [4. Setting up OpenGL](#4-setting-up-opengl)
+    + [5. Setting up SFML](#5-setting-up-sfml)
+  * [🔨Building the Programs](#--building-the-programs)
+  * [&#129302; Running the Programs](#--129302--running-the-programs)
+  * [🕹 Interacting with the Program](#---interacting-with-the-program)
+  * [🔧 Status of Project](#---status-of-project)
 
 
 ## 📦 Environment and Dependencies
