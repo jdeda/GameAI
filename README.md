@@ -7,16 +7,16 @@
 This program visualizes many fundamental algorithms of Game AI. Game AI is broken into three categories: movement, pathfinding, and decision making. This includes cannonical algorithms such as Arrive, Align, A*, and Behavior Trees. All algorithms are based upon the [AI for Games III Edition.](https://www.amazon.com/AI-Games-Third-Ian-Millington/dp/1138483974/ref=pd_lpo_1?pd_rd_i=1138483974&psc=1) Each and everyone of these algorithms have been implemented from scratch and visualized using [SFML.](https://www.sfml-dev.org/)
 
 
-  - [Setting up Environment](#setting-up-environment)
-  - [🔨Building the Programs](#🔨building-the-programs)
-  - [&#129302; Running the Programs](#129302-running-the-programs)
-  - [🕹 Interacting with the Program](#🕹interacting-with-the-program)
-  - [🔧 Status of Project](#🔧status-of-project)
+  - [:package: Setting up Environment](#setting-up-environment)
+  - [:hammer: Building the Programs](#building-the-programs)
+  - [:robot: Running the Programs](#running-the-programs)
+  - [:joystick: Interacting with the Program](#interacting-with-the-program)
+  - [:wrench: Status of Project](#status-of-project)
 
 
 <hr>
 
-## Setting up Environment
+## :package: Setting up Environment
 Unfournantely, this one is a bit lengthy, so I'll try to keep it short. I could have created a script, but one may run into issues so I decided to write a guide instead.
 
 **1. Creating the VM**
@@ -75,7 +75,7 @@ Simply run `sudo apt -y install build-essential libsfml-dev` in your VM. By this
 ## 🔨Building the Programs
 As previously explained, there are three directories, each which visualize different categories of AI algorithms. Each directory however follows the same build process. Simply run `./build.sh` to build the program and run it. Alternatively you can call `make` to build it. Note, if you change a header file you must call `make clean` as "make" will not pickup the dependency change!
 
-## &#129302; Running the Programs
+## 🤖 Running the Programs
 Once any of the programs are  built, run `./main` to run the program. `main` is the exectuable for each program. The program takes user input, and even user control, so read below for details.
 
 ## 🕹 Interacting with the Program
