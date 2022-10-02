@@ -6,7 +6,7 @@
 ## Welcome to GameAI!
 This program visualizes many fundamental algorithms of Game AI. Game AI is broken into three categories: movement, pathfinding, and decision making. This includes cannonical algorithms such as Arrive, Align, A*, and Behavior Trees. All algorithms are based upon the [AI for Games III Edition.](https://www.amazon.com/AI-Games-Third-Ian-Millington/dp/1138483974/ref=pd_lpo_1?pd_rd_i=1138483974&psc=1) Each and everyone of these algorithms have been implemented from scratch and visualized using [SFML.](https://www.sfml-dev.org/)
   - [:package: Setting up Environment](#user-content-package-setting-up-environment)
-  - [:hammer: Building the Programs](#user-content-hammer-building-the-programs)
+  - [:hammer: Building the Programs](#user-content-building-the-programs)
   - [:robot: Running the Programs](#user-content--running-the-programs)
   - [:joystick: Interacting with the Program](#user-content--interacting-with-the-programs)
   - [:wrench: Status of Project](#user-content--status-of-project)
