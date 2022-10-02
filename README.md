@@ -9,22 +9,19 @@ This program visualizes many fundamental algorithms of Game AI. Game AI is broke
 - [Game AI](#game-ai)
   - [Welcome to GameAI!](#welcome-to-gameai)
   - [🛠 Setting up Environment](#🛠setting-up-environment)
-    - [1. Creating the VM](#1-creating-the-vm)
-    - [2. Connecting to the VM](#2-connecting-to-the-vm)
-    - [3. Setting up XQuartz](#3-setting-up-xquartz)
-    - [4. Setting up OpenGL](#4-setting-up-opengl)
-    - [5. Setting up SFML](#5-setting-up-sfml)
   - [🔨Building the Programs](#🔨building-the-programs)
   - [&#129302; Running the Programs](#129302-running-the-programs)
   - [🕹 Interacting with the Program](#🕹interacting-with-the-program)
   - [🔧 Status of Project](#🔧status-of-project)
+
 
 <hr>
 
 ## 🛠 Setting up Environment
 Unfournantely, this one is a bit lengthy, so I'll try to keep it short. I could have created a script, but one may run into issues so I decided to write a guide instead.
 
-### 1. Creating the VM
+**1. Creating the VM**
+
 Install multipass, init and launch a VM:
 1. `brew install multipass`
 2. `multipass launch -n gameai -c 4 -m 8G -d 20G`
@@ -35,7 +32,8 @@ with usage of 4 CPU cores, 8G memory, 20G disk.
 
 After running the third commmand you should see your VM running. We'll use that IP address to connect to the VM later.
 
-### 2. Connecting to the VM
+**2. Connecting to the VM**
+
 We first must create an SSH key pair. You need to copy your ssh public key into the VM and add it to the authorized_keys file.
 ```
 multipass transfer ~/.ssh/id_rsa.pub gameai:.ssh/id_rsa.pub
@@ -46,7 +44,9 @@ rm id_rsa.pub
 exit
 ```
 Now you should be able to connect to your VM via something like `ssh -Y ubuntu@192.168.64.2`, with that those numbers being the IP of your VM. 
-### 3. Setting up XQuartz
+
+**3. Setting up XQuartz**
+
 Make sure you download XQuartz and launch it. This will allow X11 forwarding to your VM. Run the following commands in your VM:
 ```
 sudo apt update && sudo apt -y upgrade;
@@ -54,7 +54,8 @@ sudo apt install x11-apps;
 xeyes;
 ```
 
-### 4. Setting up OpenGL
+**4. Setting up OpenGL**
+
 SFML, the graphics library used for this prorgam uses OpenGL. Out the box there can be some issues getting it to work. We can fix those easily.
 1. OpenGL Profile Error
     1. add `export LIBGL_ALWAYS_INDIRECT=1` on your host machine to your `~/bashrc` file
@@ -67,7 +68,7 @@ SFML, the graphics library used for this prorgam uses OpenGL. Out the box there 
 3. Restart XQuartz and things should be working
 4. Go into VM and run `glxgears` and you should get 3 colored gears rotating
 
-### 5. Setting up SFML
+**5. Setting up SFML**
 Simply run `sudo apt -y install build-essential libsfml-dev` in your VM. By this point, everything should be running.
 
 <hr>
