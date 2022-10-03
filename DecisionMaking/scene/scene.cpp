@@ -11,7 +11,7 @@ SceneView::SceneView(int w, int h, int fps) {
 	frames = fps;
 
 	// Create empty scene.
-	scene.create(VideoMode(width, height), "CSC484");
+    scene.create(VideoMode(width, height), "GameAI - PathPlanning");
 	scene.setFramerateLimit(frames);
 }
 

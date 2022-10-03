@@ -1,7 +1,10 @@
 #!/bin/sh
-# Makes andruns.
+# Cleans, makes, runs.
 
 clear;
+printf "\n%s\n" "Cleaning..."
+make clean;
+
 printf "\n%s\n" "Making..."
 make;
 

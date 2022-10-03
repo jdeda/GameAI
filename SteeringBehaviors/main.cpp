@@ -210,7 +210,7 @@ class SceneView
 			frames = fps;
 
 			// Create empty scene.
-			scene.create(VideoMode(width, height), "CSC484");
+            scene.create(VideoMode(width, height), "GameAI - SteeringBehaviors");
 			scene.setFramerateLimit(frames);
 
 			// Set corners.
