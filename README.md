@@ -14,6 +14,13 @@ This program visualizes many fundamental algorithms of Game AI. Game AI is broke
 
 <hr>
 
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/move_01.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/move_02.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/maze_01.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/maze_02.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/maze_03.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/level_01.png" alt="drawing" width="500"/>
+<img src="https://github.com/jdeda/GameAI/blob/master/assets/level_02.png" alt="drawing" width="500"/>
 
 ## :package: Setting up Environment
 Unfournantely, this one is a bit lengthy, so I'll try to keep it short. I could have created a script, but one may run into issues so I decided to write a guide instead.
