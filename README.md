@@ -14,6 +14,7 @@ This program visualizes many fundamental algorithms of Game AI. Game AI is broke
 
 <hr>
 
+
 ## :package: Setting up Environment
 Unfournantely, this one is a bit lengthy, so I'll try to keep it short. I could have created a script, but one may run into issues so I decided to write a guide instead.
 
